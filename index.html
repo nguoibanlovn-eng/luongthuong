@@ -457,10 +457,10 @@
       </div>
 
       <div class="field-group">
-        <label class="field-label">Điểm hòa vốn (theo cấu hình đang nhập)</label>
+        <label class="field-label">Điểm hòa vốn (preview theo cấu hình đang nhập)</label>
         <input id="breakevenDisplay" type="text" class="field-input" readonly />
         <div class="field-sub">
-          Doanh thu cần đạt để lợi nhuận = 0 (chỉ đủ bù chi phí). Chỉ là preview khi anh chỉnh, chưa lưu.
+          Doanh thu cần đạt để lợi nhuận = 0 (chỉ đủ bù chi phí). Đây là preview, bấm “Lưu cấu hình team” để áp dụng.
         </div>
       </div>
 
@@ -497,7 +497,7 @@
       </div>
 
       <!-- Tổng hợp tất cả team -->
-      <div class="panel" id="multiTeamPanel">
+      <div class="panel">
         <div class="panel-title">
           <span>Tổng quan tất cả team (Mốc 3 – thực tế)</span>
         </div>
@@ -535,11 +535,32 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    const STORAGE_KEY = 'plan_thuong_teams_v4';
+    // ===== Helpers =====
+    function formatMoney(value) {
+      if (!isFinite(value)) return '–';
+      return value.toLocaleString('vi-VN', { maximumFractionDigits: 0 });
+    }
 
-    const DEFAULT_TARGETS = [
-      800000000, 1200000000, 3000000000
-    ];
+    function formatPercent(value) {
+      if (!isFinite(value)) return '–';
+      return value.toLocaleString('vi-VN', { maximumFractionDigits: 1 }) + '%';
+    }
+
+    function parseMoney(str) {
+      const digits = String(str || '').replace(/\D/g, '');
+      return digits ? parseInt(digits, 10) : 0;
+    }
+
+    function formatMoneyInput(el) {
+      const num = parseMoney(el.value);
+      el.value = num ? num.toLocaleString('vi-VN') : '';
+      return num;
+    }
+
+    // ===== Data & defaults =====
+    const STORAGE_KEY = 'plan_thuong_teams_v5';
+
+    const DEFAULT_TARGETS = [800000000, 1200000000, 3000000000];
 
     const DEFAULT_TEAMS = {
       facebook: {
@@ -603,7 +624,7 @@
     let teams = {};
     let currentTeamId = 'facebook';
 
-    // DOM refs - left
+    // ===== DOM refs – left =====
     const teamSelect = document.getElementById('teamSelect');
     const addTeamBtn = document.getElementById('addTeamBtn');
     const teamNameInput = document.getElementById('teamNameInput');
@@ -622,31 +643,11 @@
     const saveTeamBtn = document.getElementById('saveTeamBtn');
     const resetTeamBtn = document.getElementById('resetTeamBtn');
 
-    // DOM refs - right
+    // ===== DOM refs – right =====
     const teamsOverviewContainer = document.getElementById('teamsOverviewContainer');
     const allTeamsBody = document.getElementById('allTeamsBody');
 
-    function formatMoney(value) {
-      if (!isFinite(value)) return '–';
-      return value.toLocaleString('vi-VN', { maximumFractionDigits: 0 });
-    }
-
-    function formatPercent(value) {
-      if (!isFinite(value)) return '–';
-      return value.toLocaleString('vi-VN', { maximumFractionDigits: 1 }) + '%';
-    }
-
-    function parseMoney(str) {
-      const digits = String(str || '').replace(/\D/g, '');
-      return digits ? parseInt(digits, 10) : 0;
-    }
-
-    function normalizeMoneyInput(el) {
-      const num = parseMoney(el.value);
-      el.value = num ? num.toLocaleString('vi-VN') : '';
-      return num;
-    }
-
+    // ===== State load/save =====
     function loadState() {
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
@@ -656,13 +657,15 @@
         }
         const data = JSON.parse(raw);
         teams = data.teams || { ...DEFAULT_TEAMS };
+        currentTeamId = data.currentTeamId || 'facebook';
+
         // đảm bảo mỗi team có targets 3 phần tử
         Object.values(teams).forEach(t => {
           if (!Array.isArray(t.targets)) t.targets = [...DEFAULT_TARGETS];
           while (t.targets.length < 3) t.targets.push(0);
-          if (t.targets.length > 3) t.targets = t.targets.slice(0,3);
+          if (t.targets.length > 3) t.targets = t.targets.slice(0, 3);
         });
-        currentTeamId = data.currentTeamId || 'facebook';
+
         if (!teams[currentTeamId]) {
           currentTeamId = Object.keys(teams)[0] || 'facebook';
         }
@@ -680,6 +683,7 @@
       } catch (e) {}
     }
 
+    // ===== Logic =====
     function renderTeamOptions() {
       teamSelect.innerHTML = '';
       Object.values(teams).forEach(team => {
@@ -705,6 +709,7 @@
     function renderCurrentTeamConfig() {
       const team = teams[currentTeamId];
       if (!team) return;
+
       teamNameInput.value = team.name || '';
       fixedCostInput.value = team.fixedCost ? team.fixedCost.toLocaleString('vi-VN') : '';
       cogsRateInput.value = team.cogsRate != null ? team.cogsRate : '';
@@ -716,10 +721,8 @@
       hcnsBonusRateInput.value = team.hcnsBonusRate != null ? team.hcnsBonusRate : '';
       mediaBonusRateInput.value = team.mediaBonusRate != null ? team.mediaBonusRate : '';
 
-      // preview hòa vốn
-      const fixed = team.fixedCost || 0;
       const breakeven = calcBreakevenFromValues(
-        fixed,
+        team.fixedCost || 0,
         team.cogsRate || 0,
         team.sellRate || 0,
         team.otherRate || 0
@@ -736,14 +739,15 @@
       breakevenDisplay.value = breakeven > 0 ? formatMoney(breakeven) : 'Không xác định';
     }
 
-    function computeTeamRows(team) {
-      const tTargets = team.targets || [0,0,0];
+    function computeTeamMetrics(team) {
+      const targets = team.targets || [0, 0, 0];
       const labels = ['Mốc 1', 'Mốc 2', 'Mốc 3 (thực tế)'];
 
       const varRateDecimal = ((team.cogsRate || 0) + (team.sellRate || 0) + (team.otherRate || 0)) / 100;
       const fixed = team.fixedCost || 0;
 
-      const denom = 1 - varRateDecimal;
+      const totalVarRate = (team.cogsRate || 0) + (team.sellRate || 0) + (team.otherRate || 0);
+      const denom = 1 - totalVarRate / 100;
       const breakeven = denom > 0 ? fixed / denom : NaN;
 
       const saleBonusRate = team.saleBonusRate || 0;
@@ -753,21 +757,18 @@
       const mediaBonusRate = team.mediaBonusRate || 0;
 
       const rows = [];
-      let m3Info = {
-        revenue: tTargets[2] || 0,
-        profit: 0,
-        totalBonus: 0
-      };
+      let m3 = { revenue: targets[2] || 0, profit: 0, totalBonus: 0 };
 
       for (let i = 0; i < 3; i++) {
-        const revenue = tTargets[i] || 0;
-        if (!revenue || revenue <= 0) {
+        const revenue = targets[i] || 0;
+        if (!revenue) {
           rows.push(null);
           continue;
         }
+
         const totalCost = revenue * varRateDecimal + fixed;
         const profit = revenue - totalCost;
-        const margin = revenue > 0 ? profit / revenue * 100 : 0;
+        const margin = revenue > 0 ? (profit / revenue) * 100 : 0;
 
         const saleBonus = profit > 0 ? profit * (saleBonusRate / 100) : 0;
         const rdBonus = profit > 0 ? profit * (rdBonusRate / 100) : 0;
@@ -776,7 +777,7 @@
         const mediaBonus = profit > 0 ? profit * (mediaBonusRate / 100) : 0;
 
         const totalBonus = saleBonus + rdBonus + cskhBonus + hcnsBonus + mediaBonus;
-        const bonusOnProfit = profit > 0 ? totalBonus / profit * 100 : 0;
+        const bonusOnProfit = profit > 0 ? (totalBonus / profit) * 100 : 0;
 
         const row = {
           label: labels[i],
@@ -795,7 +796,7 @@
         rows.push(row);
 
         if (i === 2) {
-          m3Info = {
+          m3 = {
             revenue,
             profit,
             totalBonus
@@ -803,15 +804,16 @@
         }
       }
 
-      return { breakeven, rows, m3Info };
+      return { breakeven, rows, m3 };
     }
 
     function renderTeamsOverview() {
       teamsOverviewContainer.innerHTML = '';
 
       Object.values(teams).forEach(team => {
-        const { breakeven, rows, m3Info } = computeTeamRows(team);
-        const teamTargets = team.targets || [0,0,0];
+        const { breakeven, rows, m3 } = computeTeamMetrics(team);
+        const labels = ['Mốc 1', 'Mốc 2', 'Mốc 3 (thực tế)'];
+        const targets = team.targets || [0, 0, 0];
 
         const block = document.createElement('div');
         block.className = 'team-block';
@@ -832,8 +834,7 @@
         header.appendChild(toggleBtn);
         block.appendChild(header);
 
-        // targets
-        const labels = ['Mốc 1', 'Mốc 2', 'Mốc 3 (thực tế)'];
+        // targets inputs
         const targetsRow = document.createElement('div');
         targetsRow.className = 'target-inputs';
 
@@ -848,13 +849,13 @@
           const input = document.createElement('input');
           input.type = 'text';
           input.inputMode = 'numeric';
-          const v = teamTargets[i] || 0;
+          const v = targets[i] || 0;
           input.value = v ? v.toLocaleString('vi-VN') : '';
 
           input.addEventListener('input', () => {
             const num = parseMoney(input.value);
             input.value = num ? num.toLocaleString('vi-VN') : '';
-            if (!Array.isArray(team.targets)) team.targets = [0,0,0];
+            if (!Array.isArray(team.targets)) team.targets = [0, 0, 0];
             team.targets[i] = num;
             saveState();
             recalc();
@@ -878,9 +879,8 @@
           `<div class="summary-value">${breakeven > 0 ? formatMoney(breakeven) : '–'}</div>` +
           '<div class="small">Doanh thu cần để lãi = 0.</div>`;
 
-        const marginText = (m3Info.revenue > 0 && isFinite(m3Info.profit))
-          ? formatPercent(m3Info.profit / m3Info.revenue * 100)
-          : '–';
+        const marginText =
+          m3.revenue > 0 ? formatPercent((m3.profit / m3.revenue) * 100) : '–';
 
         const card2 = document.createElement('div');
         card2.className = 'summary-card';
@@ -893,18 +893,16 @@
         card3.className = 'summary-card';
         card3.innerHTML =
           '<div class="summary-title">Tổng thưởng tại Mốc 3</div>' +
-          `<div class="summary-value">${m3Info.totalBonus > 0 ? formatMoney(m3Info.totalBonus) : '–'}</div>` +
-          '<div class="small">Sale + RD + CSKH + KT+HCNS + Media (chỉ khi LN &gt; 0).</div>';
+          `<div class="summary-value">${m3.totalBonus > 0 ? formatMoney(m3.totalBonus) : '–'}</div>` +
+          '<div class="small">Sale + RD + CSKH + KT+HCNS + Media (chỉ khi LN > 0).</div>';
 
         summaryGrid.appendChild(card1);
         summaryGrid.appendChild(card2);
         summaryGrid.appendChild(card3);
-
         block.appendChild(summaryGrid);
 
-        // chi tiết bảng
+        // detail table
         const detailWrapper = document.createElement('div');
-
         const tableWrapper = document.createElement('div');
         tableWrapper.className = 'table-wrapper';
 
@@ -1024,13 +1022,13 @@
       let sumMediaBonus = 0;
 
       Object.values(teams).forEach(team => {
-        const { rows } = computeTeamRows(team);
-        const m3Row = rows[2]; // Mốc 3
-
-        const revenue = team.targets && team.targets[2] ? team.targets[2] : 0;
+        const metrics = computeTeamMetrics(team);
+        const m3Row = metrics.rows[2]; // Mốc 3
+        const revenue = (team.targets && team.targets[2]) || 0;
 
         const varRateDecimal = ((team.cogsRate || 0) + (team.sellRate || 0) + (team.otherRate || 0)) / 100;
         const fixed = team.fixedCost || 0;
+
         const totalCost = revenue * varRateDecimal + fixed;
         const profit = revenue - totalCost;
 
@@ -1063,10 +1061,10 @@
         tdName.style.textAlign = 'left';
 
         const tdRev = document.createElement('td');
-        tdRev.textContent = revenue > 0 ? formatMoney(revenue) : (m3Row ? formatMoney(m3Row.revenue) : '–');
+        tdRev.textContent = revenue ? formatMoney(revenue) : (m3Row ? formatMoney(m3Row.revenue) : '–');
 
         const tdProfit = document.createElement('td');
-        tdProfit.textContent = revenue > 0 ? formatMoney(profit) : (m3Row ? formatMoney(m3Row.profit) : '–');
+        tdProfit.textContent = revenue ? formatMoney(profit) : (m3Row ? formatMoney(m3Row.profit) : '–');
 
         const tdSale = document.createElement('td');
         tdSale.textContent = saleBonus > 0 ? formatMoney(saleBonus) : '–';
@@ -1150,7 +1148,7 @@
       recalcAllTeamsSummary();
     }
 
-    // ====== Events ======
+    // ===== Event handlers =====
     teamSelect.addEventListener('change', () => {
       currentTeamId = teamSelect.value;
       saveState();
@@ -1185,7 +1183,6 @@
       if (!team) return;
 
       team.name = teamNameInput.value || team.name;
-      team.fixedCost = parseMoney(teamNameInput.value) ? team.fixedCost : parseMoney(fixedCostInput.value);
       team.fixedCost = parseMoney(fixedCostInput.value);
       team.cogsRate = parseFloat(cogsRateInput.value || '0');
       team.sellRate = parseFloat(sellRateInput.value || '0');
@@ -1205,10 +1202,7 @@
     resetTeamBtn.addEventListener('click', () => {
       const def = DEFAULT_TEAMS[currentTeamId];
       if (def) {
-        teams[currentTeamId] = {
-          ...def,
-          targets: [...def.targets]
-        };
+        teams[currentTeamId] = { ...def, targets: [...def.targets] };
       } else {
         teams[currentTeamId] = {
           id: currentTeamId,
@@ -1231,14 +1225,15 @@
       recalc();
     });
 
-    [fixedCostInput, cogsRateInput, sellRateInput, otherRateInput].forEach(el => {
-      el.addEventListener('input', () => {
-        normalizeMoneyInput(fixedCostInput);
-        recalcLeftPreview();
-      });
+    fixedCostInput.addEventListener('input', () => {
+      formatMoneyInput(fixedCostInput);
+      recalcLeftPreview();
     });
+    cogsRateInput.addEventListener('input', recalcLeftPreview);
+    sellRateInput.addEventListener('input', recalcLeftPreview);
+    otherRateInput.addEventListener('input', recalcLeftPreview);
 
-    // INIT
+    // ===== Init =====
     loadState();
     renderTeamOptions();
     renderCurrentTeamConfig();
