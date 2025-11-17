@@ -304,9 +304,15 @@
       font-size: 13px;
     }
 
-    .table-wrapper {
-      margin-top: 8px;
-    }
+  .table-wrapper {
+  margin-top: 8px;
+  overflow-x: auto;      /* cho phép cuộn ngang */
+}
+
+/* Đảm bảo bảng đủ rộng để không bị bóp chữ quá nhỏ */
+.table-wrapper table {
+  min-width: 900px;
+}
 
     table {
       width: 100%;
