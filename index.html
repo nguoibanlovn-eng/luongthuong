@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Plan doanh thu – lợi nhuận – thưởng team | Lỗ Vũ</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --primary: #0b57d0;
+      --bg: #f5f5f5;
+      --card-radius: 12px;
+      --green-bg: #e6f4ea;
+      --green-text: #137333;
+      --yellow-bg: #fff8e1;
+      --yellow-text: #b05a00;
+      --red-bg: #fce8e6;
+      --red-text: #b3261e;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 16px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 16px;
+      padding: 16px 16px 24px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      margin: 0 0 4px;
+      font-size: 22px;
+      letter-spacing: .01em;
+    }
+
+    .subtitle {
+      font-size: 12px;
+      color: #666;
+    }
+
+    /* Layout */
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 320px) minmax(0, 1fr);
+      gap: 16px;
+      margin-top: 12px;
+    }
+
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .panel {
+      border-radius: var(--card-radius);
+      border: 1px solid #e5e5e5;
+      padding: 12px 12px 14px;
+      background: #fafafa;
+    }
+
+    .panel-title {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Team selector */
+    .team-select-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .team-select-row label {
+      font-size: 13px;
+      color: #444;
+    }
+
+    select, input[type="text"], input[type="number"] {
+      font-family: inherit;
+      font-size: 13px;
+    }
+
+    select {
+      padding: 6px 8px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      background: #fff;
+      min-width: 150px;
+    }
+
+    select:focus {
+      border-color: var(--primary);
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(11,87,208,0.15);
+    }
+
+    .tag {
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: #e5f0ff;
+      color: #1a4fbf;
+    }
+
+    /* Form fields */
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 8px;
+    }
+
+    .field-label {
+      font-size: 12px;
+      margin-bottom: 2px;
+      color: #444;
+    }
+
+    .field-sub {
+      font-size: 11px;
+      color: #888;
+      margin-top: 1px;
+    }
+
+    .field-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .field-row .field-group {
+      flex: 1;
+      margin-bottom: 0;
+    }
+
+    .field-input {
+      padding: 7px 9px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      background: #fff;
+      outline: none;
+      text-align: right;
+    }
+
+    .field-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(11,87,208,0.15);
+      background: #fff;
+    }
+
+    .field-input[readonly] {
+      background: #f3f4f6;
+      cursor: default;
+    }
+
+    .small {
+      font-size: 11px;
+      color: #777;
+    }
+
+    .btn {
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 1px 4px rgba(11,87,208,0.25);
+    }
+
+    .btn-primary:hover {
+      background: #0a4ab5;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid #ddd;
+      color: #555;
+    }
+
+    .btn-ghost:hover {
+      background: #f3f4f6;
+    }
+
+    /* Summary */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    @media (max-width: 768px) {
+      .summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 480px) {
+      .summary-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .summary-card {
+      border-radius: 10px;
+      border: 1px solid #eee;
+      background: #fafafa;
+      padding: 8px 10px;
+      font-size: 12px;
+    }
+
+    .summary-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .summary-value {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    /* Targets */
+    .targets-row {
+      margin-bottom: 6px;
+    }
+
+    .target-inputs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .target-inputs .target-field {
+      flex: 1 1 120px;
+    }
+
+    .target-label {
+      font-size: 11px;
+      color: #555;
+      margin-bottom: 2px;
+    }
+
+    .target-inputs input {
+      width: 100%;
+      padding: 6px 7px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      text-align: right;
+      background: #fff;
+      outline: none;
+    }
+
+    .target-inputs input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(11,87,208,0.15);
+    }
+
+    /* Table */
+    .table-wrapper {
+      margin-top: 10px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    th, td {
+      border: 1px solid #e0e0e0;
+      padding: 4px 6px;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    th {
+      background: #fafafa;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .pl-cell {
+      font-weight: 500;
+    }
+    .pl-pos {
+      background: var(--green-bg);
+      color: var(--green-text);
+    }
+    .pl-low {
+      background: var(--yellow-bg);
+      color: var(--yellow-text);
+    }
+    .pl-neg {
+      background: var(--red-bg);
+      color: var(--red-text);
+    }
+
+    .note {
+      margin-top: 6px;
+      font-size: 11px;
+      color: #777;
+    }
+
+    .footer-cta {
+      margin-top: 16px;
+      text-align: center;
+      font-size: 12px;
+      color: #555;
+    }
+
+    .footer-cta a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .footer-cta a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>Plan doanh thu – lợi nhuận – thưởng theo team</h1>
+    <div class="subtitle">
+      Công cụ nội bộ giúp Lỗ Vũ & team set target – tính hòa vốn – chia thưởng theo từng team khác nhau.
+    </div>
+  </header>
+
+  <div class="layout">
+    <!-- LEFT: Team config -->
+    <section class="panel">
+      <div class="panel-title">
+        <span>Cấu hình team</span>
+        <span class="tag">Lưu theo trình duyệt của bạn</span>
+      </div>
+
+      <div class="team-select-row">
+        <label for="teamSelect">Chọn team:</label>
+        <select id="teamSelect"></select>
+        <button class="btn btn-ghost" id="addTeamBtn" type="button">+ Thêm team</button>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="teamNameInput">Tên team</label>
+        <input id="teamNameInput" type="text" class="field-input" />
+        <div class="field-sub">Ví dụ: Facebook, TikTok, Shopee, Web, Offline…</div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Chi phí cố định mỗi kỳ (VNĐ)</label>
+        <input id="fixedCostInput" type="text" class="field-input" inputmode="numeric" />
+        <div class="field-sub">Lương cứng, mặt bằng, quản lý chung… dành riêng cho team này.</div>
+      </div>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">% Giá vốn (COGS)</label>
+          <input id="cogsRateInput" type="number" class="field-input" step="0.1" min="0" max="100" />
+          <div class="field-sub">Tính theo % doanh thu.</div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">% Chi phí bán hàng</label>
+          <input id="sellRateInput" type="number" class="field-input" step="0.1" min="0" max="100" />
+          <div class="field-sub">Marketing, CSKH, vận hành theo %.</div>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">% Chi phí khác (biến phí)</label>
+          <input id="otherRateInput" type="number" class="field-input" step="0.1" min="0" max="100" />
+          <div class="field-sub">Phí sàn, POS, thu hộ, vận chuyển…</div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Tổng biến phí (%)</label>
+          <input id="totalVarRateDisplay" type="text" class="field-input" readonly />
+          <div class="field-sub">= Giá vốn + bán hàng + khác</div>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">% thưởng Sale trên LỢI NHUẬN</label>
+          <input id="saleBonusRateInput" type="number" class="field-input" step="0.1" min="0" max="100" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">% thưởng RD trên LỢI NHUẬN</label>
+          <input id="rdBonusRateInput" type="number" class="field-input" step="0.1" min="0" max="100" />
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Điểm hòa vốn (theo cấu hình team)</label>
+        <input id="breakevenDisplay" type="text" class="field-input" readonly />
+        <div class="field-sub">
+          Doanh thu cần đạt để lợi nhuận = 0 (chỉ đủ bù chi phí).
+        </div>
+      </div>
+
+      <div style="display:flex; gap:8px; margin-top:6px;">
+        <button class="btn btn-primary" id="saveTeamBtn" type="button">💾 Lưu cấu hình team</button>
+        <button class="btn btn-ghost" id="resetTeamBtn" type="button">↺ Đưa về mặc định</button>
+      </div>
+
+      <div class="note">
+        • Mỗi team có thể có chi phí & mức thưởng riêng.<br>
+        • Cấu hình được lưu trong trình duyệt (localStorage) – không share giữa các máy.
+      </div>
+    </section>
+
+    <!-- RIGHT: Targets & results -->
+    <section>
+      <div class="panel">
+        <div class="panel-title">
+          <span>Mục tiêu doanh thu & tổng quan</span>
+        </div>
+
+        <div class="targets-row small">
+          Nhập các mốc doanh thu (VNĐ) muốn mô phỏng cho team đang chọn.
+        </div>
+
+        <div class="target-inputs" id="targetsContainer">
+          <!-- target inputs will be injected here -->
+        </div>
+
+        <div class="note">
+          Gợi ý: có thể nhập các mốc như 1 tỷ, 1.5 tỷ, 2 tỷ… hoặc theo KPI thực tế của từng team.
+        </div>
+
+        <div class="summary-grid">
+          <div class="summary-card">
+            <div class="summary-title">Điểm hòa vốn</div>
+            <div class="summary-value" id="summaryBreakeven">–</div>
+            <div class="small">Doanh thu cần để lãi = 0.</div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-title">Biên lợi nhuận tại mốc cao nhất</div>
+            <div class="summary-value" id="summaryTopMargin">–</div>
+            <div class="small">Tính trên doanh thu target cao nhất.</div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-title">Thưởng Sale + RD (mốc cao nhất)</div>
+            <div class="summary-value" id="summaryTopBonus">–</div>
+            <div class="small">Chỉ tính khi lợi nhuận &gt; 0.</div>
+          </div>
+        </div>
+
+        <div class="table-wrapper">
+          <div class="small" style="margin-bottom:4px;">
+            Bảng chi tiết theo từng mốc doanh thu (team đang chọn).
+          </div>
+          <div style="overflow-x:auto;">
+            <table>
+              <thead>
+              <tr>
+                <th>Mốc doanh thu</th>
+                <th>Tổng chi phí</th>
+                <th>Lợi nhuận</th>
+                <th>Biên LN (%)</th>
+                <th>Thưởng Sale</th>
+                <th>Thưởng RD</th>
+                <th>Tổng thưởng / LN</th>
+              </tr>
+              </thead>
+              <tbody id="resultsBody">
+              <!-- rows injected -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="note">
+          • Lợi nhuận & thưởng tính trên từng mốc doanh thu riêng lẻ, chưa tính bậc thang phức tạp.<br>
+          • Sau này nếu anh muốn mô hình thưởng “vượt bậc” (tier), mình có thể nâng cấp thêm.
+        </div>
+      </div>
+
+      <div class="footer-cta">
+        Xây dựng bởi Lỗ Vũ – đọc thêm chia sẻ về TMĐT tại
+        <a href="https://nguoibanlo.vn" target="_blank" rel="noopener noreferrer">nguoibanlo.vn</a>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const STORAGE_KEY = 'plan_thuong_teams_v1';
+
+    const DEFAULT_TEAMS = {
+      facebook: {
+        id: 'facebook',
+        name: 'Facebook',
+        fixedCost: 300000000,      // 300m
+        cogsRate: 60,              // % doanh thu
+        sellRate: 14,
+        otherRate: 6,
+        saleBonusRate: 5,          // % trên lợi nhuận
+        rdBonusRate: 5
+      },
+      tiktok: {
+        id: 'tiktok',
+        name: 'TikTok',
+        fixedCost: 250000000,
+        cogsRate: 58,
+        sellRate: 16,
+        otherRate: 8,
+        saleBonusRate: 6,
+        rdBonusRate: 4
+      },
+      shopee: {
+        id: 'shopee',
+        name: 'Shopee',
+        fixedCost: 200000000,
+        cogsRate: 60,
+        sellRate: 15,
+        otherRate: 10,
+        saleBonusRate: 5,
+        rdBonusRate: 5
+      },
+      web: {
+        id: 'web',
+        name: 'Web',
+        fixedCost: 150000000,
+        cogsRate: 55,
+        sellRate: 10,
+        otherRate: 5,
+        saleBonusRate: 4,
+        rdBonusRate: 4
+      }
+    };
+
+    const DEFAULT_TARGETS = [
+      500000000, 800000000, 1000000000,
+      1500000000, 2000000000, 2500000000
+    ];
+
+    let teams = {};
+    let currentTeamId = 'facebook';
+    let targets = [...DEFAULT_TARGETS];
+
+    // DOM refs
+    const teamSelect = document.getElementById('teamSelect');
+    const addTeamBtn = document.getElementById('addTeamBtn');
+    const teamNameInput = document.getElementById('teamNameInput');
+    const fixedCostInput = document.getElementById('fixedCostInput');
+    const cogsRateInput = document.getElementById('cogsRateInput');
+    const sellRateInput = document.getElementById('sellRateInput');
+    const otherRateInput = document.getElementById('otherRateInput');
+    const totalVarRateDisplay = document.getElementById('totalVarRateDisplay');
+    const saleBonusRateInput = document.getElementById('saleBonusRateInput');
+    const rdBonusRateInput = document.getElementById('rdBonusRateInput');
+    const breakevenDisplay = document.getElementById('breakevenDisplay');
+
+    const saveTeamBtn = document.getElementById('saveTeamBtn');
+    const resetTeamBtn = document.getElementById('resetTeamBtn');
+    const settingsToggle = document.getElementById('settingsToggle'); // doesn't exist here; ignore
+
+    const targetsContainer = document.getElementById('targetsContainer');
+    const resultsBody = document.getElementById('resultsBody');
+
+    const summaryBreakeven = document.getElementById('summaryBreakeven');
+    const summaryTopMargin = document.getElementById('summaryTopMargin');
+    const summaryTopBonus = document.getElementById('summaryTopBonus');
+
+    const labelPlatformRate = document.getElementById('labelPlatformRate'); // not used here but safe
+
+    function formatMoney(value) {
+      if (!isFinite(value)) return '–';
+      return value.toLocaleString('vi-VN', { maximumFractionDigits: 0 });
+    }
+
+    function formatPercent(value) {
+      if (!isFinite(value)) return '–';
+      return value.toLocaleString('vi-VN', { maximumFractionDigits: 1 }) + '%';
+    }
+
+    function parseMoney(str) {
+      const digits = String(str || '').replace(/\D/g, '');
+      return digits ? parseInt(digits, 10) : 0;
+    }
+
+    function normalizeMoneyInput(el) {
+      if (!el) return 0;
+      const num = parseMoney(el.value);
+      if (num === 0) {
+        el.value = '';
+        return 0;
+      }
+      el.value = num.toLocaleString('vi-VN');
+      return num;
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) {
+          teams = { ...DEFAULT_TEAMS };
+          targets = [...DEFAULT_TARGETS];
+          return;
+        }
+        const data = JSON.parse(raw);
+        teams = data.teams || { ...DEFAULT_TEAMS };
+        targets = Array.isArray(data.targets) && data.targets.length ? data.targets : [...DEFAULT_TARGETS];
+        currentTeamId = data.currentTeamId || 'facebook';
+        if (!teams[currentTeamId]) {
+          currentTeamId = Object.keys(teams)[0] || 'facebook';
+        }
+      } catch (e) {
+        teams = { ...DEFAULT_TEAMS };
+        targets = [...DEFAULT_TARGETS];
+      }
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({
+          teams,
+          targets,
+          currentTeamId
+        }));
+      } catch (e) {}
+    }
+
+    function renderTeamOptions() {
+      teamSelect.innerHTML = '';
+      Object.values(teams).forEach(team => {
+        const opt = document.createElement('option');
+        opt.value = team.id;
+        opt.textContent = team.name;
+        teamSelect.appendChild(opt);
+      });
+      if (teams[currentTeamId]) {
+        teamSelect.value = currentTeamId;
+      }
+    }
+
+    function renderTargetsInputs() {
+      targetsContainer.innerHTML = '';
+      targets.forEach((value, index) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'target-field';
+
+        const label = document.createElement('div');
+        label.className = 'target-label';
+        label.textContent = `Mốc ${index + 1}`;
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.inputMode = 'numeric';
+        input.value = value ? value.toLocaleString('vi-VN') : '';
+        input.dataset.index = String(index);
+
+        input.addEventListener('input', () => {
+          const num = normalizeMoneyInput(input);
+          targets[index] = num;
+          saveState();
+          recalc();
+        });
+
+        wrapper.appendChild(label);
+        wrapper.appendChild(input);
+        targetsContainer.appendChild(wrapper);
+      });
+
+      // Thêm ô “+ thêm mốc” nếu muốn (optional)
+      if (targets.length < 10) {
+        const addWrapper = document.createElement('div');
+        addWrapper.className = 'target-field';
+        const label = document.createElement('div');
+        label.className = 'target-label';
+        label.textContent = 'Thêm mốc mới';
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'btn btn-ghost';
+        btn.style.width = '100%';
+        btn.textContent = '+ Thêm mốc doanh thu';
+        btn.addEventListener('click', () => {
+          targets.push(0);
+          saveState();
+          renderTargetsInputs();
+          recalc();
+        });
+        addWrapper.appendChild(label);
+        addWrapper.appendChild(btn);
+        targetsContainer.appendChild(addWrapper);
+      }
+    }
+
+    function renderCurrentTeamConfig() {
+      const team = teams[currentTeamId];
+      if (!team) return;
+      teamNameInput.value = team.name || '';
+      fixedCostInput.value = team.fixedCost ? team.fixedCost.toLocaleString('vi-VN') : '';
+      cogsRateInput.value = team.cogsRate != null ? team.cogsRate : '';
+      sellRateInput.value = team.sellRate != null ? team.sellRate : '';
+      otherRateInput.value = team.otherRate != null ? team.otherRate : '';
+      saleBonusRateInput.value = team.saleBonusRate != null ? team.saleBonusRate : '';
+      rdBonusRateInput.value = team.rdBonusRate != null ? team.rdBonusRate : '';
+
+      const totalVar = (team.cogsRate || 0) + (team.sellRate || 0) + (team.otherRate || 0);
+      totalVarRateDisplay.value = formatPercent(totalVar);
+
+      const breakeven = calcBreakeven(team);
+      breakevenDisplay.value = breakeven > 0 ? formatMoney(breakeven) : 'Không xác định';
+
+      summaryBreakeven.textContent = breakeven > 0 ? formatMoney(breakeven) : '–';
+    }
+
+    function calcBreakeven(team) {
+      const varRate = ((team.cogsRate || 0) + (team.sellRate || 0) + (team.otherRate || 0)) / 100;
+      const fixed = team.fixedCost || 0;
+      const denom = 1 - varRate;
+      if (denom <= 0) return NaN;
+      return fixed / denom;
+    }
+
+    function applyProfitStyleCell(td, profit, revenue) {
+      td.classList.remove('pl-pos', 'pl-low', 'pl-neg');
+      const base = revenue || 0;
+      let margin = 0;
+      if (base > 0) margin = profit / base;
+
+      if (profit < 0) {
+        td.classList.add('pl-neg');
+      } else if (profit === 0 || margin < 0.03) {
+        td.classList.add('pl-low');
+      } else {
+        td.classList.add('pl-pos');
+      }
+
+      td.textContent = formatMoney(profit);
+    }
+
+    function recalc() {
+      const team = teams[currentTeamId];
+      if (!team) return;
+
+      // đọc lại form (trong trường hợp user vừa gõ nhưng chưa bấm Lưu)
+      const fixedCost = normalizeMoneyInput(fixedCostInput);
+      const cogsRate = parseFloat(cogsRateInput.value || '0');
+      const sellRate = parseFloat(sellRateInput.value || '0');
+      const otherRate = parseFloat(otherRateInput.value || '0');
+      const saleBonusRate = parseFloat(saleBonusRateInput.value || '0');
+      const rdBonusRate = parseFloat(rdBonusRateInput.value || '0');
+
+      const totalVarRate = cogsRate + sellRate + otherRate;
+      totalVarRateDisplay.value = formatPercent(totalVarRate);
+
+      const varRateDecimal = totalVarRate / 100;
+      const denom = 1 - varRateDecimal;
+      const fixed = fixedCost;
+
+      const breakeven = denom > 0 ? fixed / denom : NaN;
+      breakevenDisplay.value = breakeven > 0 ? formatMoney(breakeven) : 'Không xác định';
+      summaryBreakeven.textContent = breakeven > 0 ? formatMoney(breakeven) : '–';
+
+      resultsBody.innerHTML = '';
+
+      let topRevenue = 0;
+      let topProfit = 0;
+      let topSaleBonus = 0;
+      let topRdBonus = 0;
+
+      targets.forEach(revenue => {
+        if (!revenue || revenue <= 0) return;
+
+        const totalCost = revenue * varRateDecimal + fixed;
+        const profit = revenue - totalCost;
+        const margin = revenue > 0 ? profit / revenue * 100 : 0;
+        const saleBonus = profit > 0 ? profit * (saleBonusRate / 100) : 0;
+        const rdBonus = profit > 0 ? profit * (rdBonusRate / 100) : 0;
+        const totalBonus = saleBonus + rdBonus;
+        const bonusOnProfit = profit > 0 ? totalBonus / profit * 100 : 0;
+
+        // track top target (the highest revenue)
+        if (revenue > topRevenue) {
+          topRevenue = revenue;
+          topProfit = profit;
+          topSaleBonus = saleBonus;
+          topRdBonus = rdBonus;
+        }
+
+        const tr = document.createElement('tr');
+
+        const tdRev = document.createElement('td');
+        tdRev.textContent = formatMoney(revenue);
+        tdRev.style.textAlign = 'right';
+
+        const tdCost = document.createElement('td');
+        tdCost.textContent = formatMoney(totalCost);
+
+        const tdProfit = document.createElement('td');
+        tdProfit.className = 'pl-cell';
+        applyProfitStyleCell(tdProfit, profit, revenue);
+
+        const tdMargin = document.createElement('td');
+        tdMargin.textContent = formatPercent(margin);
+
+        const tdSaleBonus = document.createElement('td');
+        tdSaleBonus.textContent = saleBonus > 0 ? formatMoney(saleBonus) : '–';
+
+        const tdRdBonus = document.createElement('td');
+        tdRdBonus.textContent = rdBonus > 0 ? formatMoney(rdBonus) : '–';
+
+        const tdRatio = document.createElement('td');
+        tdRatio.textContent = totalBonus > 0 && profit > 0
+          ? formatPercent(bonusOnProfit)
+          : '–';
+
+        tr.appendChild(tdRev);
+        tr.appendChild(tdCost);
+        tr.appendChild(tdProfit);
+        tr.appendChild(tdMargin);
+        tr.appendChild(tdSaleBonus);
+        tr.appendChild(tdRdBonus);
+        tr.appendChild(tdRatio);
+
+        resultsBody.appendChild(tr);
+      });
+
+      if (topRevenue > 0) {
+        const topMargin = topRevenue > 0 ? topProfit / topRevenue * 100 : 0;
+        summaryTopMargin.textContent = formatPercent(topMargin);
+
+        const totalTopBonus = topSaleBonus + topRdBonus;
+        summaryTopBonus.textContent = totalTopBonus > 0 ? formatMoney(totalTopBonus) : '–';
+      } else {
+        summaryTopMargin.textContent = '–';
+        summaryTopBonus.textContent = '–';
+      }
+    }
+
+    // Event handlers
+    teamSelect.addEventListener('change', () => {
+      currentTeamId = teamSelect.value;
+      saveState();
+      renderCurrentTeamConfig();
+      recalc();
+    });
+
+    addTeamBtn.addEventListener('click', () => {
+      const id = 'team_' + Date.now();
+      teams[id] = {
+        id,
+        name: 'Team mới',
+        fixedCost: 0,
+        cogsRate: 60,
+        sellRate: 10,
+        otherRate: 5,
+        saleBonusRate: 5,
+        rdBonusRate: 5
+      };
+      currentTeamId = id;
+      saveState();
+      renderTeamOptions();
+      renderCurrentTeamConfig();
+      recalc();
+    });
+
+    saveTeamBtn.addEventListener('click', () => {
+      const team = teams[currentTeamId];
+      if (!team) return;
+      team.name = teamNameInput.value || team.name;
+      team.fixedCost = normalizeMoneyInput(fixedCostInput);
+      team.cogsRate = parseFloat(cogsRateInput.value || '0');
+      team.sellRate = parseFloat(sellRateInput.value || '0');
+      team.otherRate = parseFloat(otherRateInput.value || '0');
+      team.saleBonusRate = parseFloat(saleBonusRateInput.value || '0');
+      team.rdBonusRate = parseFloat(rdBonusRateInput.value || '0');
+      teams[currentTeamId] = team;
+      saveState();
+      renderTeamOptions();
+      renderCurrentTeamConfig();
+      recalc();
+    });
+
+    resetTeamBtn.addEventListener('click', () => {
+      const def = DEFAULT_TEAMS[currentTeamId];
+      if (def) {
+        teams[currentTeamId] = { ...def };
+      } else {
+        // nếu là team custom thì set về 0
+        teams[currentTeamId] = {
+          id: currentTeamId,
+          name: 'Team mới',
+          fixedCost: 0,
+          cogsRate: 60,
+          sellRate: 10,
+          otherRate: 5,
+          saleBonusRate: 5,
+          rdBonusRate: 5
+        };
+      }
+      saveState();
+      renderTeamOptions();
+      renderCurrentTeamConfig();
+      recalc();
+    });
+
+    // Khi user gõ trong các ô config, recalc realtime
+    [fixedCostInput, cogsRateInput, sellRateInput, otherRateInput,
+     saleBonusRateInput, rdBonusRateInput].forEach(el => {
+      el.addEventListener('input', () => {
+        recalc();
+      });
+    });
+
+    // INIT
+    loadState();
+    renderTeamOptions();
+    renderTargetsInputs();
+    renderCurrentTeamConfig();
+    recalc();
+  });
+</script>
+</body>
+</html>
