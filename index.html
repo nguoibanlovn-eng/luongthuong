@@ -794,12 +794,18 @@ document.addEventListener('DOMContentLoaded', function () {
         const v = team.targets[i] || 0;
         input.value = v ? v.toLocaleString('vi-VN') : '';
 
-        input.addEventListener('input', () => {
-          const num = parseMoney(input.value);
-          input.value = num ? num.toLocaleString('vi-VN') : '';
-          teams[teamIdx].targets[i] = num;
-          recalc();
-        });
+        // Khi đang gõ: chỉ lưu số, KHÔNG format
+input.addEventListener('input', () => {
+  const num = parseMoney(input.value);
+  teams[teamIdx].targets[i] = num;
+  recalc();
+});
+
+// Khi rời ô input: mới format lại cho đẹp
+input.addEventListener('blur', () => {
+  const num = parseMoney(input.value);
+  input.value = num ? num.toLocaleString('vi-VN') : '';
+});
 
         field.appendChild(label);
         field.appendChild(input);
