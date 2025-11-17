@@ -190,7 +190,7 @@
     }
 
     .btn-primary {
-      background: var(--primary);
+      background: #0b57d0;
       color: #fff;
       box-shadow: 0 1px 4px rgba(11,87,208,0.25);
     }
@@ -462,13 +462,13 @@
         </div>
 
         <div class="targets-row small">
-          Nhập các mốc doanh thu (VNĐ) muốn mô phỏng cho team đang chọn.
+          Sử dụng <b>3 mốc doanh thu</b>: Mốc 1, Mốc 2 và <b>Mốc 3 (thực tế)</b>.
         </div>
 
         <div class="target-inputs" id="targetsContainer"></div>
 
         <div class="note">
-          Gợi ý: có thể nhập các mốc như 1 tỷ, 1.5 tỷ, 2 tỷ… hoặc theo KPI thực tế của từng team.
+          Gợi ý: Mốc 1 = kịch bản thấp, Mốc 2 = kịch bản kỳ vọng, Mốc 3 = doanh thu thực tế / target chính.
         </div>
 
         <div class="summary-grid">
@@ -478,26 +478,27 @@
             <div class="small">Doanh thu cần để lãi = 0.</div>
           </div>
           <div class="summary-card">
-            <div class="summary-title">Biên lợi nhuận tại mốc cao nhất</div>
+            <div class="summary-title">Biên lợi nhuận tại Mốc 3 (thực tế)</div>
             <div class="summary-value" id="summaryTopMargin">–</div>
-            <div class="small">Tính trên doanh thu target cao nhất của team đang chọn.</div>
+            <div class="small">Tính trên doanh thu Mốc 3 của team đang chọn.</div>
           </div>
           <div class="summary-card">
-            <div class="summary-title">Tổng thưởng (team đang chọn)</div>
+            <div class="summary-title">Tổng thưởng tại Mốc 3 (team hiện tại)</div>
             <div class="summary-value" id="summaryTopBonus">–</div>
-            <div class="small">Sale + RD + CSKH + KT+HCNS + Media (mốc cao nhất, LN &gt; 0).</div>
+            <div class="small">Sale + RD + CSKH + KT+HCNS + Media (chỉ tính khi LN &gt; 0).</div>
           </div>
         </div>
 
         <div class="table-wrapper">
           <div class="small" style="margin-bottom:4px;">
-            Bảng chi tiết theo từng mốc doanh thu (team đang chọn). Vuốt ngang trên màn hình nhỏ để xem đủ cột.
+            Bảng chi tiết 3 mốc doanh thu (team đang chọn). Vuốt ngang trên màn hình nhỏ để xem đủ cột.
           </div>
           <div style="overflow-x:auto;">
             <table>
               <thead>
               <tr>
-                <th>Mốc doanh thu</th>
+                <th>Mốc</th>
+                <th>Doanh thu</th>
                 <th>Tổng chi phí</th>
                 <th>Lợi nhuận</th>
                 <th>Biên LN (%)</th>
@@ -516,29 +517,28 @@
         </div>
 
         <div class="note">
-          • Lợi nhuận &amp; thưởng tính trên từng mốc doanh thu riêng lẻ, chưa tính bậc thang phức tạp.<br>
-          • Sau này nếu anh muốn mô hình thưởng “vượt bậc” (tier), mình có thể nâng cấp thêm.
+          • Lợi nhuận &amp; thưởng tính riêng cho từng mốc doanh thu.<br>
+          • Mốc 3 được dùng để tính tổng doanh thu và tổng thưởng toàn doanh nghiệp.
         </div>
       </div>
 
       <!-- panel tổng quan nhiều team -->
       <div class="panel" id="multiTeamPanel">
         <div class="panel-title">
-          <span>Tổng quan tất cả team (dùng mốc doanh thu cao nhất)</span>
+          <span>Tổng quan tất cả team (Mốc 3 – thực tế)</span>
           <button class="btn btn-ghost" id="multiTeamToggleBtn" type="button">Ẩn</button>
         </div>
 
         <div id="multiTeamInner">
           <div class="small" style="margin-bottom:4px;">
-            Mỗi team được tính tại <b>mốc doanh thu cao nhất</b> trong danh sách target hiện tại.
-            Dòng cuối cùng là <b>tổng doanh thu</b> &amp; <b>tổng thưởng</b> tất cả team.
+            Mỗi team được tính tại <b>Mốc 3 (thực tế)</b>. Dòng cuối cùng là <b>tổng doanh thu</b> &amp; <b>tổng thưởng</b> tất cả team.
           </div>
           <div style="overflow-x:auto;">
             <table>
               <thead>
               <tr>
                 <th>Team</th>
-                <th>Doanh thu kế hoạch</th>
+                <th>Doanh thu Mốc 3</th>
                 <th>Lợi nhuận</th>
                 <th>Thưởng Sale</th>
                 <th>Thưởng RD</th>
@@ -564,7 +564,7 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    const STORAGE_KEY = 'plan_thuong_teams_v2';
+    const STORAGE_KEY = 'plan_thuong_teams_v3';
 
     const DEFAULT_TEAMS = {
       facebook: {
@@ -621,14 +621,14 @@
       }
     };
 
+    // Chỉ 3 mốc
     const DEFAULT_TARGETS = [
-      500000000, 800000000, 1000000000,
-      1500000000, 2000000000, 2500000000
+      800000000, 1200000000, 2000000000
     ];
 
     let teams = {};
     let currentTeamId = 'facebook';
-    let targets = [...DEFAULT_TARGETS];
+    let targets = [...DEFAULT_TARGETS]; // luôn 3 phần tử
 
     // DOM refs
     const teamSelect = document.getElementById('teamSelect');
@@ -696,7 +696,9 @@
         }
         const data = JSON.parse(raw);
         teams = data.teams || { ...DEFAULT_TEAMS };
-        targets = Array.isArray(data.targets) && data.targets.length ? data.targets : [...DEFAULT_TARGETS];
+        const t = Array.isArray(data.targets) ? data.targets.slice(0,3) : [];
+        while (t.length < 3) t.push(0);
+        targets = t;
         currentTeamId = data.currentTeamId || 'facebook';
         if (!teams[currentTeamId]) {
           currentTeamId = Object.keys(teams)[0] || 'facebook';
@@ -732,23 +734,25 @@
 
     function renderTargetsInputs() {
       targetsContainer.innerHTML = '';
-      targets.forEach((value, index) => {
+      const labels = ['Mốc 1', 'Mốc 2', 'Mốc 3 (thực tế)'];
+
+      for (let i = 0; i < 3; i++) {
         const wrapper = document.createElement('div');
         wrapper.className = 'target-field';
 
         const label = document.createElement('div');
         label.className = 'target-label';
-        label.textContent = `Mốc ${index + 1}`;
+        label.textContent = labels[i];
 
         const input = document.createElement('input');
         input.type = 'text';
         input.inputMode = 'numeric';
-        input.value = value ? value.toLocaleString('vi-VN') : '';
-        input.dataset.index = String(index);
+        input.value = targets[i] ? targets[i].toLocaleString('vi-VN') : '';
+        input.dataset.index = String(i);
 
         input.addEventListener('input', () => {
           const num = normalizeMoneyInput(input);
-          targets[index] = num;
+          targets[i] = num;
           saveState();
           recalc();
         });
@@ -756,28 +760,6 @@
         wrapper.appendChild(label);
         wrapper.appendChild(input);
         targetsContainer.appendChild(wrapper);
-      });
-
-      if (targets.length < 10) {
-        const addWrapper = document.createElement('div');
-        addWrapper.className = 'target-field';
-        const label = document.createElement('div');
-        label.className = 'target-label';
-        label.textContent = 'Thêm mốc mới';
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'btn btn-ghost';
-        btn.style.width = '100%';
-        btn.textContent = '+ Thêm mốc doanh thu';
-        btn.addEventListener('click', () => {
-          targets.push(0);
-          saveState();
-          renderTargetsInputs();
-          recalc();
-        });
-        addWrapper.appendChild(label);
-        addWrapper.appendChild(btn);
-        targetsContainer.appendChild(addWrapper);
       }
     }
 
@@ -855,16 +837,21 @@
 
       resultsBody.innerHTML = '';
 
-      let topRevenue = 0;
-      let topProfit = 0;
-      let topSaleBonus = 0;
-      let topRdBonus = 0;
-      let topCskhBonus = 0;
-      let topHcnsBonus = 0;
-      let topMediaBonus = 0;
+      const labels = ['Mốc 1', 'Mốc 2', 'Mốc 3 (thực tế)'];
 
-      targets.forEach(revenue => {
-        if (!revenue || revenue <= 0) return;
+      let actualRevenue = targets[2] || 0;
+      let actualProfit = 0;
+      let actualSaleBonus = 0;
+      let actualRdBonus = 0;
+      let actualCskhBonus = 0;
+      let actualHcnsBonus = 0;
+      let actualMediaBonus = 0;
+
+      for (let i = 0; i < 3; i++) {
+        const revenue = targets[i] || 0;
+        const label = labels[i];
+
+        if (!revenue || revenue <= 0) continue;
 
         const totalCost = revenue * varRateDecimal + fixed;
         const profit = revenue - totalCost;
@@ -879,17 +866,20 @@
         const totalBonus = saleBonus + rdBonus + cskhBonus + hcnsBonus + mediaBonus;
         const bonusOnProfit = profit > 0 ? totalBonus / profit * 100 : 0;
 
-        if (revenue > topRevenue) {
-          topRevenue = revenue;
-          topProfit = profit;
-          topSaleBonus = saleBonus;
-          topRdBonus = rdBonus;
-          topCskhBonus = cskhBonus;
-          topHcnsBonus = hcnsBonus;
-          topMediaBonus = mediaBonus;
+        if (i === 2) { // mốc 3
+          actualProfit = profit;
+          actualSaleBonus = saleBonus;
+          actualRdBonus = rdBonus;
+          actualCskhBonus = cskhBonus;
+          actualHcnsBonus = hcnsBonus;
+          actualMediaBonus = mediaBonus;
         }
 
         const tr = document.createElement('tr');
+
+        const tdLabel = document.createElement('td');
+        tdLabel.textContent = label;
+        tdLabel.style.textAlign = 'left';
 
         const tdRev = document.createElement('td');
         tdRev.textContent = formatMoney(revenue);
@@ -927,6 +917,7 @@
           ? formatPercent(bonusOnProfit)
           : '–';
 
+        tr.appendChild(tdLabel);
         tr.appendChild(tdRev);
         tr.appendChild(tdCost);
         tr.appendChild(tdProfit);
@@ -940,12 +931,12 @@
         tr.appendChild(tdRatio);
 
         resultsBody.appendChild(tr);
-      });
+      }
 
-      if (topRevenue > 0) {
-        const topMargin = topRevenue > 0 ? topProfit / topRevenue * 100 : 0;
+      if (actualRevenue > 0) {
+        const topMargin = actualProfit / actualRevenue * 100;
         summaryTopMargin.textContent = formatPercent(topMargin);
-        const totalTopBonus = topSaleBonus + topRdBonus + topCskhBonus + topHcnsBonus + topMediaBonus;
+        const totalTopBonus = actualSaleBonus + actualRdBonus + actualCskhBonus + actualHcnsBonus + actualMediaBonus;
         summaryTopBonus.textContent = totalTopBonus > 0 ? formatMoney(totalTopBonus) : '–';
       } else {
         summaryTopMargin.textContent = '–';
@@ -953,14 +944,12 @@
       }
     }
 
-    // Tổng quan tất cả team: dùng mốc doanh thu cao nhất
+    // Tổng quan tất cả team: dùng Mốc 3
     function recalcAllTeamsSummary() {
-      if (!allTeamsBody) return;
       allTeamsBody.innerHTML = '';
 
-      const validTargets = targets.filter(t => t > 0);
-      if (!validTargets.length) return;
-      const revenuePlan = Math.max(...validTargets); // mốc cao nhất
+      const revenuePlan = targets[2] || 0; // Mốc 3
+      if (!revenuePlan || revenuePlan <= 0) return;
 
       let sumRevenue = 0;
       let sumSaleBonus = 0;
@@ -1045,6 +1034,7 @@
       // dòng tổng
       const trTotal = document.createElement('tr');
       trTotal.style.fontWeight = '600';
+
       const tdLabel = document.createElement('td');
       tdLabel.textContent = 'TỔNG (tất cả team)';
       tdLabel.style.textAlign = 'left';
