@@ -649,14 +649,42 @@
 
     // ===== State load/save =====
     function loadState() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) {
-          teams = { ...DEFAULT_TEAMS };
-          return;
-        }
-        const data = JSON.parse(raw);
-        teams = data.teams || { ...DEFAULT_TEAMS };
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+
+    if (!raw) {
+      // Chưa từng lưu gì -> dùng default
+      teams = { ...DEFAULT_TEAMS };
+    } else {
+      const data = JSON.parse(raw);
+      teams = data.teams || {};
+
+      // Nếu dữ liệu cũ nhưng bị rỗng -> cũng reset về default
+      if (!teams || Object.keys(teams).length === 0) {
+        teams = { ...DEFAULT_TEAMS };
+      }
+
+      currentTeamId = data.currentTeamId || 'facebook';
+    }
+  } catch (e) {
+    // Lỗi khi đọc localStorage -> dùng default cho chắc
+    teams = { ...DEFAULT_TEAMS };
+  }
+
+  // Đảm bảo mỗi team có 3 mốc target
+  Object.values(teams).forEach(t => {
+    if (!Array.isArray(t.targets)) t.targets = [...DEFAULT_TARGETS];
+    while (t.targets.length < 3) t.targets.push(0);
+    if (t.targets.length > 3) t.targets = t.targets.slice(0, 3);
+  });
+
+  // Đảm bảo currentTeamId hợp lệ
+  if (!teams[currentTeamId]) {
+    const keys = Object.keys(teams);
+    currentTeamId = keys.length ? keys[0] : 'facebook';
+  }
+}
+
         currentTeamId = data.currentTeamId || 'facebook';
 
         // đảm bảo mỗi team có targets 3 phần tử
