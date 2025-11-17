@@ -213,7 +213,7 @@
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 8px;
-      margin-bottom: 10px;
+      margin: 8px 0 10px;
     }
 
     @media (max-width: 768px) {
@@ -255,6 +255,7 @@
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
+      margin-top: 4px;
     }
 
     .target-inputs .target-field {
@@ -282,8 +283,29 @@
       box-shadow: 0 0 0 2px rgba(11,87,208,0.15);
     }
 
+    .team-block {
+      border-radius: 10px;
+      border: 1px solid #e5e5e5;
+      padding: 10px 10px 12px;
+      background: #fff;
+      margin-bottom: 10px;
+    }
+
+    .team-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .team-name {
+      font-weight: 600;
+      font-size: 13px;
+    }
+
     .table-wrapper {
-      margin-top: 10px;
+      margin-top: 8px;
     }
 
     table {
@@ -435,10 +457,10 @@
       </div>
 
       <div class="field-group">
-        <label class="field-label">Điểm hòa vốn (theo cấu hình team)</label>
+        <label class="field-label">Điểm hòa vốn (theo cấu hình đang nhập)</label>
         <input id="breakevenDisplay" type="text" class="field-input" readonly />
         <div class="field-sub">
-          Doanh thu cần đạt để lợi nhuận = 0 (chỉ đủ bù chi phí).
+          Doanh thu cần đạt để lợi nhuận = 0 (chỉ đủ bù chi phí). Chỉ là preview khi anh chỉnh, chưa lưu.
         </div>
       </div>
 
@@ -449,108 +471,57 @@
 
       <div class="note">
         • Mỗi team có thể có chi phí &amp; mức thưởng riêng cho từng bộ phận (Sale, RD, CSKH, KT+HCNS, Media).<br>
-        • Cấu hình được lưu trong trình duyệt (localStorage) – không share giữa các máy.
+        • Cấu hình &amp; mốc doanh thu được lưu trong trình duyệt (localStorage) – không share giữa các máy.
       </div>
     </section>
 
     <!-- RIGHT: mục tiêu + kết quả + tổng quan nhiều team -->
     <section>
-      <!-- panel mục tiêu + kết quả 1 team -->
+      <!-- TẤT CẢ TEAM -->
       <div class="panel">
         <div class="panel-title">
-          <span>Mục tiêu doanh thu &amp; tổng quan team đang chọn</span>
+          <span>Mục tiêu doanh thu &amp; tổng quan các team</span>
         </div>
 
         <div class="targets-row small">
-          Sử dụng <b>3 mốc doanh thu</b>: Mốc 1, Mốc 2 và <b>Mốc 3 (thực tế)</b>.
+          Mỗi team dùng <b>3 mốc doanh thu riêng</b>: Mốc 1, Mốc 2 và <b>Mốc 3 (thực tế)</b>.  
+          Mốc 3 sẽ dùng để tính tổng doanh thu &amp; tổng thưởng toàn công ty.
         </div>
 
-        <div class="target-inputs" id="targetsContainer"></div>
+        <div id="teamsOverviewContainer"></div>
 
         <div class="note">
-          Gợi ý: Mốc 1 = kịch bản thấp, Mốc 2 = kịch bản kỳ vọng, Mốc 3 = doanh thu thực tế / target chính.
-        </div>
-
-        <div class="summary-grid">
-          <div class="summary-card">
-            <div class="summary-title">Điểm hòa vốn</div>
-            <div class="summary-value" id="summaryBreakeven">–</div>
-            <div class="small">Doanh thu cần để lãi = 0.</div>
-          </div>
-          <div class="summary-card">
-            <div class="summary-title">Biên lợi nhuận tại Mốc 3 (thực tế)</div>
-            <div class="summary-value" id="summaryTopMargin">–</div>
-            <div class="small">Tính trên doanh thu Mốc 3 của team đang chọn.</div>
-          </div>
-          <div class="summary-card">
-            <div class="summary-title">Tổng thưởng tại Mốc 3 (team hiện tại)</div>
-            <div class="summary-value" id="summaryTopBonus">–</div>
-            <div class="small">Sale + RD + CSKH + KT+HCNS + Media (chỉ tính khi LN &gt; 0).</div>
-          </div>
-        </div>
-
-        <div class="table-wrapper">
-          <div class="small" style="margin-bottom:4px;">
-            Bảng chi tiết 3 mốc doanh thu (team đang chọn). Vuốt ngang trên màn hình nhỏ để xem đủ cột.
-          </div>
-          <div style="overflow-x:auto;">
-            <table>
-              <thead>
-              <tr>
-                <th>Mốc</th>
-                <th>Doanh thu</th>
-                <th>Tổng chi phí</th>
-                <th>Lợi nhuận</th>
-                <th>Biên LN (%)</th>
-                <th>Thưởng Sale</th>
-                <th>Thưởng RD</th>
-                <th>Thưởng CSKH</th>
-                <th>Thưởng KT+HCNS</th>
-                <th>Thưởng Media</th>
-                <th>Tổng thưởng</th>
-                <th>Tổng thưởng / LN</th>
-              </tr>
-              </thead>
-              <tbody id="resultsBody"></tbody>
-            </table>
-          </div>
-        </div>
-
-        <div class="note">
-          • Lợi nhuận &amp; thưởng tính riêng cho từng mốc doanh thu.<br>
-          • Mốc 3 được dùng để tính tổng doanh thu và tổng thưởng toàn doanh nghiệp.
+          • Bảng chi tiết trong mỗi team có thể thu gọn bằng nút “Ẩn chi tiết / Xem chi tiết”.<br>
+          • Mốc 3 được dùng làm “mốc thực tế” để cộng tổng toàn doanh nghiệp.
         </div>
       </div>
 
-      <!-- panel tổng quan nhiều team -->
+      <!-- Tổng hợp tất cả team -->
       <div class="panel" id="multiTeamPanel">
         <div class="panel-title">
           <span>Tổng quan tất cả team (Mốc 3 – thực tế)</span>
-          <button class="btn btn-ghost" id="multiTeamToggleBtn" type="button">Ẩn</button>
         </div>
 
-        <div id="multiTeamInner">
-          <div class="small" style="margin-bottom:4px;">
-            Mỗi team được tính tại <b>Mốc 3 (thực tế)</b>. Dòng cuối cùng là <b>tổng doanh thu</b> &amp; <b>tổng thưởng</b> tất cả team.
-          </div>
-          <div style="overflow-x:auto;">
-            <table>
-              <thead>
-              <tr>
-                <th>Team</th>
-                <th>Doanh thu Mốc 3</th>
-                <th>Lợi nhuận</th>
-                <th>Thưởng Sale</th>
-                <th>Thưởng RD</th>
-                <th>Thưởng CSKH</th>
-                <th>Thưởng KT+HCNS</th>
-                <th>Thưởng Media</th>
-                <th>Tổng thưởng</th>
-              </tr>
-              </thead>
-              <tbody id="allTeamsBody"></tbody>
-            </table>
-          </div>
+        <div class="small" style="margin-bottom:4px;">
+          Dùng <b>doanh thu Mốc 3</b> riêng của từng team để tính doanh thu, lợi nhuận và thưởng.
+        </div>
+        <div style="overflow-x:auto;">
+          <table>
+            <thead>
+            <tr>
+              <th>Team</th>
+              <th>Doanh thu Mốc 3</th>
+              <th>Lợi nhuận</th>
+              <th>Thưởng Sale</th>
+              <th>Thưởng RD</th>
+              <th>Thưởng CSKH</th>
+              <th>Thưởng KT+HCNS</th>
+              <th>Thưởng Media</th>
+              <th>Tổng thưởng</th>
+            </tr>
+            </thead>
+            <tbody id="allTeamsBody"></tbody>
+          </table>
         </div>
       </div>
 
@@ -564,7 +535,11 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    const STORAGE_KEY = 'plan_thuong_teams_v3';
+    const STORAGE_KEY = 'plan_thuong_teams_v4';
+
+    const DEFAULT_TARGETS = [
+      800000000, 1200000000, 3000000000
+    ];
 
     const DEFAULT_TEAMS = {
       facebook: {
@@ -578,7 +553,8 @@
         rdBonusRate: 4,
         cskhBonusRate: 1,
         hcnsBonusRate: 1.2,
-        mediaBonusRate: 1
+        mediaBonusRate: 1,
+        targets: [...DEFAULT_TARGETS]
       },
       tiktok: {
         id: 'tiktok',
@@ -591,7 +567,8 @@
         rdBonusRate: 4,
         cskhBonusRate: 1,
         hcnsBonusRate: 1.2,
-        mediaBonusRate: 1
+        mediaBonusRate: 1,
+        targets: [...DEFAULT_TARGETS]
       },
       shopee: {
         id: 'shopee',
@@ -604,7 +581,8 @@
         rdBonusRate: 4,
         cskhBonusRate: 1,
         hcnsBonusRate: 1.2,
-        mediaBonusRate: 1
+        mediaBonusRate: 1,
+        targets: [...DEFAULT_TARGETS]
       },
       web: {
         id: 'web',
@@ -617,20 +595,15 @@
         rdBonusRate: 4,
         cskhBonusRate: 1,
         hcnsBonusRate: 1.2,
-        mediaBonusRate: 1
+        mediaBonusRate: 1,
+        targets: [...DEFAULT_TARGETS]
       }
     };
 
-    // Chỉ 3 mốc
-    const DEFAULT_TARGETS = [
-      800000000, 1200000000, 2000000000
-    ];
-
     let teams = {};
     let currentTeamId = 'facebook';
-    let targets = [...DEFAULT_TARGETS]; // luôn 3 phần tử
 
-    // DOM refs
+    // DOM refs - left
     const teamSelect = document.getElementById('teamSelect');
     const addTeamBtn = document.getElementById('addTeamBtn');
     const teamNameInput = document.getElementById('teamNameInput');
@@ -649,16 +622,9 @@
     const saveTeamBtn = document.getElementById('saveTeamBtn');
     const resetTeamBtn = document.getElementById('resetTeamBtn');
 
-    const targetsContainer = document.getElementById('targetsContainer');
-    const resultsBody = document.getElementById('resultsBody');
-
-    const summaryBreakeven = document.getElementById('summaryBreakeven');
-    const summaryTopMargin = document.getElementById('summaryTopMargin');
-    const summaryTopBonus = document.getElementById('summaryTopBonus');
-
+    // DOM refs - right
+    const teamsOverviewContainer = document.getElementById('teamsOverviewContainer');
     const allTeamsBody = document.getElementById('allTeamsBody');
-    const multiTeamToggleBtn = document.getElementById('multiTeamToggleBtn');
-    const multiTeamInner = document.getElementById('multiTeamInner');
 
     function formatMoney(value) {
       if (!isFinite(value)) return '–';
@@ -676,13 +642,8 @@
     }
 
     function normalizeMoneyInput(el) {
-      if (!el) return 0;
       const num = parseMoney(el.value);
-      if (num === 0) {
-        el.value = '';
-        return 0;
-      }
-      el.value = num.toLocaleString('vi-VN');
+      el.value = num ? num.toLocaleString('vi-VN') : '';
       return num;
     }
 
@@ -691,21 +652,22 @@
         const raw = localStorage.getItem(STORAGE_KEY);
         if (!raw) {
           teams = { ...DEFAULT_TEAMS };
-          targets = [...DEFAULT_TARGETS];
           return;
         }
         const data = JSON.parse(raw);
         teams = data.teams || { ...DEFAULT_TEAMS };
-        const t = Array.isArray(data.targets) ? data.targets.slice(0,3) : [];
-        while (t.length < 3) t.push(0);
-        targets = t;
+        // đảm bảo mỗi team có targets 3 phần tử
+        Object.values(teams).forEach(t => {
+          if (!Array.isArray(t.targets)) t.targets = [...DEFAULT_TARGETS];
+          while (t.targets.length < 3) t.targets.push(0);
+          if (t.targets.length > 3) t.targets = t.targets.slice(0,3);
+        });
         currentTeamId = data.currentTeamId || 'facebook';
         if (!teams[currentTeamId]) {
           currentTeamId = Object.keys(teams)[0] || 'facebook';
         }
       } catch (e) {
         teams = { ...DEFAULT_TEAMS };
-        targets = [...DEFAULT_TARGETS];
       }
     }
 
@@ -713,7 +675,6 @@
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify({
           teams,
-          targets,
           currentTeamId
         }));
       } catch (e) {}
@@ -732,43 +693,13 @@
       }
     }
 
-    function renderTargetsInputs() {
-      targetsContainer.innerHTML = '';
-      const labels = ['Mốc 1', 'Mốc 2', 'Mốc 3 (thực tế)'];
-
-      for (let i = 0; i < 3; i++) {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'target-field';
-
-        const label = document.createElement('div');
-        label.className = 'target-label';
-        label.textContent = labels[i];
-
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.inputMode = 'numeric';
-        input.value = targets[i] ? targets[i].toLocaleString('vi-VN') : '';
-        input.dataset.index = String(i);
-
-        input.addEventListener('input', () => {
-          const num = normalizeMoneyInput(input);
-          targets[i] = num;
-          saveState();
-          recalc();
-        });
-
-        wrapper.appendChild(label);
-        wrapper.appendChild(input);
-        targetsContainer.appendChild(wrapper);
-      }
-    }
-
-    function calcBreakeven(team) {
-      const varRate = ((team.cogsRate || 0) + (team.sellRate || 0) + (team.otherRate || 0)) / 100;
-      const fixed = team.fixedCost || 0;
-      const denom = 1 - varRate;
+    function calcBreakevenFromValues(fixedCost, cogsRate, sellRate, otherRate) {
+      const totalVarRate = (cogsRate || 0) + (sellRate || 0) + (otherRate || 0);
+      totalVarRateDisplay.value = formatPercent(totalVarRate);
+      const varRateDecimal = totalVarRate / 100;
+      const denom = 1 - varRateDecimal;
       if (denom <= 0) return NaN;
-      return fixed / denom;
+      return fixedCost / denom;
     }
 
     function renderCurrentTeamConfig() {
@@ -785,74 +716,55 @@
       hcnsBonusRateInput.value = team.hcnsBonusRate != null ? team.hcnsBonusRate : '';
       mediaBonusRateInput.value = team.mediaBonusRate != null ? team.mediaBonusRate : '';
 
-      const totalVar = (team.cogsRate || 0) + (team.sellRate || 0) + (team.otherRate || 0);
-      totalVarRateDisplay.value = formatPercent(totalVar);
-
-      const breakeven = calcBreakeven(team);
+      // preview hòa vốn
+      const fixed = team.fixedCost || 0;
+      const breakeven = calcBreakevenFromValues(
+        fixed,
+        team.cogsRate || 0,
+        team.sellRate || 0,
+        team.otherRate || 0
+      );
       breakevenDisplay.value = breakeven > 0 ? formatMoney(breakeven) : 'Không xác định';
-      summaryBreakeven.textContent = breakeven > 0 ? formatMoney(breakeven) : '–';
     }
 
-    function applyProfitStyleCell(td, profit, revenue) {
-      td.classList.remove('pl-pos', 'pl-low', 'pl-neg');
-      const base = revenue || 0;
-      let margin = 0;
-      if (base > 0) margin = profit / base;
-
-      if (profit < 0) {
-        td.classList.add('pl-neg');
-      } else if (profit === 0 || margin < 0.03) {
-        td.classList.add('pl-low');
-      } else {
-        td.classList.add('pl-pos');
-      }
-
-      td.textContent = formatMoney(profit);
+    function recalcLeftPreview() {
+      const fixed = parseMoney(fixedCostInput.value);
+      const cogs = parseFloat(cogsRateInput.value || '0');
+      const sell = parseFloat(sellRateInput.value || '0');
+      const other = parseFloat(otherRateInput.value || '0');
+      const breakeven = calcBreakevenFromValues(fixed, cogs, sell, other);
+      breakevenDisplay.value = breakeven > 0 ? formatMoney(breakeven) : 'Không xác định';
     }
 
-    function recalcCurrentTeam() {
-      const team = teams[currentTeamId];
-      if (!team) return;
-
-      const fixedCost = normalizeMoneyInput(fixedCostInput);
-      const cogsRate = parseFloat(cogsRateInput.value || '0');
-      const sellRate = parseFloat(sellRateInput.value || '0');
-      const otherRate = parseFloat(otherRateInput.value || '0');
-      const saleBonusRate = parseFloat(saleBonusRateInput.value || '0');
-      const rdBonusRate = parseFloat(rdBonusRateInput.value || '0');
-      const cskhBonusRate = parseFloat(cskhBonusRateInput.value || '0');
-      const hcnsBonusRate = parseFloat(hcnsBonusRateInput.value || '0');
-      const mediaBonusRate = parseFloat(mediaBonusRateInput.value || '0');
-
-      const totalVarRate = cogsRate + sellRate + otherRate;
-      totalVarRateDisplay.value = formatPercent(totalVarRate);
-
-      const varRateDecimal = totalVarRate / 100;
-      const denom = 1 - varRateDecimal;
-      const fixed = fixedCost;
-
-      const breakeven = denom > 0 ? fixed / denom : NaN;
-      breakevenDisplay.value = breakeven > 0 ? formatMoney(breakeven) : 'Không xác định';
-      summaryBreakeven.textContent = breakeven > 0 ? formatMoney(breakeven) : '–';
-
-      resultsBody.innerHTML = '';
-
+    function computeTeamRows(team) {
+      const tTargets = team.targets || [0,0,0];
       const labels = ['Mốc 1', 'Mốc 2', 'Mốc 3 (thực tế)'];
 
-      let actualRevenue = targets[2] || 0;
-      let actualProfit = 0;
-      let actualSaleBonus = 0;
-      let actualRdBonus = 0;
-      let actualCskhBonus = 0;
-      let actualHcnsBonus = 0;
-      let actualMediaBonus = 0;
+      const varRateDecimal = ((team.cogsRate || 0) + (team.sellRate || 0) + (team.otherRate || 0)) / 100;
+      const fixed = team.fixedCost || 0;
+
+      const denom = 1 - varRateDecimal;
+      const breakeven = denom > 0 ? fixed / denom : NaN;
+
+      const saleBonusRate = team.saleBonusRate || 0;
+      const rdBonusRate = team.rdBonusRate || 0;
+      const cskhBonusRate = team.cskhBonusRate || 0;
+      const hcnsBonusRate = team.hcnsBonusRate || 0;
+      const mediaBonusRate = team.mediaBonusRate || 0;
+
+      const rows = [];
+      let m3Info = {
+        revenue: tTargets[2] || 0,
+        profit: 0,
+        totalBonus: 0
+      };
 
       for (let i = 0; i < 3; i++) {
-        const revenue = targets[i] || 0;
-        const label = labels[i];
-
-        if (!revenue || revenue <= 0) continue;
-
+        const revenue = tTargets[i] || 0;
+        if (!revenue || revenue <= 0) {
+          rows.push(null);
+          continue;
+        }
         const totalCost = revenue * varRateDecimal + fixed;
         const profit = revenue - totalCost;
         const margin = revenue > 0 ? profit / revenue * 100 : 0;
@@ -866,105 +778,261 @@
         const totalBonus = saleBonus + rdBonus + cskhBonus + hcnsBonus + mediaBonus;
         const bonusOnProfit = profit > 0 ? totalBonus / profit * 100 : 0;
 
-        if (i === 2) { // mốc 3
-          actualProfit = profit;
-          actualSaleBonus = saleBonus;
-          actualRdBonus = rdBonus;
-          actualCskhBonus = cskhBonus;
-          actualHcnsBonus = hcnsBonus;
-          actualMediaBonus = mediaBonus;
+        const row = {
+          label: labels[i],
+          revenue,
+          totalCost,
+          profit,
+          margin,
+          saleBonus,
+          rdBonus,
+          cskhBonus,
+          hcnsBonus,
+          mediaBonus,
+          totalBonus,
+          bonusOnProfit
+        };
+        rows.push(row);
+
+        if (i === 2) {
+          m3Info = {
+            revenue,
+            profit,
+            totalBonus
+          };
         }
-
-        const tr = document.createElement('tr');
-
-        const tdLabel = document.createElement('td');
-        tdLabel.textContent = label;
-        tdLabel.style.textAlign = 'left';
-
-        const tdRev = document.createElement('td');
-        tdRev.textContent = formatMoney(revenue);
-
-        const tdCost = document.createElement('td');
-        tdCost.textContent = formatMoney(totalCost);
-
-        const tdProfit = document.createElement('td');
-        tdProfit.className = 'pl-cell';
-        applyProfitStyleCell(tdProfit, profit, revenue);
-
-        const tdMargin = document.createElement('td');
-        tdMargin.textContent = formatPercent(margin);
-
-        const tdSaleBonus = document.createElement('td');
-        tdSaleBonus.textContent = saleBonus > 0 ? formatMoney(saleBonus) : '–';
-
-        const tdRdBonus = document.createElement('td');
-        tdRdBonus.textContent = rdBonus > 0 ? formatMoney(rdBonus) : '–';
-
-        const tdCskhBonus = document.createElement('td');
-        tdCskhBonus.textContent = cskhBonus > 0 ? formatMoney(cskhBonus) : '–';
-
-        const tdHcnsBonus = document.createElement('td');
-        tdHcnsBonus.textContent = hcnsBonus > 0 ? formatMoney(hcnsBonus) : '–';
-
-        const tdMediaBonus = document.createElement('td');
-        tdMediaBonus.textContent = mediaBonus > 0 ? formatMoney(mediaBonus) : '–';
-
-        const tdTotalBonus = document.createElement('td');
-        tdTotalBonus.textContent = totalBonus > 0 ? formatMoney(totalBonus) : '–';
-
-        const tdRatio = document.createElement('td');
-        tdRatio.textContent = totalBonus > 0 && profit > 0
-          ? formatPercent(bonusOnProfit)
-          : '–';
-
-        tr.appendChild(tdLabel);
-        tr.appendChild(tdRev);
-        tr.appendChild(tdCost);
-        tr.appendChild(tdProfit);
-        tr.appendChild(tdMargin);
-        tr.appendChild(tdSaleBonus);
-        tr.appendChild(tdRdBonus);
-        tr.appendChild(tdCskhBonus);
-        tr.appendChild(tdHcnsBonus);
-        tr.appendChild(tdMediaBonus);
-        tr.appendChild(tdTotalBonus);
-        tr.appendChild(tdRatio);
-
-        resultsBody.appendChild(tr);
       }
 
-      if (actualRevenue > 0) {
-        const topMargin = actualProfit / actualRevenue * 100;
-        summaryTopMargin.textContent = formatPercent(topMargin);
-        const totalTopBonus = actualSaleBonus + actualRdBonus + actualCskhBonus + actualHcnsBonus + actualMediaBonus;
-        summaryTopBonus.textContent = totalTopBonus > 0 ? formatMoney(totalTopBonus) : '–';
-      } else {
-        summaryTopMargin.textContent = '–';
-        summaryTopBonus.textContent = '–';
-      }
+      return { breakeven, rows, m3Info };
     }
 
-    // Tổng quan tất cả team: dùng Mốc 3
+    function renderTeamsOverview() {
+      teamsOverviewContainer.innerHTML = '';
+
+      Object.values(teams).forEach(team => {
+        const { breakeven, rows, m3Info } = computeTeamRows(team);
+        const teamTargets = team.targets || [0,0,0];
+
+        const block = document.createElement('div');
+        block.className = 'team-block';
+
+        const header = document.createElement('div');
+        header.className = 'team-header';
+
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'team-name';
+        nameSpan.textContent = team.name || team.id;
+
+        const toggleBtn = document.createElement('button');
+        toggleBtn.type = 'button';
+        toggleBtn.className = 'btn btn-ghost';
+        toggleBtn.textContent = 'Ẩn chi tiết';
+
+        header.appendChild(nameSpan);
+        header.appendChild(toggleBtn);
+        block.appendChild(header);
+
+        // targets
+        const labels = ['Mốc 1', 'Mốc 2', 'Mốc 3 (thực tế)'];
+        const targetsRow = document.createElement('div');
+        targetsRow.className = 'target-inputs';
+
+        for (let i = 0; i < 3; i++) {
+          const field = document.createElement('div');
+          field.className = 'target-field';
+
+          const label = document.createElement('div');
+          label.className = 'target-label';
+          label.textContent = labels[i];
+
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.inputMode = 'numeric';
+          const v = teamTargets[i] || 0;
+          input.value = v ? v.toLocaleString('vi-VN') : '';
+
+          input.addEventListener('input', () => {
+            const num = parseMoney(input.value);
+            input.value = num ? num.toLocaleString('vi-VN') : '';
+            if (!Array.isArray(team.targets)) team.targets = [0,0,0];
+            team.targets[i] = num;
+            saveState();
+            recalc();
+          });
+
+          field.appendChild(label);
+          field.appendChild(input);
+          targetsRow.appendChild(field);
+        }
+
+        block.appendChild(targetsRow);
+
+        // summary cards
+        const summaryGrid = document.createElement('div');
+        summaryGrid.className = 'summary-grid';
+
+        const card1 = document.createElement('div');
+        card1.className = 'summary-card';
+        card1.innerHTML =
+          '<div class="summary-title">Điểm hòa vốn</div>' +
+          `<div class="summary-value">${breakeven > 0 ? formatMoney(breakeven) : '–'}</div>` +
+          '<div class="small">Doanh thu cần để lãi = 0.</div>`;
+
+        const marginText = (m3Info.revenue > 0 && isFinite(m3Info.profit))
+          ? formatPercent(m3Info.profit / m3Info.revenue * 100)
+          : '–';
+
+        const card2 = document.createElement('div');
+        card2.className = 'summary-card';
+        card2.innerHTML =
+          '<div class="summary-title">Biên lợi nhuận tại Mốc 3</div>' +
+          `<div class="summary-value">${marginText}</div>` +
+          '<div class="small">Tính trên doanh thu Mốc 3 của team này.</div>';
+
+        const card3 = document.createElement('div');
+        card3.className = 'summary-card';
+        card3.innerHTML =
+          '<div class="summary-title">Tổng thưởng tại Mốc 3</div>' +
+          `<div class="summary-value">${m3Info.totalBonus > 0 ? formatMoney(m3Info.totalBonus) : '–'}</div>` +
+          '<div class="small">Sale + RD + CSKH + KT+HCNS + Media (chỉ khi LN &gt; 0).</div>';
+
+        summaryGrid.appendChild(card1);
+        summaryGrid.appendChild(card2);
+        summaryGrid.appendChild(card3);
+
+        block.appendChild(summaryGrid);
+
+        // chi tiết bảng
+        const detailWrapper = document.createElement('div');
+
+        const tableWrapper = document.createElement('div');
+        tableWrapper.className = 'table-wrapper';
+
+        const table = document.createElement('table');
+        const thead = document.createElement('thead');
+        thead.innerHTML = `
+          <tr>
+            <th>Mốc</th>
+            <th>Doanh thu</th>
+            <th>Tổng chi phí</th>
+            <th>Lợi nhuận</th>
+            <th>Biên LN (%)</th>
+            <th>Thưởng Sale</th>
+            <th>Thưởng RD</th>
+            <th>Thưởng CSKH</th>
+            <th>Thưởng KT+HCNS</th>
+            <th>Thưởng Media</th>
+            <th>Tổng thưởng</th>
+            <th>Tổng thưởng / LN</th>
+          </tr>
+        `;
+        const tbody = document.createElement('tbody');
+
+        rows.forEach(row => {
+          if (!row) return;
+          const tr = document.createElement('tr');
+
+          const tdLabel = document.createElement('td');
+          tdLabel.textContent = row.label;
+          tdLabel.style.textAlign = 'left';
+
+          const tdRev = document.createElement('td');
+          tdRev.textContent = formatMoney(row.revenue);
+
+          const tdCost = document.createElement('td');
+          tdCost.textContent = formatMoney(row.totalCost);
+
+          const tdProfit = document.createElement('td');
+          tdProfit.className = 'pl-cell';
+          if (row.profit < 0) {
+            tdProfit.classList.add('pl-neg');
+          } else if (row.profit === 0 || row.margin < 3) {
+            tdProfit.classList.add('pl-low');
+          } else {
+            tdProfit.classList.add('pl-pos');
+          }
+          tdProfit.textContent = formatMoney(row.profit);
+
+          const tdMargin = document.createElement('td');
+          tdMargin.textContent = formatPercent(row.margin);
+
+          const tdSale = document.createElement('td');
+          tdSale.textContent = row.saleBonus > 0 ? formatMoney(row.saleBonus) : '–';
+
+          const tdRd = document.createElement('td');
+          tdRd.textContent = row.rdBonus > 0 ? formatMoney(row.rdBonus) : '–';
+
+          const tdCskh = document.createElement('td');
+          tdCskh.textContent = row.cskhBonus > 0 ? formatMoney(row.cskhBonus) : '–';
+
+          const tdHcns = document.createElement('td');
+          tdHcns.textContent = row.hcnsBonus > 0 ? formatMoney(row.hcnsBonus) : '–';
+
+          const tdMedia = document.createElement('td');
+          tdMedia.textContent = row.mediaBonus > 0 ? formatMoney(row.mediaBonus) : '–';
+
+          const tdTotalBonus = document.createElement('td');
+          tdTotalBonus.textContent = row.totalBonus > 0 ? formatMoney(row.totalBonus) : '–';
+
+          const tdRatio = document.createElement('td');
+          tdRatio.textContent =
+            row.totalBonus > 0 && row.profit > 0
+              ? formatPercent(row.bonusOnProfit)
+              : '–';
+
+          tr.appendChild(tdLabel);
+          tr.appendChild(tdRev);
+          tr.appendChild(tdCost);
+          tr.appendChild(tdProfit);
+          tr.appendChild(tdMargin);
+          tr.appendChild(tdSale);
+          tr.appendChild(tdRd);
+          tr.appendChild(tdCskh);
+          tr.appendChild(tdHcns);
+          tr.appendChild(tdMedia);
+          tr.appendChild(tdTotalBonus);
+          tr.appendChild(tdRatio);
+
+          tbody.appendChild(tr);
+        });
+
+        table.appendChild(thead);
+        table.appendChild(tbody);
+        tableWrapper.appendChild(table);
+        detailWrapper.appendChild(tableWrapper);
+        block.appendChild(detailWrapper);
+
+        toggleBtn.addEventListener('click', () => {
+          const hidden = detailWrapper.style.display === 'none';
+          detailWrapper.style.display = hidden ? '' : 'none';
+          toggleBtn.textContent = hidden ? 'Ẩn chi tiết' : 'Xem chi tiết';
+        });
+
+        teamsOverviewContainer.appendChild(block);
+      });
+    }
+
     function recalcAllTeamsSummary() {
       allTeamsBody.innerHTML = '';
 
-      const revenuePlan = targets[2] || 0; // Mốc 3
-      if (!revenuePlan || revenuePlan <= 0) return;
-
       let sumRevenue = 0;
+      let sumProfit = 0;
       let sumSaleBonus = 0;
       let sumRdBonus = 0;
       let sumCskhBonus = 0;
       let sumHcnsBonus = 0;
       let sumMediaBonus = 0;
-      let sumProfit = 0;
 
       Object.values(teams).forEach(team => {
+        const { rows } = computeTeamRows(team);
+        const m3Row = rows[2]; // Mốc 3
+
+        const revenue = team.targets && team.targets[2] ? team.targets[2] : 0;
+
         const varRateDecimal = ((team.cogsRate || 0) + (team.sellRate || 0) + (team.otherRate || 0)) / 100;
         const fixed = team.fixedCost || 0;
-
-        const totalCost = revenuePlan * varRateDecimal + fixed;
-        const profit = revenuePlan - totalCost;
+        const totalCost = revenue * varRateDecimal + fixed;
+        const profit = revenue - totalCost;
 
         const saleBonusRate = team.saleBonusRate || 0;
         const rdBonusRate = team.rdBonusRate || 0;
@@ -980,7 +1048,7 @@
 
         const totalBonus = saleBonus + rdBonus + cskhBonus + hcnsBonus + mediaBonus;
 
-        sumRevenue += revenuePlan;
+        sumRevenue += revenue;
         sumProfit += profit;
         sumSaleBonus += saleBonus;
         sumRdBonus += rdBonus;
@@ -995,10 +1063,10 @@
         tdName.style.textAlign = 'left';
 
         const tdRev = document.createElement('td');
-        tdRev.textContent = formatMoney(revenuePlan);
+        tdRev.textContent = revenue > 0 ? formatMoney(revenue) : (m3Row ? formatMoney(m3Row.revenue) : '–');
 
         const tdProfit = document.createElement('td');
-        tdProfit.textContent = formatMoney(profit);
+        tdProfit.textContent = revenue > 0 ? formatMoney(profit) : (m3Row ? formatMoney(m3Row.profit) : '–');
 
         const tdSale = document.createElement('td');
         tdSale.textContent = saleBonus > 0 ? formatMoney(saleBonus) : '–';
@@ -1031,7 +1099,6 @@
         allTeamsBody.appendChild(tr);
       });
 
-      // dòng tổng
       const trTotal = document.createElement('tr');
       trTotal.style.fontWeight = '600';
 
@@ -1061,7 +1128,9 @@
       tdMediaSum.textContent = formatMoney(sumMediaBonus);
 
       const tdBonusSum = document.createElement('td');
-      tdBonusSum.textContent = formatMoney(sumSaleBonus + sumRdBonus + sumCskhBonus + sumHcnsBonus + sumMediaBonus);
+      tdBonusSum.textContent = formatMoney(
+        sumSaleBonus + sumRdBonus + sumCskhBonus + sumHcnsBonus + sumMediaBonus
+      );
 
       trTotal.appendChild(tdLabel);
       trTotal.appendChild(tdRevSum);
@@ -1077,16 +1146,15 @@
     }
 
     function recalc() {
-      recalcCurrentTeam();
+      renderTeamsOverview();
       recalcAllTeamsSummary();
     }
 
-    // Events
+    // ====== Events ======
     teamSelect.addEventListener('change', () => {
       currentTeamId = teamSelect.value;
       saveState();
       renderCurrentTeamConfig();
-      recalc();
     });
 
     addTeamBtn.addEventListener('click', () => {
@@ -1102,7 +1170,8 @@
         rdBonusRate: 5,
         cskhBonusRate: 3,
         hcnsBonusRate: 3,
-        mediaBonusRate: 2
+        mediaBonusRate: 2,
+        targets: [...DEFAULT_TARGETS]
       };
       currentTeamId = id;
       saveState();
@@ -1114,8 +1183,10 @@
     saveTeamBtn.addEventListener('click', () => {
       const team = teams[currentTeamId];
       if (!team) return;
+
       team.name = teamNameInput.value || team.name;
-      team.fixedCost = normalizeMoneyInput(fixedCostInput);
+      team.fixedCost = parseMoney(teamNameInput.value) ? team.fixedCost : parseMoney(fixedCostInput.value);
+      team.fixedCost = parseMoney(fixedCostInput.value);
       team.cogsRate = parseFloat(cogsRateInput.value || '0');
       team.sellRate = parseFloat(sellRateInput.value || '0');
       team.otherRate = parseFloat(otherRateInput.value || '0');
@@ -1124,7 +1195,7 @@
       team.cskhBonusRate = parseFloat(cskhBonusRateInput.value || '0');
       team.hcnsBonusRate = parseFloat(hcnsBonusRateInput.value || '0');
       team.mediaBonusRate = parseFloat(mediaBonusRateInput.value || '0');
-      teams[currentTeamId] = team;
+
       saveState();
       renderTeamOptions();
       renderCurrentTeamConfig();
@@ -1134,7 +1205,10 @@
     resetTeamBtn.addEventListener('click', () => {
       const def = DEFAULT_TEAMS[currentTeamId];
       if (def) {
-        teams[currentTeamId] = { ...def };
+        teams[currentTeamId] = {
+          ...def,
+          targets: [...def.targets]
+        };
       } else {
         teams[currentTeamId] = {
           id: currentTeamId,
@@ -1147,7 +1221,8 @@
           rdBonusRate: 5,
           cskhBonusRate: 3,
           hcnsBonusRate: 3,
-          mediaBonusRate: 2
+          mediaBonusRate: 2,
+          targets: [...DEFAULT_TARGETS]
         };
       }
       saveState();
@@ -1156,33 +1231,16 @@
       recalc();
     });
 
-    [
-      fixedCostInput,
-      cogsRateInput,
-      sellRateInput,
-      otherRateInput,
-      saleBonusRateInput,
-      rdBonusRateInput,
-      cskhBonusRateInput,
-      hcnsBonusRateInput,
-      mediaBonusRateInput
-    ].forEach(el => {
+    [fixedCostInput, cogsRateInput, sellRateInput, otherRateInput].forEach(el => {
       el.addEventListener('input', () => {
-        recalc();
+        normalizeMoneyInput(fixedCostInput);
+        recalcLeftPreview();
       });
-    });
-
-    // Toggle ẩn/hiện tổng quan tất cả team
-    multiTeamToggleBtn.addEventListener('click', () => {
-      const isHidden = multiTeamInner.style.display === 'none';
-      multiTeamInner.style.display = isHidden ? '' : 'none';
-      multiTeamToggleBtn.textContent = isHidden ? 'Ẩn' : 'Hiện';
     });
 
     // INIT
     loadState();
     renderTeamOptions();
-    renderTargetsInputs();
     renderCurrentTeamConfig();
     recalc();
   });
