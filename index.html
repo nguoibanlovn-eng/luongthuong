@@ -75,6 +75,12 @@
       border-color: #2563eb;
     }
 
+    .team-name {
+      max-width: 170px;
+      font-weight: 600;
+      font-size: 13px;
+    }
+
     .grid {
       display: grid;
       grid-template-columns: repeat(12, minmax(0, 1fr));
@@ -93,11 +99,16 @@
 
     .card {
       border-radius: 14px;
-      border: 1px solid rgba(128,128,128,0.35);
+      border: 1px solid rgba(148,163,184,0.8);
       padding: 10px;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
       background: rgba(255,255,255,0.02);
     }
+    .card.team-0 { border-left: 4px solid #3b82f6; background: rgba(59,130,246,0.02); }
+    .card.team-1 { border-left: 4px solid #22c55e; background: rgba(34,197,94,0.02); }
+    .card.team-2 { border-left: 4px solid #f97316; background: rgba(249,115,22,0.02); }
+    .card.team-3 { border-left: 4px solid #a855f7; background: rgba(168,85,247,0.02); }
+
     .card-header {
       display: flex;
       align-items: center;
@@ -116,8 +127,9 @@
       font-size: 11px;
       padding: 2px 6px;
       border-radius: 999px;
-      border: 1px solid rgba(128,128,128,0.6);
-      background: rgba(128,128,128,0.05);
+      border: 1px solid rgba(148,163,184,0.9);
+      background: rgba(148,163,184,0.15);
+      font-weight: 600;
     }
 
     .pill-input {
@@ -127,8 +139,8 @@
       font-size: 11px;
       padding: 4px 10px;
       border-radius: 999px;
-      border: 1px dashed rgba(128,128,128,0.6);
-      background: rgba(249,250,251,0.8);
+      border: 1px dashed rgba(148,163,184,0.9);
+      background: rgba(249,250,251,0.9);
     }
     .pill-input span { opacity: 0.7; }
     .pill-input strong { font-variant-numeric: tabular-nums; }
@@ -141,13 +153,13 @@
     }
     th, td {
       padding: 6px 8px;
-      border-bottom: 1px solid rgba(128,128,128,0.25);
+      border-bottom: 1px solid rgba(148,163,184,0.6);
       text-align: right;
       font-variant-numeric: tabular-nums;
       vertical-align: top;
     }
     th:first-child, td:first-child { text-align: left; }
-    th { font-weight: 600; background: rgba(148,163,184,0.18); }
+    th { font-weight: 600; background: rgba(148,163,184,0.25); }
     tbody tr:nth-child(even) { background: rgba(148,163,184,0.08); }
     tfoot td { font-weight: 600; background: rgba(37,99,235,0.06); }
     .row-total  { background: rgba(59,130,246,0.08) !important; }
@@ -185,6 +197,7 @@
       <span class="muted">Chọn team nhanh:</span>
       <button class="chip-button" data-name="TikTok"   onclick="focusTeam('TikTok')">TikTok</button>
       <button class="chip-button" data-name="Shopee"   onclick="focusTeam('Shopee')">Shopee</button>
+      <button class="chip-button" data-name="Website"  onclick="focusTeam('Website')">Website</button>
       <button class="chip-button" data-name="Facebook" onclick="focusTeam('Facebook')">Facebook</button>
       <button class="chip-button" data-name="Offline"  onclick="focusTeam('Offline')">Offline</button>
     </div>
@@ -228,7 +241,6 @@
       if (isNaN(n)) return "-";
       return n.toLocaleString("vi-VN", { maximumFractionDigits: 1 }) + " %";
     }
-    // hiển thị số + % trên doanh thu
     function cellValPct(val, revenue) {
       if (isNaN(val)) return "-";
       const base = formatCurrency(val);
@@ -259,7 +271,8 @@
 
     let teams = [
       createDefaultTeam("TikTok"),
-      createDefaultTeam("Shopee")
+      createDefaultTeam("Shopee"),
+      createDefaultTeam("Website")
     ];
 
     function focusTeam(name) {
@@ -368,7 +381,7 @@
       teams.forEach((team, index) => {
         const metrics = computeTeamMetrics(team);
         const card = document.createElement("div");
-        card.className = "card";
+        card.className = "card team-" + (index % 4);
         card.dataset.teamId = team.id;
 
         const breakEvenText = metrics.breakEven
@@ -381,9 +394,9 @@
               <span class="badge">Team ${index + 1}</span>
               <input
                 type="text"
+                class="team-name"
                 value="${team.name}"
-                oninput="handleInput('${team.id}', 'name', this.value)"
-                style="max-width: 170px;"
+                onchange="handleInput('${team.id}', 'name', this.value)"
               />
               <span class="pill-input">
                 <span>Tổng biến phí:</span>
@@ -414,7 +427,7 @@
                 <input
                   type="number"
                   value="${team.fixedCost}"
-                  oninput="handleInput('${team.id}', 'fixedCost', this.value)"
+                  onchange="handleInput('${team.id}', 'fixedCost', this.value)"
                   placeholder="Lương cứng, mặt bằng..."
                 />
               </div>
@@ -423,7 +436,7 @@
                 <input
                   type="number"
                   value="${team.cogs}"
-                  oninput="handleInput('${team.id}', 'cogs', this.value)"
+                  onchange="handleInput('${team.id}', 'cogs', this.value)"
                   placeholder="VD: 60"
                 />
               </div>
@@ -432,7 +445,7 @@
                 <input
                   type="number"
                   value="${team.selling}"
-                  oninput="handleInput('${team.id}', 'selling', this.value)"
+                  onchange="handleInput('${team.id}', 'selling', this.value)"
                   placeholder="VD: 10"
                 />
               </div>
@@ -441,7 +454,7 @@
                 <input
                   type="number"
                   value="${team.other}"
-                  oninput="handleInput('${team.id}', 'other', this.value)"
+                  onchange="handleInput('${team.id}', 'other', this.value)"
                   placeholder="VD: 5"
                 />
               </div>
@@ -457,7 +470,7 @@
                 <input
                   type="number"
                   value="${team.bonusSale}"
-                  oninput="handleInput('${team.id}', 'bonusSale', this.value)"
+                  onchange="handleInput('${team.id}', 'bonusSale', this.value)"
                 />
               </div>
               <div class="col-2">
@@ -465,7 +478,7 @@
                 <input
                   type="number"
                   value="${team.bonusRD}"
-                  oninput="handleInput('${team.id}', 'bonusRD', this.value)"
+                  onchange="handleInput('${team.id}', 'bonusRD', this.value)"
                 />
               </div>
               <div class="col-2">
@@ -473,7 +486,7 @@
                 <input
                   type="number"
                   value="${team.bonusCSKH}"
-                  oninput="handleInput('${team.id}', 'bonusCSKH', this.value)"
+                  onchange="handleInput('${team.id}', 'bonusCSKH', this.value)"
                 />
               </div>
               <div class="col-2">
@@ -481,7 +494,7 @@
                 <input
                   type="number"
                   value="${team.bonusKT}"
-                  oninput="handleInput('${team.id}', 'bonusKT', this.value)"
+                  onchange="handleInput('${team.id}', 'bonusKT', this.value)"
                 />
               </div>
               <div class="col-2">
@@ -489,7 +502,7 @@
                 <input
                   type="number"
                   value="${team.bonusMedia}"
-                  oninput="handleInput('${team.id}', 'bonusMedia', this.value)"
+                  onchange="handleInput('${team.id}', 'bonusMedia', this.value)"
                 />
               </div>
               <div class="col-12 muted">
@@ -504,7 +517,7 @@
                 <input
                   type="number"
                   value="${team.revenue1}"
-                  oninput="handleInput('${team.id}', 'revenue1', this.value)"
+                  onchange="handleInput('${team.id}', 'revenue1', this.value)"
                   placeholder="Mục tiêu thấp"
                 />
               </div>
@@ -513,7 +526,7 @@
                 <input
                   type="number"
                   value="${team.revenue2}"
-                  oninput="handleInput('${team.id}', 'revenue2', this.value)"
+                  onchange="handleInput('${team.id}', 'revenue2', this.value)"
                   placeholder="Mục tiêu chuẩn"
                 />
               </div>
@@ -522,7 +535,7 @@
                 <input
                   type="number"
                   value="${team.revenue3}"
-                  oninput="handleInput('${team.id}', 'revenue3', this.value)"
+                  onchange="handleInput('${team.id}', 'revenue3', this.value)"
                   placeholder="Thực tế đạt"
                 />
               </div>
