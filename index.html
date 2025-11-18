@@ -146,66 +146,62 @@
     .pill-input strong { font-variant-numeric: tabular-nums; }
 
     table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 4px;
-  font-size: 12px;
-  table-layout: fixed;          /* chia đều 3 cột mốc, tận dụng ngang */
-}
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 4px;
+      font-size: 12px;
+      table-layout: fixed;
+    }
+    th, td {
+      padding: 3px 6px;
+      border-bottom: 1px solid rgba(148,163,184,0.6);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      vertical-align: middle;
+    }
+    th:first-child,
+    td:first-child {
+      text-align: left;
+    }
+    th { font-weight: 600; background: rgba(148,163,184,0.25); }
+    tbody tr:nth-child(even) { background: rgba(148,163,184,0.08); }
+    tfoot td { font-weight: 600; background: rgba(37,99,235,0.06); }
+    .row-total  { background: rgba(59,130,246,0.08) !important; }
+    .row-profit { background: rgba(16,185,129,0.08) !important; }
 
-th, td {
-  padding: 3px 6px;             /* giảm padding dọc để hàng thấp hơn */
-  border-bottom: 1px solid rgba(148,163,184,0.6);
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-  vertical-align: middle;       /* căn giữa theo chiều dọc */
-}
+    .muted-percent {
+      display: inline-block;
+      margin-left: 4px;
+      font-size: 10px;
+      opacity: 0.7;
+    }
 
-th:first-child,
-td:first-child {
-  text-align: left;
-}
+    .positive { color: #16a34a; }
+    .negative { color: #dc2626; }
 
-.muted-percent {
-  display: inline-block;        /* cùng dòng với số tiền */
-  margin-top: 0;
-  margin-left: 4px;             /* cách nhẹ ra cho dễ đọc */
-  font-size: 10px;
-  opacity: 0.7;
-}
+    .table-input {
+      height: 22px;
+      padding: 1px 4px;
+      font-size: 12px;
+      text-align: right;
+      border-radius: 6px;
+      background: transparent;
+    }
 
-.table-input {
-  height: 22px;                 /* ô nhập thấp hơn */
-  padding: 1px 4px;
-  font-size: 12px;
-  text-align: right;
-  border-radius: 6px;
-  background: transparent;
-}
     .section-divider {
       margin: 14px 0 8px;
       border-top: 1px dashed rgba(148,163,184,0.9);
     }
     .tagline { font-size: 12px; margin-top: 12px; }
 
-    .status-chip {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 999px;
+    .mini-compare {
+      margin-top: 6px;
       font-size: 11px;
-      font-weight: 500;
     }
-    .status-bad {
-      background: #fee2e2;
-      color: #b91c1c;
-    }
-    .status-warn {
-      background: #fef3c7;
-      color: #92400e;
-    }
-    .status-good {
-      background: #dcfce7;
-      color: #166534;
+
+    .mini-compare th,
+    .mini-compare td {
+      padding: 2px 6px;
     }
   </style>
 </head>
@@ -241,10 +237,10 @@ td:first-child {
 
   <div class="section-divider"></div>
 
-  <h2>Mục tiêu doanh thu &amp; tổng quan các team</h2>
+  <h2>Tổng quan doanh thu &amp; thưởng các team</h2>
   <p class="muted">
     Mỗi team dùng 3 mốc doanh thu: <b>Mốc 1</b>, <b>Mốc 2</b>, <b>Mốc 3 (thực tế)</b>. Mốc 3 dùng để
-    tính tổng doanh thu &amp; tổng thưởng toàn công ty.
+    tính tổng doanh thu &amp; tổng thưởng toàn doanh nghiệp.
   </p>
 
   <h2 style="margin-top: 18px;">Tổng quan tất cả team (Mốc 3 – thực tế)</h2>
@@ -280,52 +276,38 @@ td:first-child {
       const base = formatCurrency(val);
       if (!revenue || isNaN(revenue) || revenue === 0) return base;
       const pct = (val / revenue) * 100;
-      return `${base}<span class="muted-percent">${pct.toFixed(1)}%</span>`;
-    };
-
-    // ===== Status chips =====
-    const revenueStatus = (actual, target) => {
-      if (!target || target <= 0 || isNaN(actual)) {
-        return { cls: "", label: "--" };
-      }
-      const ratio = actual / target;
-      const pct = (ratio * 100).toFixed(0);
-      if (ratio < 0.8)  return { cls: "status-bad",  label: `${pct}% mục tiêu` };
-      if (ratio < 1.0)  return { cls: "status-warn", label: `${pct}% mục tiêu` };
-      return             { cls: "status-good", label: `${pct}% mục tiêu` };
-    };
-
-    const costStatus = (actualPct, targetPct) => {
-      if ((targetPct === null || targetPct === undefined || targetPct === "") || isNaN(actualPct)) {
-        return { cls: "", label: "--" };
-      }
-      const target = Number(targetPct);
-      const diff = actualPct - target;
-      if (diff <= 0)   return { cls: "status-good", label: "≤ mục tiêu" };
-      if (diff <= 5)   return { cls: "status-warn", label: `+${diff.toFixed(1)} điểm %` };
-      return           { cls: "status-bad",  label: `vượt ${diff.toFixed(1)} điểm %` };
+      return `${base}<span class="muted-percent">(${pct.toFixed(1)}%)</span>`;
     };
 
     // ===== Data =====
     const createDefaultTeam = (name) => {
-      const baseVar = 60 + 10 + 5;
+      const fixedCost = 30000000;
+      const cogs = 60;
+      const selling = 10;
+      const other = 5;
+
       return {
         id: Date.now().toString() + Math.random().toString(16).slice(2),
         name: name || "Team mới",
-        fixedCost: 30000000,
-        cogs: 60,
-        selling: 10,
-        other: 5,
+        fixedCost,
+        cogs,
+        selling,
+        other,
+        // % thưởng mặc định theo bảng gốc
         bonusSale: 10,
         bonusRD: 5,
         bonusCSKH: 5,
         bonusKT: 3,
         bonusMedia: 5,
+        // doanh thu 3 mốc
         revenue1: 100000000,
         revenue2: 150000000,
         revenue3: 200000000,
-        targetRevenue3: 200000000,
-        targetVarPct: baseVar,
+        // target chi phí
+        targetFixedCost: fixedCost,
+        targetCogs: cogs,
+        targetSelling: selling,
+        targetOther: other,
         collapsed: false
       };
     };
@@ -452,23 +434,6 @@ td:first-child {
           ? `${formatCurrency(metrics.breakEven)} đ`
           : "Không xác định";
 
-        const revStatus = revenueStatus(metrics.m3.revenue, Number(team.targetRevenue3) || 0);
-        const costStat  = costStatus(metrics.varPct, team.targetVarPct);
-
-        // Chip so sánh chi phí ngay ở header
-        let costHeaderHtml = "";
-        if (costStat.cls) {
-          let targetTxt = "";
-          if (team.targetVarPct !== null && team.targetVarPct !== undefined && team.targetVarPct !== "") {
-            targetTxt = ` (target ${formatPercent(team.targetVarPct)})`;
-          }
-          costHeaderHtml = `
-            <span class="status-chip ${costStat.cls}">
-              Chi phí${targetTxt}: ${costStat.label}
-            </span>
-          `;
-        }
-
         const headerHtml = `
           <div class="card-header">
             <div class="card-header-left">
@@ -483,7 +448,6 @@ td:first-child {
                 <span>Tổng biến phí:</span>
                 <strong>${formatPercent(metrics.varPct)}</strong>
               </span>
-              ${costHeaderHtml}
               <span class="pill-input">
                 <span>Điểm hòa vốn:</span>
                 <strong>${breakEvenText}</strong>
@@ -502,11 +466,6 @@ td:first-child {
 
         let bodyHtml = "";
         if (!team.collapsed) {
-          const targetVarPctDisplay =
-            team.targetVarPct === null || team.targetVarPct === undefined
-              ? ""
-              : String(team.targetVarPct);
-
           const profitClassM1 = metrics.m1.netProfit >= 0 ? "positive" : "negative";
           const profitClassM2 = metrics.m2.netProfit >= 0 ? "positive" : "negative";
           const profitClassM3 = metrics.m3.netProfit >= 0 ? "positive" : "negative";
@@ -514,6 +473,32 @@ td:first-child {
           const paClassM1 = metrics.m1.profitAfterBonus >= 0 ? "positive" : "negative";
           const paClassM2 = metrics.m2.profitAfterBonus >= 0 ? "positive" : "negative";
           const paClassM3 = metrics.m3.profitAfterBonus >= 0 ? "positive" : "negative";
+
+          // so sánh target vs thực tế cho từng loại chi phí
+          const fixedActual  = Number(team.fixedCost) || 0;
+          const fixedTarget  = Number(team.targetFixedCost) || 0;
+          let fixedDiffTxt = "--", fixedDiffClass = "";
+          if (fixedTarget > 0) {
+            const diffPct = ((fixedActual - fixedTarget) / fixedTarget) * 100;
+            const sign = diffPct >= 0 ? "+" : "";
+            fixedDiffTxt = `${sign}${diffPct.toFixed(1)}%`;
+            fixedDiffClass = diffPct <= 0 ? "positive" : "negative";
+          }
+
+          const comparePercent = (actual, target) => {
+            actual = Number(actual) || 0;
+            target = Number(target) || 0;
+            if (!target) return { txt: "--", cls: "" };
+            const diff = actual - target;
+            const sign = diff >= 0 ? "+" : "";
+            const txt = `${sign}${diff.toFixed(1)} điểm %`;
+            const cls = diff <= 0 ? "positive" : "negative";
+            return { txt, cls };
+          };
+
+          const cogsCmp    = comparePercent(team.cogs,    team.targetCogs);
+          const sellCmp    = comparePercent(team.selling, team.targetSelling);
+          const otherCmp   = comparePercent(team.other,   team.targetOther);
 
           bodyHtml = `
             <div class="grid">
@@ -555,6 +540,74 @@ td:first-child {
               </div>
               <div class="col-12 muted">
                 = Giá vốn + Chi phí bán hàng + Chi phí khác → <b>Tổng biến phí: ${formatPercent(metrics.varPct)}</b>
+              </div>
+
+              <!-- Bảng so sánh mong muốn / thực tế / chênh lệch -->
+              <div class="col-12">
+                <table class="mini-compare">
+                  <thead>
+                    <tr>
+                      <th>Chỉ tiêu</th>
+                      <th>Target</th>
+                      <th>Thực tế</th>
+                      <th>Chênh lệch</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Chi phí cố định</td>
+                      <td>
+                        <input
+                          type="text"
+                          class="table-input"
+                          value="${formatMoneyInput(team.targetFixedCost)}"
+                          onchange="handleMoney('${team.id}','targetFixedCost',this.value)"
+                        />
+                      </td>
+                      <td>${formatCurrency(fixedActual)}</td>
+                      <td class="${fixedDiffClass}">${fixedDiffTxt}</td>
+                    </tr>
+                    <tr>
+                      <td>Giá vốn (COGS)</td>
+                      <td>
+                        <input
+                          type="number"
+                          class="table-input"
+                          value="${team.targetCogs}"
+                          onchange="handleInput('${team.id}','targetCogs',this.value)"
+                        />
+                      </td>
+                      <td>${formatPercent(team.cogs)}</td>
+                      <td class="${cogsCmp.cls}">${cogsCmp.txt}</td>
+                    </tr>
+                    <tr>
+                      <td>Chi phí bán hàng</td>
+                      <td>
+                        <input
+                          type="number"
+                          class="table-input"
+                          value="${team.targetSelling}"
+                          onchange="handleInput('${team.id}','targetSelling',this.value)"
+                        />
+                      </td>
+                      <td>${formatPercent(team.selling)}</td>
+                      <td class="${sellCmp.cls}">${sellCmp.txt}</td>
+                    </tr>
+                    <tr>
+                      <td>Chi phí khác</td>
+                      <td>
+                        <input
+                          type="number"
+                          class="table-input"
+                          value="${team.targetOther}"
+                          onchange="handleInput('${team.id}','targetOther',this.value)"
+                        />
+                      </td>
+                      <td>${formatPercent(team.other)}</td>
+                      <td class="${otherCmp.cls}">${otherCmp.txt}</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
 
               <div class="col-12" style="margin-top:6px;">
@@ -602,43 +655,6 @@ td:first-child {
               </div>
               <div class="col-12 muted">
                 Tổng % thưởng = Sale + RD + CSKH + KT + Media. Nên giữ ở mức hợp lý để doanh nghiệp vẫn còn lợi nhuận.
-              </div>
-
-              <!-- Mục tiêu & đánh giá -->
-              <div class="col-3" style="margin-top:6px;">
-                <p><strong>Mục tiêu DT Mốc 3 (VNĐ)</strong></p>
-                <input
-                  type="text"
-                  value="${formatMoneyInput(team.targetRevenue3)}"
-                  onchange="handleMoney('${team.id}','targetRevenue3',this.value)"
-                  placeholder="VD: 200.000.000"
-                />
-              </div>
-              <div class="col-3" style="margin-top:6px;">
-                <p><strong>Mục tiêu tổng biến phí (%)</strong></p>
-                <input
-                  type="number"
-                  value="${targetVarPctDisplay}"
-                  onchange="handleInput('${team.id}','targetVarPct',this.value)"
-                  placeholder="VD: 75"
-                />
-              </div>
-              <div class="col-6" style="margin-top:6px;">
-                <p><strong>Đánh giá nhanh so với mục tiêu</strong></p>
-                <div class="grid" style="gap:4px;">
-                  <div class="col-6">
-                    <div class="muted">Doanh thu Mốc 3</div>
-                    <span class="status-chip ${revStatus.cls}">
-                      ${revStatus.label}
-                    </span>
-                  </div>
-                  <div class="col-6">
-                    <div class="muted">Tổng biến phí</div>
-                    <span class="status-chip ${costStat.cls}">
-                      ${costStat.label}
-                    </span>
-                  </div>
-                </div>
               </div>
             </div>
 
