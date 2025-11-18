@@ -279,6 +279,9 @@
     <div style="display:flex; gap:6px; flex-wrap:wrap;">
       <button class="small" onclick="resetToDefaults()">Cập nhật lại chỉ số</button>
       <button class="small" onclick="saveDefaultsFromCurrent()">Lưu làm mặc định</button>
+      <!-- 2 nút mới -->
+  <button class="small" onclick="loadFromServer()">Tải từ Google Sheet</button>
+  <button class="small" onclick="saveToServer()">Lưu lên Google Sheet</button>
       <button class="primary" onclick="addTeam()">+ Thêm team</button>
     </div>
   </div>
@@ -310,10 +313,16 @@
     </div>
   </div>
 
-  <script>
-    // ===== Storage keys =====
-    const STORAGE_KEY_STATE = "thuong_tool_state_v1";
-    const STORAGE_KEY_DEFAULTS = "thuong_tool_defaults_v1";
+<script>
+// ===== API Google Apps Script =====
+const API_URL = 'https://script.google.com/macros/s/AKfycbwmSNxt3fvHzWnfl3fHMhDi4GWaDfWTMeNPtXiSOyu_h2hLfrJvTbJRP3C50ob5zeBPFQ/exec';
+const SCENARIO_ID = 'default';
+
+// ===== Storage keys =====
+const STORAGE_KEY_STATE = "thuong_tool_state_v1";
+const STORAGE_KEY_DEFAULTS = "thuong_tool_defaults_v1";
+...
+
 
     const loadJSON = (key) => {
       try {
