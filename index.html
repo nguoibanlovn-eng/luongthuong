@@ -990,83 +990,101 @@
 
     // ===== Render summary =====
     const renderSummary = () => {
-      const container = document.getElementById("summaryContainer");
-      if (!teams.length) {
-        container.innerHTML = "<p class='muted'>Chưa có team nào.</p>";
-        return;
-      }
+  const container = document.getElementById("summaryContainer");
+  if (!teams.length) {
+    container.innerHTML = "<p class='muted'>Chưa có team nào.</p>";
+    return;
+  }
 
-      let rowsHtml = "";
-      let totalRevenue = 0;
-      let totalProfit = 0;
-      let totalSale = 0, totalRD = 0, totalCSKH = 0, totalKT = 0, totalMedia = 0, totalBonus = 0;
+  let rowsHtml = "";
 
-      teams.forEach(team => {
-        const metrics = computeTeamMetrics(team).m3;
-        totalRevenue += metrics.revenue;
-        totalProfit  += metrics.profitAfterBonus;
-        totalSale    += metrics.bonusSale;
-        totalRD      += metrics.bonusRD;
-        totalCSKH    += metrics.bonusCSKH;
-        totalKT      += metrics.bonusKT;
-        totalMedia   += metrics.bonusMedia;
-        totalBonus   += metrics.totalBonus;
+  let totalRevenue = 0;
+  let totalGross   = 0;
+  let totalProfit  = 0;
+  let totalSale    = 0;
+  let totalRD      = 0;
+  let totalCSKH    = 0;
+  let totalKT      = 0;
+  let totalMedia   = 0;
+  let totalBonus   = 0;
 
-        const paCls = metrics.profitAfterBonus >= 0 ? "positive" : "negative";
+  teams.forEach(team => {
+    const m = computeTeamMetrics(team).m3; // dùng Mốc 3 – thực tế
 
-        rowsHtml += `
-          <tr>
-            <td>${team.name}</td>
-            <td>${formatCurrency(metrics.revenue)}</td>
-            <td class="${paCls}">${formatCurrency(metrics.profitAfterBonus)}</td>
-            <td>${formatCurrency(metrics.bonusSale)}</td>
-            <td>${formatCurrency(metrics.bonusRD)}</td>
-            <td>${formatCurrency(metrics.bonusCSKH)}</td>
-            <td>${formatCurrency(metrics.bonusKT)}</td>
-            <td>${formatCurrency(metrics.bonusMedia)}</td>
-            <td>${formatCurrency(metrics.totalBonus)}</td>
-          </tr>
-        `;
-      });
+    totalRevenue += m.revenue;
+    totalGross   += m.grossProfit;
+    totalProfit  += m.profitAfterBonus;
+    totalSale    += m.bonusSale;
+    totalRD      += m.bonusRD;
+    totalCSKH    += m.bonusCSKH;
+    totalKT      += m.bonusKT;
+    totalMedia   += m.bonusMedia;
+    totalBonus   += m.totalBonus;
 
-      const totalCls = totalProfit >= 0 ? "positive" : "negative";
+    const grossCls = m.grossProfit       >= 0 ? "positive" : "negative";
+    const profitCls= m.profitAfterBonus  >= 0 ? "positive" : "negative";
 
-      const tableHtml = `
-        <table>
-          <thead>
-            <tr>
-              <th>Team</th>
-              <th>Doanh thu Mốc 3</th>
-              <th>Lợi nhuận sau thưởng</th>
-              <th>Thưởng Sale</th>
-              <th>Thưởng RD</th>
-              <th>Thưởng CSKH</th>
-              <th>Thưởng KT+HCNS</th>
-              <th>Thưởng Media</th>
-              <th>Tổng thưởng</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${rowsHtml}
-          </tbody>
-          <tfoot>
-            <tr>
-              <td><strong>Tổng doanh nghiệp</strong></td>
-              <td>${formatCurrency(totalRevenue)}</td>
-              <td class="${totalCls}">${formatCurrency(totalProfit)}</td>
-              <td>${formatCurrency(totalSale)}</td>
-              <td>${formatCurrency(totalRD)}</td>
-              <td>${formatCurrency(totalCSKH)}</td>
-              <td>${formatCurrency(totalKT)}</td>
-              <td>${formatCurrency(totalMedia)}</td>
-              <td>${formatCurrency(totalBonus)}</td>
-            </tr>
-          </tfoot>
-        </table>
-      `;
+    rowsHtml += `
+      <tr>
+        <td>${team.name}</td>
+        <td>${formatCurrency(m.revenue)}</td>
+        <td class="${grossCls}">${cellValPct(m.grossProfit, m.revenue)}</td>
+        <td class="${profitCls}">${cellValPct(m.profitAfterBonus, m.revenue)}</td>
+        <td>${formatCurrency(m.bonusSale)}</td>
+        <td>${formatCurrency(m.bonusRD)}</td>
+        <td>${formatCurrency(m.bonusCSKH)}</td>
+        <td>${formatCurrency(m.bonusKT)}</td>
+        <td>${formatCurrency(m.bonusMedia)}</td>
+        <td>${cellValPct(m.totalBonus, m.revenue)}</td>
+      </tr>
+    `;
+  });
 
-      container.innerHTML = tableHtml;
-    };
+  const totalGrossCls  = totalGross  >= 0 ? "positive" : "negative";
+  const totalProfitCls = totalProfit >= 0 ? "positive" : "negative";
+
+  const tableHtml = `
+    <table>
+      <thead>
+        <tr>
+          <th>Team</th>
+          <th>Doanh thu Mốc 3</th>
+          <th>Lợi nhuận gộp</th>
+          <th>Lợi nhuận sau thưởng</th>
+          <th>Thưởng Sale</th>
+          <th>Thưởng RD</th>
+          <th>Thưởng CSKH</th>
+          <th>Thưởng KT+HCNS</th>
+          <th>Thưởng Media</th>
+          <th>Tổng thưởng</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rowsHtml}
+      </tbody>
+      <tfoot>
+        <tr>
+          <td><strong>Tổng doanh nghiệp</strong></td>
+          <td>${formatCurrency(totalRevenue)}</td>
+          <td class="${totalGrossCls}">
+            ${cellValPct(totalGross, totalRevenue)}
+          </td>
+          <td class="${totalProfitCls}">
+            ${cellValPct(totalProfit, totalRevenue)}
+          </td>
+          <td>${formatCurrency(totalSale)}</td>
+          <td>${formatCurrency(totalRD)}</td>
+          <td>${formatCurrency(totalCSKH)}</td>
+          <td>${formatCurrency(totalKT)}</td>
+          <td>${formatCurrency(totalMedia)}</td>
+          <td>${cellValPct(totalBonus, totalRevenue)}</td>
+        </tr>
+      </tfoot>
+    </table>
+  `;
+
+  container.innerHTML = tableHtml;
+};
 
     const render = () => {
       renderTeams();
