@@ -461,7 +461,7 @@
           if (!target) return { txt: "--", cls: "" };
           const diff = actual - target;
           const sign = diff >= 0 ? "+" : "";
-          const txt = `${sign}${diff.toFixed(1)} điểm %`;
+          const txt = `${sign}${diff.toFixed(1)}%`;
           const cls = diff <= 0 ? "positive" : "negative";
           return { txt, cls };
         };
