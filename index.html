@@ -192,7 +192,6 @@
       margin: 14px 0 8px;
       border-top: 1px dashed rgba(148,163,184,0.9);
     }
-    .tagline { font-size: 12px; margin-top: 12px; }
 
     .mini-compare {
       margin-top: 2px;
@@ -210,21 +209,59 @@
       max-width: 110px;
     }
 
-   .bonus-input {
-  width: 70px !important;
-  max-width: 100%;
-  height: 22px !important;
-  font-size: 12px;
-  text-align: right;
-  padding: 2px 4px;
-}
+    .bonus-input {
+      width: 70px !important;
+      max-width: 100%;
+      height: 22px !important;
+      font-size: 12px;
+      text-align: right;
+      padding: 2px 4px;
+    }
+    .bonus-field {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .bonus-label {
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .blog-promo {
+      margin-top: 20px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(37,99,235,0.4);
+      background: linear-gradient(90deg, rgba(37,99,235,0.08), rgba(59,130,246,0.02));
+    }
+    .blog-promo-title {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .blog-promo-link {
+      display: inline-block;
+      margin-bottom: 4px;
+      font-weight: 600;
+      text-decoration: none;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(37,99,235,0.7);
+    }
+    .blog-promo-link:hover {
+      background: rgba(37,99,235,0.12);
+    }
+    .blog-promo-sub {
+      font-size: 12px;
+      opacity: 0.8;
+    }
   </style>
 </head>
 <body>
   <h1>Plan doanh thu – lợi nhuận – thưởng theo team</h1>
   <p class="muted">
     Công cụ nội bộ giúp Lỗ Vũ &amp; team set target, tính hòa vốn, chia thưởng theo từng team
-    (Sale, RD, CSKH, KT+HCNS, Media).
+    (Sale, RD, CSKH, KT+HCNS, Media). Đơn vị doanh thu &amp; chi phí có thể dùng theo triệu cho dễ nhìn.
   </p>
 
   <div class="section-divider"></div>
@@ -237,15 +274,17 @@
       <button class="chip-button" data-name="Shopee"   onclick="focusTeam('Shopee')">Shopee</button>
       <button class="chip-button" data-name="Website"  onclick="focusTeam('Website')">Website</button>
       <button class="chip-button" data-name="Facebook" onclick="focusTeam('Facebook')">Facebook</button>
-      <button class="chip-button" data-name="Offline"  onclick="focusTeam('Offline')">Offline</button>
+      <button class="chip-button" data-name="B2B"      onclick="focusTeam('B2B')">B2B</button>
     </div>
-    <div>
+    <div style="display:flex; gap:6px; flex-wrap:wrap;">
+      <button class="small" onclick="resetToDefaults()">Cập nhật lại chỉ số</button>
+      <button class="small" onclick="saveDefaultsFromCurrent()">Lưu làm mặc định</button>
       <button class="primary" onclick="addTeam()">+ Thêm team</button>
     </div>
   </div>
   <p class="muted">
-    • Thay đổi chỉ lưu trong lần mở trang này (reload sẽ quay về mặc định).<br />
-    • Mỗi team có chi phí &amp; mức thưởng riêng: Sale, RD, CSKH, KT+HCNS, Media.
+    • Thay đổi được lưu lại trên trình duyệt của anh (localStorage).<br />
+    • “Lưu làm mặc định” sẽ ghi nhớ cấu hình hiện tại để lần reset sau dùng lại.
   </p>
 
   <div id="teamsContainer"></div>
@@ -261,12 +300,40 @@
   <h2 style="margin-top: 18px;">Tổng quan tất cả team (Mốc 3 – thực tế)</h2>
   <div id="summaryContainer"></div>
 
-  <p class="tagline">
-    Xây dựng bởi Lỗ Vũ – đọc thêm chia sẻ về TMĐT tại
-    <a href="https://nguoibanlo.vn" target="_blank" rel="noreferrer">nguoibanlo.vn</a>
-  </p>
+  <div class="blog-promo">
+    <div class="blog-promo-title">Đọc thêm các bài viết &amp; case thực chiến tại trang chủ:</div>
+    <a href="https://nguoibanlo.vn" target="_blank" rel="noreferrer" class="blog-promo-link">
+      nguoibanlo.vn
+    </a>
+    <div class="blog-promo-sub">
+      Chia sẻ về TMĐT, xây kênh, chia thưởng, tối ưu P&amp;L cho SME Việt – phong cách Lỗ Vũ.
+    </div>
+  </div>
 
   <script>
+    // ===== Storage keys =====
+    const STORAGE_KEY_STATE = "thuong_tool_state_v1";
+    const STORAGE_KEY_DEFAULTS = "thuong_tool_defaults_v1";
+
+    const loadJSON = (key) => {
+      try {
+        const raw = localStorage.getItem(key);
+        if (!raw) return null;
+        return JSON.parse(raw);
+      } catch (e) {
+        console.warn("Không đọc được", key, e);
+        return null;
+      }
+    };
+
+    const saveJSON = (key, value) => {
+      try {
+        localStorage.setItem(key, JSON.stringify(value));
+      } catch (e) {
+        console.warn("Không lưu được", key, e);
+      }
+    };
+
     // ===== Helper format =====
     const formatCurrency = (n) => {
       if (isNaN(n)) return "-";
@@ -294,46 +361,159 @@
       return `${base}<span class="muted-percent">(${pct.toFixed(1)}%)</span>`;
     };
 
-    // ===== Data =====
+    // ===== Default config per channel (đơn vị theo file Excel gốc) =====
+    const DEFAULT_TEAMS = {
+      Facebook: {
+        fixedCost: 320,
+        cogs: 60,
+        selling: 15,
+        other: 5,
+        bonusSale: 27,
+        bonusRD: 4,
+        bonusCSKH: 1,
+        bonusKT: 1.2,
+        bonusMedia: 1,
+        revenue1: 1250,
+        revenue2: 2309,
+        revenue3: 2800,
+      },
+      TikTok: {
+        fixedCost: 320,
+        cogs: 51,
+        selling: 30,
+        other: 5,
+        bonusSale: 27,
+        bonusRD: 4,
+        bonusCSKH: 1,
+        bonusKT: 1.2,
+        bonusMedia: 1,
+        revenue1: 1800,
+        revenue2: 1862,
+        revenue3: 2800,
+      },
+      Shopee: {
+        fixedCost: 120,
+        cogs: 53,
+        selling: 30,
+        other: 5,
+        bonusSale: 7,
+        bonusRD: 4,
+        bonusCSKH: 1,
+        bonusKT: 1.2,
+        bonusMedia: 1,
+        revenue1: 800,
+        revenue2: 1030,
+        revenue3: 1200,
+      },
+      Website: {
+        fixedCost: 75,
+        cogs: 60,
+        selling: 15,
+        other: 5,
+        bonusSale: 25,
+        bonusRD: 4,
+        bonusCSKH: 1,
+        bonusKT: 1.2,
+        bonusMedia: 1,
+        revenue1: 245,
+        revenue2: 245,
+        revenue3: 320,
+      },
+      B2B: {
+        fixedCost: 75,
+        cogs: 60,
+        selling: 15,
+        other: 5,
+        bonusSale: 20, // Sale B2B ăn 20% LNR
+        bonusRD: 4,
+        bonusCSKH: 1,
+        bonusKT: 1.2,
+        bonusMedia: 1,
+        revenue1: 245,
+        revenue2: 245,
+        revenue3: 320,
+      },
+    };
+
+    // ===== Create default team object =====
     const createDefaultTeam = (name) => {
-      const fixedCost = 30000000;
-      const cogs = 60;
-      const selling = 10;
-      const other = 5;
+      const baseName = name || "Team mới";
+      const d = DEFAULT_TEAMS[baseName] || {};
+      const fixedCost = d.fixedCost ?? 100;
+      const cogs = d.cogs ?? 60;
+      const selling = d.selling ?? 10;
+      const other = d.other ?? 5;
 
       return {
         id: Date.now().toString() + Math.random().toString(16).slice(2),
-        name: name || "Team mới",
+        name: baseName,
         fixedCost,
         cogs,
         selling,
         other,
-        // % thưởng mặc định theo bảng gốc
-        bonusSale: 10,
-        bonusRD: 5,
-        bonusCSKH: 5,
-        bonusKT: 3,
-        bonusMedia: 5,
-        // doanh thu 3 mốc
-        revenue1: 100000000,
-        revenue2: 150000000,
-        revenue3: 200000000,
-        // target chi phí
-        targetFixedCost: fixedCost,
-        targetCogs: cogs,
-        targetSelling: selling,
-        targetOther: other,
-        collapsed: false
+        bonusSale: d.bonusSale ?? 10,
+        bonusRD: d.bonusRD ?? 4,
+        bonusCSKH: d.bonusCSKH ?? 1,
+        bonusKT: d.bonusKT ?? 1.2,
+        bonusMedia: d.bonusMedia ?? 1,
+        revenue1: d.revenue1 ?? 1000,
+        revenue2: d.revenue2 ?? 1500,
+        revenue3: d.revenue3 ?? 2000,
+        targetFixedCost: d.fixedCost ?? fixedCost,
+        targetCogs: d.cogs ?? cogs,
+        targetSelling: d.selling ?? selling,
+        targetOther: d.other ?? other,
+        collapsed: false,
       };
     };
 
-    let teams = [
+    const createInitialTeamsFromCodeDefaults = () => ([
       createDefaultTeam("TikTok"),
       createDefaultTeam("Shopee"),
-      createDefaultTeam("Website")
-    ];
+      createDefaultTeam("Website"),
+      createDefaultTeam("Facebook"),
+      createDefaultTeam("B2B"),
+    ]);
 
-    // ===== Logic =====
+    const loadState = () => loadJSON(STORAGE_KEY_STATE);
+    const saveState = () => saveJSON(STORAGE_KEY_STATE, teams);
+
+    const loadDefaults = () => loadJSON(STORAGE_KEY_DEFAULTS);
+
+    const saveDefaultsFromCurrent = () => {
+      saveJSON(STORAGE_KEY_DEFAULTS, teams);
+      alert("Đã lưu cấu hình hiện tại làm mặc định.");
+    };
+
+    const resetToDefaults = () => {
+      const storedDefaults = loadDefaults();
+      if (storedDefaults && storedDefaults.length) {
+        teams = storedDefaults.map(t => ({
+          ...createDefaultTeam(t.name || "Team"),
+          ...t,
+        }));
+      } else {
+        teams = createInitialTeamsFromCodeDefaults();
+      }
+      saveState();
+      render();
+    };
+
+    // ===== Init teams =====
+    const storedState = loadState();
+    let teams = storedState && storedState.length
+      ? storedState.map(t => ({
+          ...createDefaultTeam(t.name || "Team"),
+          ...t,
+        }))
+      : createInitialTeamsFromCodeDefaults();
+
+    // ===== Core logic =====
+    const formatMoneyInputField = (teamId, field, raw) => {
+      const num = parseMoneyInput(raw);
+      handleInput(teamId, field, num);
+    };
+
     const focusTeam = (name) => {
       document.querySelectorAll(".chip-button").forEach(btn => {
         btn.classList.toggle("active", btn.dataset.name === name);
@@ -443,7 +623,7 @@
       const diffPct = ((actual - target) / target) * 100;
       const sign = diffPct >= 0 ? "+" : "";
       const txt = `${sign}${diffPct.toFixed(1)}%`;
-      const cls = diffPct <= 0 ? "positive" : "negative";
+      const cls = diffPct <= 0 ? "positive" : "negative"; // xanh nếu ≤ target, đỏ nếu vượt
       return { txt, cls };
     };
 
@@ -459,10 +639,10 @@
         card.dataset.teamId = team.id;
 
         const breakEvenText = metrics.breakEven
-          ? `${formatCurrency(metrics.breakEven)} đ`
+          ? `${formatCurrency(metrics.breakEven)}`
           : "Không xác định";
 
-        // So sánh target vs thực tế cho từng loại chi phí
+        // So sánh target vs thực tế
         const fixedActual  = Number(team.fixedCost) || 0;
         const fixedTarget  = Number(team.targetFixedCost) || 0;
         let fixedDiffTxt = "--", fixedDiffClass = "";
@@ -519,7 +699,7 @@
 
           bodyHtml = `
             <div class="grid">
-              <!-- Bảng so sánh: điền luôn Target & Thực tế -->
+              <!-- Bảng so sánh: Target & Thực tế -->
               <div class="col-12">
                 <table class="mini-compare">
                   <thead>
@@ -532,7 +712,7 @@
                   </thead>
                   <tbody>
                     <tr>
-                      <td>Chi phí cố định / kỳ (VNĐ)</td>
+                      <td>Chi phí cố định / kỳ</td>
                       <td>
                         <input
                           type="text"
@@ -624,52 +804,62 @@
                 <p><strong>% thưởng trên LỢI NHUẬN (chỉ tính khi lợi nhuận &gt; 0)</strong></p>
               </div>
               <div class="col-2">
-                <p>Sale</p>
-                <input
-                  type="number"
-                  class="bonus-input"
-                  value="${team.bonusSale}"
-                  onchange="handleInput('${team.id}','bonusSale',this.value)"
-                />
+                <div class="bonus-field">
+                  <span class="bonus-label">Sale</span>
+                  <input
+                    type="number"
+                    class="bonus-input"
+                    value="${team.bonusSale}"
+                    onchange="handleInput('${team.id}','bonusSale',this.value)"
+                  />
+                </div>
               </div>
               <div class="col-2">
-                <p>RD</p>
-                <input
-                  type="number"
-                  class="bonus-input"
-                  value="${team.bonusRD}"
-                  onchange="handleInput('${team.id}','bonusRD',this.value)"
-                />
+                <div class="bonus-field">
+                  <span class="bonus-label">RD</span>
+                  <input
+                    type="number"
+                    class="bonus-input"
+                    value="${team.bonusRD}"
+                    onchange="handleInput('${team.id}','bonusRD',this.value)"
+                  />
+                </div>
               </div>
               <div class="col-2">
-                <p>CSKH</p>
-                <input
-                  type="number"
-                  class="bonus-input"
-                  value="${team.bonusCSKH}"
-                  onchange="handleInput('${team.id}','bonusCSKH',this.value)"
-                />
+                <div class="bonus-field">
+                  <span class="bonus-label">CSKH</span>
+                  <input
+                    type="number"
+                    class="bonus-input"
+                    value="${team.bonusCSKH}"
+                    onchange="handleInput('${team.id}','bonusCSKH',this.value)"
+                  />
+                </div>
               </div>
               <div class="col-2">
-                <p>KT + HCNS</p>
-                <input
-                  type="number"
-                  class="bonus-input"
-                  value="${team.bonusKT}"
-                  onchange="handleInput('${team.id}','bonusKT',this.value)"
-                />
+                <div class="bonus-field">
+                  <span class="bonus-label">KT + HCNS</span>
+                  <input
+                    type="number"
+                    class="bonus-input"
+                    value="${team.bonusKT}"
+                    onchange="handleInput('${team.id}','bonusKT',this.value)"
+                  />
+                </div>
               </div>
               <div class="col-2">
-                <p>Media</p>
-                <input
-                  type="number"
-                  class="bonus-input"
-                  value="${team.bonusMedia}"
-                  onchange="handleInput('${team.id}','bonusMedia',this.value)"
-                />
+                <div class="bonus-field">
+                  <span class="bonus-label">Media</span>
+                  <input
+                    type="number"
+                    class="bonus-input"
+                    value="${team.bonusMedia}"
+                    onchange="handleInput('${team.id}','bonusMedia',this.value)"
+                  />
+                </div>
               </div>
               <div class="col-12 muted">
-                Tổng % thưởng = Sale + RD + CSKH + KT + Media. Nên giữ ở mức hợp lý để doanh nghiệp vẫn còn lợi nhuận.
+                Tổng % thưởng = Sale + RD + CSKH + KT + Media. Thưởng tính trên LNR &gt; 0 của từng mốc.
               </div>
             </div>
 
@@ -881,6 +1071,7 @@
     const render = () => {
       renderTeams();
       renderSummary();
+      saveState();
     };
 
     render();
