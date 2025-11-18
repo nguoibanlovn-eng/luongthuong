@@ -194,14 +194,25 @@
     }
     .tagline { font-size: 12px; margin-top: 12px; }
 
-    .mini-compare {
-      margin-top: 4px;
-      font-size: 11px;
-    }
-    .mini-compare th,
-    .mini-compare td {
-      padding: 2px 6px;
-    }
+   .mini-compare {
+  margin-top: 2px;
+  font-size: 11px;
+  table-layout: auto;
+}
+
+.mini-compare th,
+.mini-compare td {
+  padding: 1px 4px;          /* giảm padding để hàng thấp hơn */
+}
+
+/* input trong bảng mini-compare nhỏ lại cho gọn */
+.mini-compare .table-input {
+  height: 20px;
+  font-size: 11px;
+  padding: 1px 4px;
+  max-width: 110px;          /* không cho quá rộng */
+}
+
   </style>
 </head>
 <body>
