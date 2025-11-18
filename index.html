@@ -999,6 +999,7 @@
   let rowsHtml = "";
 
   let totalRevenue = 0;
+  let totalCostBeforeBonus = 0;
   let totalGross   = 0;
   let totalProfit  = 0;
   let totalSale    = 0;
@@ -1011,30 +1012,34 @@
   teams.forEach(team => {
     const m = computeTeamMetrics(team).m3; // dùng Mốc 3 – thực tế
 
-    totalRevenue += m.revenue;
-    totalGross   += m.grossProfit;
-    totalProfit  += m.profitAfterBonus;
-    totalSale    += m.bonusSale;
-    totalRD      += m.bonusRD;
-    totalCSKH    += m.bonusCSKH;
-    totalKT      += m.bonusKT;
-    totalMedia   += m.bonusMedia;
-    totalBonus   += m.totalBonus;
+    const costBeforeBonus = m.variableCost + m.fixedCost;
 
-    const grossCls = m.grossProfit       >= 0 ? "positive" : "negative";
-    const profitCls= m.profitAfterBonus  >= 0 ? "positive" : "negative";
+    totalRevenue         += m.revenue;
+    totalCostBeforeBonus += costBeforeBonus;
+    totalGross           += m.grossProfit;
+    totalProfit          += m.profitAfterBonus;
+    totalSale            += m.bonusSale;
+    totalRD              += m.bonusRD;
+    totalCSKH            += m.bonusCSKH;
+    totalKT              += m.bonusKT;
+    totalMedia           += m.bonusMedia;
+    totalBonus           += m.totalBonus;
+
+    const grossCls  = m.grossProfit      >= 0 ? "positive" : "negative";
+    const profitCls = m.profitAfterBonus >= 0 ? "positive" : "negative";
 
     rowsHtml += `
       <tr>
         <td>${team.name}</td>
         <td>${formatCurrency(m.revenue)}</td>
+        <td>${cellValPct(costBeforeBonus, m.revenue)}</td>
         <td class="${grossCls}">${cellValPct(m.grossProfit, m.revenue)}</td>
         <td class="${profitCls}">${cellValPct(m.profitAfterBonus, m.revenue)}</td>
-        <td>${formatCurrency(m.bonusSale)}</td>
-        <td>${formatCurrency(m.bonusRD)}</td>
-        <td>${formatCurrency(m.bonusCSKH)}</td>
-        <td>${formatCurrency(m.bonusKT)}</td>
-        <td>${formatCurrency(m.bonusMedia)}</td>
+        <td>${cellValPct(m.bonusSale, m.revenue)}</td>
+        <td>${cellValPct(m.bonusRD, m.revenue)}</td>
+        <td>${cellValPct(m.bonusCSKH, m.revenue)}</td>
+        <td>${cellValPct(m.bonusKT, m.revenue)}</td>
+        <td>${cellValPct(m.bonusMedia, m.revenue)}</td>
         <td>${cellValPct(m.totalBonus, m.revenue)}</td>
       </tr>
     `;
@@ -1049,6 +1054,7 @@
         <tr>
           <th>Team</th>
           <th>Doanh thu Mốc 3</th>
+          <th>Chi phí (trước thưởng)</th>
           <th>Lợi nhuận gộp</th>
           <th>Lợi nhuận sau thưởng</th>
           <th>Thưởng Sale</th>
@@ -1066,17 +1072,18 @@
         <tr>
           <td><strong>Tổng doanh nghiệp</strong></td>
           <td>${formatCurrency(totalRevenue)}</td>
+          <td>${cellValPct(totalCostBeforeBonus, totalRevenue)}</td>
           <td class="${totalGrossCls}">
             ${cellValPct(totalGross, totalRevenue)}
           </td>
           <td class="${totalProfitCls}">
             ${cellValPct(totalProfit, totalRevenue)}
           </td>
-          <td>${formatCurrency(totalSale)}</td>
-          <td>${formatCurrency(totalRD)}</td>
-          <td>${formatCurrency(totalCSKH)}</td>
-          <td>${formatCurrency(totalKT)}</td>
-          <td>${formatCurrency(totalMedia)}</td>
+          <td>${cellValPct(totalSale, totalRevenue)}</td>
+          <td>${cellValPct(totalRD, totalRevenue)}</td>
+          <td>${cellValPct(totalCSKH, totalRevenue)}</td>
+          <td>${cellValPct(totalKT, totalRevenue)}</td>
+          <td>${cellValPct(totalMedia, totalRevenue)}</td>
           <td>${cellValPct(totalBonus, totalRevenue)}</td>
         </tr>
       </tfoot>
