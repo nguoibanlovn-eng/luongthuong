@@ -60,7 +60,7 @@
       border-color: #111827;
     }
 
-    input[type="number"], input[type="text"] {
+    input[type="text"], input[type="number"] {
       width: 100%;
       box-sizing: border-box;
       padding: 4px 6px;
@@ -241,6 +241,18 @@
       if (isNaN(n)) return "-";
       return n.toLocaleString("vi-VN", { maximumFractionDigits: 1 }) + " %";
     }
+    // format cho input tiền
+    function formatMoneyInput(n) {
+      if (n === null || n === undefined || n === "" || isNaN(n)) return "";
+      return Number(n).toLocaleString("vi-VN");
+    }
+    function parseMoneyInput(str) {
+      if (str === null || str === undefined) return 0;
+      const cleaned = String(str).replace(/[^\d-]/g, "");
+      const num = Number(cleaned);
+      return isNaN(num) ? 0 : num;
+    }
+    // hiển thị số + % trên doanh thu trong bảng
     function cellValPct(val, revenue) {
       if (isNaN(val)) return "-";
       const base = formatCurrency(val);
@@ -353,6 +365,12 @@
       render();
     }
 
+    // handler riêng cho ô tiền: parse xong mới lưu
+    function handleMoney(teamId, field, raw) {
+      const num = parseMoneyInput(raw);
+      handleInput(teamId, field, num);
+    }
+
     function toggleCollapse(teamId) {
       teams = teams.map(t =>
         t.id === teamId ? { ...t, collapsed: !t.collapsed } : t
@@ -425,9 +443,9 @@
               <div class="col-3">
                 <p><strong>Chi phí cố định / kỳ (VNĐ)</strong></p>
                 <input
-                  type="number"
-                  value="${team.fixedCost}"
-                  onchange="handleInput('${team.id}', 'fixedCost', this.value)"
+                  type="text"
+                  value="${formatMoneyInput(team.fixedCost)}"
+                  onchange="handleMoney('${team.id}', 'fixedCost', this.value)"
                   placeholder="Lương cứng, mặt bằng..."
                 />
               </div>
@@ -515,27 +533,27 @@
               <div class="col-4">
                 <p>Mốc 1</p>
                 <input
-                  type="number"
-                  value="${team.revenue1}"
-                  onchange="handleInput('${team.id}', 'revenue1', this.value)"
+                  type="text"
+                  value="${formatMoneyInput(team.revenue1)}"
+                  onchange="handleMoney('${team.id}', 'revenue1', this.value)"
                   placeholder="Mục tiêu thấp"
                 />
               </div>
               <div class="col-4">
                 <p>Mốc 2</p>
                 <input
-                  type="number"
-                  value="${team.revenue2}"
-                  onchange="handleInput('${team.id}', 'revenue2', this.value)"
+                  type="text"
+                  value="${formatMoneyInput(team.revenue2)}"
+                  onchange="handleMoney('${team.id}', 'revenue2', this.value)"
                   placeholder="Mục tiêu chuẩn"
                 />
               </div>
               <div class="col-4">
                 <p>Mốc 3 (thực tế)</p>
                 <input
-                  type="number"
-                  value="${team.revenue3}"
-                  onchange="handleInput('${team.id}', 'revenue3', this.value)"
+                  type="text"
+                  value="${formatMoneyInput(team.revenue3)}"
+                  onchange="handleMoney('${team.id}', 'revenue3', this.value)"
                   placeholder="Thực tế đạt"
                 />
               </div>
