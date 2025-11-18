@@ -195,10 +195,9 @@
     .tagline { font-size: 12px; margin-top: 12px; }
 
     .mini-compare {
-      margin-top: 6px;
+      margin-top: 4px;
       font-size: 11px;
     }
-
     .mini-compare th,
     .mini-compare td {
       padding: 2px 6px;
@@ -434,6 +433,32 @@
           ? `${formatCurrency(metrics.breakEven)} đ`
           : "Không xác định";
 
+        // So sánh target vs thực tế cho từng loại chi phí
+        const fixedActual  = Number(team.fixedCost) || 0;
+        const fixedTarget  = Number(team.targetFixedCost) || 0;
+        let fixedDiffTxt = "--", fixedDiffClass = "";
+        if (fixedTarget > 0) {
+          const diffPct = ((fixedActual - fixedTarget) / fixedTarget) * 100;
+          const sign = diffPct >= 0 ? "+" : "";
+          fixedDiffTxt = `${sign}${diffPct.toFixed(1)}%`;
+          fixedDiffClass = diffPct <= 0 ? "positive" : "negative";
+        }
+
+        const comparePercent = (actual, target) => {
+          actual = Number(actual) || 0;
+          target = Number(target) || 0;
+          if (!target) return { txt: "--", cls: "" };
+          const diff = actual - target;
+          const sign = diff >= 0 ? "+" : "";
+          const txt = `${sign}${diff.toFixed(1)} điểm %`;
+          const cls = diff <= 0 ? "positive" : "negative";
+          return { txt, cls };
+        };
+
+        const cogsCmp  = comparePercent(team.cogs,    team.targetCogs);
+        const sellCmp  = comparePercent(team.selling, team.targetSelling);
+        const otherCmp = comparePercent(team.other,   team.targetOther);
+
         const headerHtml = `
           <div class="card-header">
             <div class="card-header-left">
@@ -474,75 +499,9 @@
           const paClassM2 = metrics.m2.profitAfterBonus >= 0 ? "positive" : "negative";
           const paClassM3 = metrics.m3.profitAfterBonus >= 0 ? "positive" : "negative";
 
-          // so sánh target vs thực tế cho từng loại chi phí
-          const fixedActual  = Number(team.fixedCost) || 0;
-          const fixedTarget  = Number(team.targetFixedCost) || 0;
-          let fixedDiffTxt = "--", fixedDiffClass = "";
-          if (fixedTarget > 0) {
-            const diffPct = ((fixedActual - fixedTarget) / fixedTarget) * 100;
-            const sign = diffPct >= 0 ? "+" : "";
-            fixedDiffTxt = `${sign}${diffPct.toFixed(1)}%`;
-            fixedDiffClass = diffPct <= 0 ? "positive" : "negative";
-          }
-
-          const comparePercent = (actual, target) => {
-            actual = Number(actual) || 0;
-            target = Number(target) || 0;
-            if (!target) return { txt: "--", cls: "" };
-            const diff = actual - target;
-            const sign = diff >= 0 ? "+" : "";
-            const txt = `${sign}${diff.toFixed(1)} điểm %`;
-            const cls = diff <= 0 ? "positive" : "negative";
-            return { txt, cls };
-          };
-
-          const cogsCmp    = comparePercent(team.cogs,    team.targetCogs);
-          const sellCmp    = comparePercent(team.selling, team.targetSelling);
-          const otherCmp   = comparePercent(team.other,   team.targetOther);
-
           bodyHtml = `
             <div class="grid">
-              <div class="col-3">
-                <p><strong>Chi phí cố định / kỳ (VNĐ)</strong></p>
-                <input
-                  type="text"
-                  value="${formatMoneyInput(team.fixedCost)}"
-                  onchange="handleMoney('${team.id}','fixedCost',this.value)"
-                  placeholder="Lương cứng, mặt bằng..."
-                />
-              </div>
-              <div class="col-3">
-                <p><strong>% Giá vốn (COGS)</strong></p>
-                <input
-                  type="number"
-                  value="${team.cogs}"
-                  onchange="handleInput('${team.id}','cogs',this.value)"
-                  placeholder="VD: 60"
-                />
-              </div>
-              <div class="col-3">
-                <p><strong>% Chi phí bán hàng</strong></p>
-                <input
-                  type="number"
-                  value="${team.selling}"
-                  onchange="handleInput('${team.id}','selling',this.value)"
-                  placeholder="VD: 10"
-                />
-              </div>
-              <div class="col-3">
-                <p><strong>% Chi phí khác (biến phí)</strong></p>
-                <input
-                  type="number"
-                  value="${team.other}"
-                  onchange="handleInput('${team.id}','other',this.value)"
-                  placeholder="VD: 5"
-                />
-              </div>
-              <div class="col-12 muted">
-                = Giá vốn + Chi phí bán hàng + Chi phí khác → <b>Tổng biến phí: ${formatPercent(metrics.varPct)}</b>
-              </div>
-
-              <!-- Bảng so sánh mong muốn / thực tế / chênh lệch -->
+              <!-- Bảng so sánh: điền luôn Target & Thực tế -->
               <div class="col-12">
                 <table class="mini-compare">
                   <thead>
@@ -555,7 +514,7 @@
                   </thead>
                   <tbody>
                     <tr>
-                      <td>Chi phí cố định</td>
+                      <td>Chi phí cố định / kỳ (VNĐ)</td>
                       <td>
                         <input
                           type="text"
@@ -564,7 +523,14 @@
                           onchange="handleMoney('${team.id}','targetFixedCost',this.value)"
                         />
                       </td>
-                      <td>${formatCurrency(fixedActual)}</td>
+                      <td>
+                        <input
+                          type="text"
+                          class="table-input"
+                          value="${formatMoneyInput(team.fixedCost)}"
+                          onchange="handleMoney('${team.id}','fixedCost',this.value)"
+                        />
+                      </td>
                       <td class="${fixedDiffClass}">${fixedDiffTxt}</td>
                     </tr>
                     <tr>
@@ -577,7 +543,14 @@
                           onchange="handleInput('${team.id}','targetCogs',this.value)"
                         />
                       </td>
-                      <td>${formatPercent(team.cogs)}</td>
+                      <td>
+                        <input
+                          type="number"
+                          class="table-input"
+                          value="${team.cogs}"
+                          onchange="handleInput('${team.id}','cogs',this.value)"
+                        />
+                      </td>
                       <td class="${cogsCmp.cls}">${cogsCmp.txt}</td>
                     </tr>
                     <tr>
@@ -590,11 +563,18 @@
                           onchange="handleInput('${team.id}','targetSelling',this.value)"
                         />
                       </td>
-                      <td>${formatPercent(team.selling)}</td>
+                      <td>
+                        <input
+                          type="number"
+                          class="table-input"
+                          value="${team.selling}"
+                          onchange="handleInput('${team.id}','selling',this.value)"
+                        />
+                      </td>
                       <td class="${sellCmp.cls}">${sellCmp.txt}</td>
                     </tr>
                     <tr>
-                      <td>Chi phí khác</td>
+                      <td>Chi phí khác (biến phí)</td>
                       <td>
                         <input
                           type="number"
@@ -603,13 +583,25 @@
                           onchange="handleInput('${team.id}','targetOther',this.value)"
                         />
                       </td>
-                      <td>${formatPercent(team.other)}</td>
+                      <td>
+                        <input
+                          type="number"
+                          class="table-input"
+                          value="${team.other}"
+                          onchange="handleInput('${team.id}','other',this.value)"
+                        />
+                      </td>
                       <td class="${otherCmp.cls}">${otherCmp.txt}</td>
                     </tr>
                   </tbody>
                 </table>
               </div>
 
+              <div class="col-12 muted">
+                = Giá vốn + Chi phí bán hàng + Chi phí khác → <b>Tổng biến phí: ${formatPercent(metrics.varPct)}</b>
+              </div>
+
+              <!-- Khối % thưởng -->
               <div class="col-12" style="margin-top:6px;">
                 <p><strong>% thưởng trên LỢI NHUẬN (chỉ tính khi lợi nhuận &gt; 0)</strong></p>
               </div>
