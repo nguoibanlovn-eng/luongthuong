@@ -16,49 +16,44 @@
       margin-inline: auto;
       box-sizing: border-box;
       line-height: 1.5;
+      font-size: 14px;
     }
     h1 {
       font-size: 22px;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
     h2 {
-      margin-top: 24px;
+      margin-top: 20px;
       font-size: 18px;
     }
     p {
-      margin: 4px 0 8px;
-      font-size: 14px;
+      margin: 2px 0 6px;
     }
     .muted {
       opacity: 0.7;
-      font-size: 13px;
+      font-size: 12px;
     }
-    .chip {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(128,128,128,0.4);
-      font-size: 11px;
-      margin-right: 4px;
-    }
+
     .toolbar {
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 8px;
-      margin: 8px 0 12px;
+      margin: 6px 0 10px;
       flex-wrap: wrap;
     }
+
     button {
       cursor: pointer;
       border-radius: 999px;
       border: 1px solid rgba(128,128,128,0.5);
       padding: 6px 12px;
       background: transparent;
-      font-size: 13px;
+      font-size: 12px;
       display: inline-flex;
       align-items: center;
       gap: 4px;
+      white-space: nowrap;
     }
     button.primary {
       background: #2563eb;
@@ -71,41 +66,61 @@
     }
     button.small {
       padding: 4px 8px;
-      font-size: 12px;
+      font-size: 11px;
     }
+
+    .chip-button {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      background: rgba(128,128,128,0.06);
+    }
+    .chip-button.active {
+      background: #111827;
+      color: #f9fafb;
+      border-color: #111827;
+    }
+
     input[type="number"],
     input[type="text"] {
       width: 100%;
       box-sizing: border-box;
-      padding: 6px 8px;
-      border-radius: 6px;
+      padding: 4px 6px;
+      border-radius: 8px;
       border: 1px solid rgba(128,128,128,0.5);
       font-size: 13px;
       background: transparent;
+      height: 32px;
     }
     input:focus {
       outline: 2px solid #2563eb55;
       border-color: #2563eb;
     }
+
     .grid {
       display: grid;
       grid-template-columns: repeat(12, minmax(0, 1fr));
       gap: 8px;
+      margin-top: 6px;
     }
+    .col-2 { grid-column: span 2; }
     .col-3 { grid-column: span 3; }
     .col-4 { grid-column: span 4; }
     .col-6 { grid-column: span 6; }
     .col-12 { grid-column: span 12; }
 
     @media (max-width: 768px) {
-      .col-3, .col-4, .col-6 { grid-column: span 12; }
+      .col-2,
+      .col-3,
+      .col-4,
+      .col-6 { grid-column: span 12; }
     }
 
     .card {
-      border-radius: 12px;
+      border-radius: 14px;
       border: 1px solid rgba(128,128,128,0.35);
-      padding: 12px;
-      margin-bottom: 16px;
+      padding: 10px;
+      margin-bottom: 12px;
       background: rgba(255,255,255,0.02);
     }
     .card-header {
@@ -113,7 +128,8 @@
       align-items: center;
       justify-content: space-between;
       gap: 8px;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
+      flex-wrap: wrap;
     }
     .card-header-left {
       display: flex;
@@ -126,15 +142,18 @@
       padding: 2px 6px;
       border-radius: 999px;
       border: 1px solid rgba(128,128,128,0.6);
+      background: rgba(128,128,128,0.05);
     }
+
     .pill-input {
       display: inline-flex;
       align-items: center;
       gap: 4px;
-      font-size: 12px;
-      padding: 2px 8px;
+      font-size: 11px;
+      padding: 4px 10px;
       border-radius: 999px;
-      border: 1px dashed rgba(128,128,128,0.5);
+      border: 1px dashed rgba(128,128,128,0.6);
+      background: rgba(249,250,251,0.8);
     }
     .pill-input span {
       opacity: 0.7;
@@ -146,12 +165,12 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 8px;
+      margin-top: 6px;
       font-size: 12px;
     }
     th, td {
       padding: 6px 8px;
-      border-bottom: 1px solid rgba(128,128,128,0.3);
+      border-bottom: 1px solid rgba(128,128,128,0.25);
       text-align: right;
       font-variant-numeric: tabular-nums;
     }
@@ -161,11 +180,20 @@
     }
     th {
       font-weight: 600;
-      background: rgba(128,128,128,0.1);
+      background: rgba(148,163,184,0.18);
+    }
+    tbody tr:nth-child(even) {
+      background: rgba(148,163,184,0.08);
     }
     tfoot td {
       font-weight: 600;
-      background: rgba(37,99,235,0.05);
+      background: rgba(37,99,235,0.06);
+    }
+    .row-total {
+      background: rgba(59,130,246,0.08) !important;
+    }
+    .row-profit {
+      background: rgba(16,185,129,0.08) !important;
     }
     .positive {
       color: #16a34a;
@@ -173,21 +201,13 @@
     .negative {
       color: #dc2626;
     }
+    .section-divider {
+      margin: 14px 0 8px;
+      border-top: 1px dashed rgba(148,163,184,0.9);
+    }
     .tagline {
       font-size: 12px;
-      margin-top: 16px;
-    }
-    .note-list {
-      font-size: 12px;
-      margin: 4px 0 0 0;
-      padding-left: 16px;
-    }
-    .note-list li {
-      margin: 2px 0;
-    }
-    .section-divider {
-      margin: 16px 0 8px;
-      border-top: 1px dashed rgba(128,128,128,0.5);
+      margin-top: 12px;
     }
   </style>
 </head>
@@ -203,11 +223,11 @@
   <h2>Cấu hình team <span class="muted">Áp dụng trong phiên làm việc này</span></h2>
   <div class="toolbar">
     <div>
-      <span class="muted">Chọn team:</span>
-      <span class="chip">TikTok</span>
-      <span class="chip">Shopee</span>
-      <span class="chip">Facebook</span>
-      <span class="chip">Offline</span>
+      <span class="muted">Chọn team nhanh:</span>
+      <button class="chip-button" data-name="TikTok" onclick="focusTeam('TikTok')">TikTok</button>
+      <button class="chip-button" data-name="Shopee" onclick="focusTeam('Shopee')">Shopee</button>
+      <button class="chip-button" data-name="Facebook" onclick="focusTeam('Facebook')">Facebook</button>
+      <button class="chip-button" data-name="Offline" onclick="focusTeam('Offline')">Offline</button>
     </div>
     <div>
       <button class="primary" onclick="addTeam()">+ Thêm team</button>
@@ -232,7 +252,7 @@
     • Mốc 3 là “mốc thực tế” để cộng tổng doanh nghiệp.
   </p>
 
-  <h2 style="margin-top: 20px;">Tổng quan tất cả team (Mốc 3 – thực tế)</h2>
+  <h2 style="margin-top: 18px;">Tổng quan tất cả team (Mốc 3 – thực tế)</h2>
   <div id="summaryContainer"></div>
 
   <p class="tagline">
@@ -254,18 +274,18 @@
       return {
         id: Date.now().toString() + Math.random().toString(16).slice(2),
         name: name || "Team mới",
-        fixedCost: 30000000,      // chi phí cố định mỗi kỳ
-        cogs: 60,                // % giá vốn
-        selling: 10,             // % chi phí bán hàng
-        other: 5,                // % chi phí khác
-        bonusSale: 10,           // % thưởng trên LỢI NHUẬN
+        fixedCost: 30000000,
+        cogs: 60,
+        selling: 10,
+        other: 5,
+        bonusSale: 10,
         bonusRD: 5,
         bonusCSKH: 5,
         bonusKT: 3,
         bonusMedia: 5,
-        revenue1: 100000000,     // Mốc 1
-        revenue2: 150000000,     // Mốc 2
-        revenue3: 200000000,     // Mốc 3 (thực tế)
+        revenue1: 100000000,
+        revenue2: 150000000,
+        revenue3: 200000000,
         collapsed: false
       };
     }
@@ -275,8 +295,33 @@
       createDefaultTeam("Shopee")
     ];
 
+    // --- chọn team nhanh bằng chip ---
+    function focusTeam(name) {
+      // highlight chip
+      document.querySelectorAll(".chip-button").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.name === name);
+      });
+
+      // tìm team theo name
+      let t = teams.find(team => team.name.toLowerCase() === name.toLowerCase());
+      if (!t) {
+        t = createDefaultTeam(name);
+        teams = [...teams, t];
+      }
+      render();
+
+      // scroll tới card của team
+      requestAnimationFrame(() => {
+        const el = document.querySelector(`.card[data-team-id="${t.id}"]`);
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
+
     function computeTeamMetrics(team) {
-      const varPct = (Number(team.cogs) || 0) + (Number(team.selling) || 0) + (Number(team.other) || 0);
+      const varPct = (Number(team.cogs) || 0) +
+                     (Number(team.selling) || 0) +
+                     (Number(team.other) || 0);
+
       function calcForRevenue(r) {
         const revenue = Number(r) || 0;
         const variableCost = revenue * (varPct / 100);
@@ -361,10 +406,11 @@
         const metrics = computeTeamMetrics(team);
         const card = document.createElement("div");
         card.className = "card";
+        card.dataset.teamId = team.id;
 
         const breakEvenText = metrics.breakEven
           ? formatCurrency(metrics.breakEven) + " đ"
-          : "Không xác định (tổng biến phí ≥ 100% hoặc chi phí cố định = 0)";
+          : "Không xác định";
 
         const headerHtml = `
           <div class="card-header">
@@ -374,7 +420,7 @@
                 type="text"
                 value="${team.name}"
                 oninput="handleInput('${team.id}', 'name', this.value)"
-                style="max-width: 200px;"
+                style="max-width: 170px;"
               />
               <span class="pill-input">
                 <span>Tổng biến phí:</span>
@@ -401,7 +447,7 @@
           bodyHtml += `
             <div class="grid">
               <div class="col-3">
-                <p><strong>Chi phí cố định mỗi kỳ (VNĐ)</strong></p>
+                <p><strong>Chi phí cố định / kỳ (VNĐ)</strong></p>
                 <input
                   type="number"
                   value="${team.fixedCost}"
@@ -440,10 +486,10 @@
                 = Giá vốn + Chi phí bán hàng + Chi phí khác → <b>Tổng biến phí: ${formatPercent(metrics.varPct)}</b>
               </div>
 
-              <div class="col-12" style="margin-top: 8px;">
+              <div class="col-12" style="margin-top: 6px;">
                 <p><strong>% thưởng trên LỢI NHUẬN (chỉ tính khi lợi nhuận &gt; 0)</strong></p>
               </div>
-              <div class="col-2 col-4">
+              <div class="col-2">
                 <p>Sale</p>
                 <input
                   type="number"
@@ -451,7 +497,7 @@
                   oninput="handleInput('${team.id}', 'bonusSale', this.value)"
                 />
               </div>
-              <div class="col-2 col-4">
+              <div class="col-2">
                 <p>RD</p>
                 <input
                   type="number"
@@ -459,7 +505,7 @@
                   oninput="handleInput('${team.id}', 'bonusRD', this.value)"
                 />
               </div>
-              <div class="col-2 col-4">
+              <div class="col-2">
                 <p>CSKH</p>
                 <input
                   type="number"
@@ -467,7 +513,7 @@
                   oninput="handleInput('${team.id}', 'bonusCSKH', this.value)"
                 />
               </div>
-              <div class="col-2 col-4">
+              <div class="col-2">
                 <p>KT + HCNS</p>
                 <input
                   type="number"
@@ -475,7 +521,7 @@
                   oninput="handleInput('${team.id}', 'bonusKT', this.value)"
                 />
               </div>
-              <div class="col-2 col-4">
+              <div class="col-2">
                 <p>Media</p>
                 <input
                   type="number"
@@ -487,7 +533,7 @@
                 Tổng % thưởng = Sale + RD + CSKH + KT + Media. Nên giữ ở mức hợp lý để doanh nghiệp vẫn còn lợi nhuận.
               </div>
 
-              <div class="col-12" style="margin-top: 8px;">
+              <div class="col-12" style="margin-top: 6px;">
                 <p><strong>Doanh thu 3 mốc</strong></p>
               </div>
               <div class="col-4">
@@ -595,13 +641,13 @@
                   <td>${formatCurrency(metrics.m2.bonusMedia)}</td>
                   <td>${formatCurrency(metrics.m3.bonusMedia)}</td>
                 </tr>
-                <tr>
+                <tr class="row-total">
                   <td><strong>Tổng thưởng</strong></td>
                   <td>${formatCurrency(metrics.m1.totalBonus)}</td>
                   <td>${formatCurrency(metrics.m2.totalBonus)}</td>
                   <td>${formatCurrency(metrics.m3.totalBonus)}</td>
                 </tr>
-                <tr>
+                <tr class="row-profit">
                   <td><strong>Lợi nhuận sau thưởng</strong></td>
                   <td class="${metrics.m1.profitAfterBonus >= 0 ? "positive" : "negative"}">
                     ${formatCurrency(metrics.m1.profitAfterBonus)}
