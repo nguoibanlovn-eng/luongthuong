@@ -555,10 +555,14 @@ const loadFromServer = async () => {
     }
 
     // merge với default để tránh thiếu field nếu sau này thêm biến mới
-    teams = incoming.map(t => ({
-      ...createDefaultTeam(t.name || "Team"),
-      ...t,
-    }));
+        // merge với default để tránh thiếu field nếu sau này thêm biến mới
+    teams = incoming.map(t =>
+      Object.assign(
+        {},
+        createDefaultTeam(t.name || "Team"),
+        t
+      )
+    );
 
     render();
     alert(`Đã tải cấu hình từ Google Sheet (scenario: ${SCENARIO_ID}).`);
