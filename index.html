@@ -175,6 +175,15 @@
     .positive { color: #16a34a; }
     .negative { color: #dc2626; }
 
+    .table-input {
+      height: 26px;
+      padding: 2px 4px;
+      font-size: 12px;
+      text-align: right;
+      border-radius: 6px;
+      background: transparent;
+    }
+
     .section-divider {
       margin: 14px 0 8px;
       border-top: 1px dashed rgba(148,163,184,0.9);
@@ -241,7 +250,6 @@
       if (isNaN(n)) return "-";
       return n.toLocaleString("vi-VN", { maximumFractionDigits: 1 }) + " %";
     }
-    // format cho input tiền
     function formatMoneyInput(n) {
       if (n === null || n === undefined || n === "" || isNaN(n)) return "";
       return Number(n).toLocaleString("vi-VN");
@@ -252,7 +260,6 @@
       const num = Number(cleaned);
       return isNaN(num) ? 0 : num;
     }
-    // hiển thị số + % trên doanh thu trong bảng
     function cellValPct(val, revenue) {
       if (isNaN(val)) return "-";
       const base = formatCurrency(val);
@@ -364,8 +371,6 @@
       );
       render();
     }
-
-    // handler riêng cho ô tiền: parse xong mới lưu
     function handleMoney(teamId, field, raw) {
       const num = parseMoneyInput(raw);
       handleInput(teamId, field, num);
@@ -526,37 +531,6 @@
               <div class="col-12 muted">
                 Tổng % thưởng = Sale + RD + CSKH + KT + Media. Nên giữ ở mức hợp lý để doanh nghiệp vẫn còn lợi nhuận.
               </div>
-
-              <div class="col-12" style="margin-top: 6px;">
-                <p><strong>Doanh thu 3 mốc</strong></p>
-              </div>
-              <div class="col-4">
-                <p>Mốc 1</p>
-                <input
-                  type="text"
-                  value="${formatMoneyInput(team.revenue1)}"
-                  onchange="handleMoney('${team.id}', 'revenue1', this.value)"
-                  placeholder="Mục tiêu thấp"
-                />
-              </div>
-              <div class="col-4">
-                <p>Mốc 2</p>
-                <input
-                  type="text"
-                  value="${formatMoneyInput(team.revenue2)}"
-                  onchange="handleMoney('${team.id}', 'revenue2', this.value)"
-                  placeholder="Mục tiêu chuẩn"
-                />
-              </div>
-              <div class="col-4">
-                <p>Mốc 3 (thực tế)</p>
-                <input
-                  type="text"
-                  value="${formatMoneyInput(team.revenue3)}"
-                  onchange="handleMoney('${team.id}', 'revenue3', this.value)"
-                  placeholder="Thực tế đạt"
-                />
-              </div>
             </div>
 
             <table>
@@ -571,9 +545,30 @@
               <tbody>
                 <tr>
                   <td>Doanh thu</td>
-                  <td>${formatCurrency(metrics.m1.revenue)}</td>
-                  <td>${formatCurrency(metrics.m2.revenue)}</td>
-                  <td>${formatCurrency(metrics.m3.revenue)}</td>
+                  <td>
+                    <input
+                      type="text"
+                      class="table-input"
+                      value="${formatMoneyInput(team.revenue1)}"
+                      onchange="handleMoney('${team.id}', 'revenue1', this.value)"
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      class="table-input"
+                      value="${formatMoneyInput(team.revenue2)}"
+                      onchange="handleMoney('${team.id}', 'revenue2', this.value)"
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      class="table-input"
+                      value="${formatMoneyInput(team.revenue3)}"
+                      onchange="handleMoney('${team.id}', 'revenue3', this.value)"
+                    />
+                  </td>
                 </tr>
                 <tr>
                   <td>Biến phí</td>
