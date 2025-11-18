@@ -146,44 +146,42 @@
     .pill-input strong { font-variant-numeric: tabular-nums; }
 
     table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 6px;
-      font-size: 12px;
-    }
-    th, td {
-      padding: 6px 8px;
-      border-bottom: 1px solid rgba(148,163,184,0.6);
-      text-align: right;
-      font-variant-numeric: tabular-nums;
-      vertical-align: top;
-    }
-    th:first-child, td:first-child { text-align: left; }
-    th { font-weight: 600; background: rgba(148,163,184,0.25); }
-    tbody tr:nth-child(even) { background: rgba(148,163,184,0.08); }
-    tfoot td { font-weight: 600; background: rgba(37,99,235,0.06); }
-    .row-total  { background: rgba(59,130,246,0.08) !important; }
-    .row-profit { background: rgba(16,185,129,0.08) !important; }
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 4px;
+  font-size: 12px;
+  table-layout: fixed;          /* chia đều 3 cột mốc, tận dụng ngang */
+}
 
-    .muted-percent {
-      display: block;
-      margin-top: 2px;
-      font-size: 11px;
-      opacity: 0.7;
-    }
+th, td {
+  padding: 3px 6px;             /* giảm padding dọc để hàng thấp hơn */
+  border-bottom: 1px solid rgba(148,163,184,0.6);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  vertical-align: middle;       /* căn giữa theo chiều dọc */
+}
 
-    .positive { color: #16a34a; }
-    .negative { color: #dc2626; }
+th:first-child,
+td:first-child {
+  text-align: left;
+}
 
-    .table-input {
-      height: 26px;
-      padding: 2px 4px;
-      font-size: 12px;
-      text-align: right;
-      border-radius: 6px;
-      background: transparent;
-    }
+.muted-percent {
+  display: inline-block;        /* cùng dòng với số tiền */
+  margin-top: 0;
+  margin-left: 4px;             /* cách nhẹ ra cho dễ đọc */
+  font-size: 10px;
+  opacity: 0.7;
+}
 
+.table-input {
+  height: 22px;                 /* ô nhập thấp hơn */
+  padding: 1px 4px;
+  font-size: 12px;
+  text-align: right;
+  border-radius: 6px;
+  background: transparent;
+}
     .section-divider {
       margin: 14px 0 8px;
       border-top: 1px dashed rgba(148,163,184,0.9);
