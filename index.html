@@ -507,6 +507,67 @@ const STORAGE_KEY_DEFAULTS = "thuong_tool_defaults_v1";
       saveState();
       render();
     };
+  // ===== Đồng bộ với Google Sheet qua Apps Script =====
+const saveToServer = async () => {
+  if (!API_URL) {
+    alert("Chưa cấu hình API_URL.");
+    return;
+  }
+
+  try {
+    const payload = { id: SCENARIO_ID, teams };
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await res.json();
+    if (!res.ok || !data.ok) {
+      throw new Error(data.error || 'Lỗi không xác định');
+    }
+
+    alert(`Đã lưu lên Google Sheet (scenario: ${SCENARIO_ID}).`);
+  } catch (err) {
+    console.error(err);
+    alert("Không lưu được lên Google Sheet: " + err.message);
+  }
+};
+
+const loadFromServer = async () => {
+  if (!API_URL) {
+    alert("Chưa cấu hình API_URL.");
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_URL}?id=${encodeURIComponent(SCENARIO_ID)}`);
+    const data = await res.json();
+
+    if (!res.ok || !data.ok) {
+      throw new Error(data.error || 'Lỗi không xác định');
+    }
+
+    const incoming = Array.isArray(data.teams) ? data.teams : [];
+    if (!incoming.length) {
+      alert("Chưa có dữ liệu trên Google Sheet cho scenario này.");
+      return;
+    }
+
+    // merge với default để tránh thiếu field nếu sau này thêm biến mới
+    teams = incoming.map(t => ({
+      ...createDefaultTeam(t.name || "Team"),
+      ...t,
+    }));
+
+    render();
+    alert(`Đã tải cấu hình từ Google Sheet (scenario: ${SCENARIO_ID}).`);
+  } catch (err) {
+    console.error(err);
+    alert("Không tải được dữ liệu từ Google Sheet: " + err.message);
+  }
+};
+
 
     // ===== Init teams =====
     const storedState = loadState();
