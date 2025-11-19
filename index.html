@@ -142,8 +142,8 @@
       border: 1px dashed rgba(148,163,184,0.9);
       background: rgba(249,250,251,0.9);
     }
-    .pill-input span { opacity: 0.7; }
-    .pill-input strong { font-variant-numeric: tabular-nums; }
+    .pill-input span  { opacity: 0.7; }
+    .pill-input strong{ font-variant-numeric: tabular-nums; }
 
     table {
       width: 100%;
@@ -228,33 +228,32 @@
     }
 
     .blog-promo {
-      margin-top: 24px;
-      padding: 16px 18px;
-      border-radius: 16px;
-      border: 1px solid rgba(37,99,235,0.45);
-      background: linear-gradient(90deg, rgba(37,99,235,0.12), rgba(59,130,246,0.03));
+      margin-top: 20px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(37,99,235,0.4);
+      background: linear-gradient(90deg, rgba(37,99,235,0.08), rgba(59,130,246,0.02));
     }
     .blog-promo-title {
-      font-size: 14px;
-      font-weight: 700;
-      margin-bottom: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 6px;
     }
     .blog-promo-link {
       display: inline-block;
-      margin-bottom: 6px;
-      font-weight: 700;
+      margin-bottom: 4px;
+      font-weight: 600;
       text-decoration: none;
-      padding: 6px 14px;
+      padding: 4px 10px;
       border-radius: 999px;
-      border: 1px solid rgba(37,99,235,0.9);
-      font-size: 14px;
+      border: 1px solid rgba(37,99,235,0.7);
     }
     .blog-promo-link:hover {
       background: rgba(37,99,235,0.12);
     }
     .blog-promo-sub {
       font-size: 12px;
-      opacity: 0.85;
+      opacity: 0.8;
     }
   </style>
 </head>
@@ -267,6 +266,7 @@
 
   <div class="section-divider"></div>
 
+  <!-- CẤU HÌNH TEAM -->
   <h2>Cấu hình team <span class="muted">Áp dụng trong phiên làm việc này</span></h2>
   <div class="toolbar">
     <div>
@@ -294,6 +294,7 @@
 
   <div class="section-divider"></div>
 
+  <!-- TỔNG QUAN DOANH THU -->
   <h2>Tổng quan doanh thu &amp; thưởng các team</h2>
   <p class="muted">
     Mỗi team dùng 3 mốc doanh thu: <b>Mốc 1</b>, <b>Mốc 2</b>, <b>Mốc 3 (thực tế)</b>. Mốc 3 dùng để
@@ -303,6 +304,7 @@
   <h2 style="margin-top: 18px;">Tổng quan tất cả team (Mốc 3 – thực tế)</h2>
   <div id="summaryContainer"></div>
 
+  <!-- PROMO -->
   <div class="blog-promo">
     <div class="blog-promo-title">Đọc thêm các bài viết &amp; case thực chiến tại trang chủ:</div>
     <a href="https://nguoibanlo.vn" target="_blank" rel="noreferrer" class="blog-promo-link">
@@ -314,17 +316,16 @@
   </div>
 
 <script>
-  // ================== CONFIG ==================
-  // URL Web App của Google Apps Script (anh thay bằng URL của anh)
-  const API_URL = 'https://script.google.com/macros/s/AKfycbyV10WNpHNnJXfCqrnWI0PhDBKZdQSND_KkVjLFUF26qC1Phfo7sn3OOMzI_A6-01-Trw/exec';
+  // ===== API Google Apps Script =====
+  // Nếu anh deploy Apps Script URL khác thì thay chuỗi này.
+  const API_URL = 'https://script.google.com/macros/s/AKfycbwmSNxt3fvHzWnfl3fHMhDi4GWaDfWTMeNPtXiSOyu_h2hLfrJvTbJRP3C50ob5zeBPFQ/exec';
   const SCENARIO_ID = 'default';
 
+  // ===== Storage keys =====
   const STORAGE_KEY_STATE    = 'thuong_tool_state_v1';
   const STORAGE_KEY_DEFAULTS = 'thuong_tool_defaults_v1';
 
-  let teams = [];
-
-  // ================== LOCAL STORAGE HELPERS ==================
+  // ===== LocalStorage helpers =====
   const loadJSON = (key) => {
     try {
       const raw = localStorage.getItem(key);
@@ -344,7 +345,7 @@
     }
   };
 
-  // ================== FORMAT HELPERS ==================
+  // ===== Format helpers =====
   const formatCurrency = (n) => {
     if (isNaN(n)) return '-';
     return Number(n).toLocaleString('vi-VN', { maximumFractionDigits: 0 });
@@ -375,104 +376,62 @@
     return `${base}<span class="muted-percent">(${pct.toFixed(1)}%)</span>`;
   };
 
-  // ================== DEFAULT CONFIG MỖI KÊNH ==================
+  // ===== Default config per channel =====
   const DEFAULT_TEAMS = {
     Facebook: {
       fixedCost: 320,
-      cogs: 60,
-      selling: 15,
-      other: 5,
-      bonusSale: 27,
-      bonusRD: 4,
-      bonusCSKH: 1,
-      bonusKT: 1.2,
-      bonusMedia: 1,
-      revenue1: 1250,
-      revenue2: 2309,
-      revenue3: 2800,
+      cogs: 60, selling: 15, other: 5,
+      bonusSale: 27, bonusRD: 4, bonusCSKH: 1, bonusKT: 1.2, bonusMedia: 1,
+      revenue1: 1250, revenue2: 2309, revenue3: 2800,
     },
     TikTok: {
       fixedCost: 320,
-      cogs: 51,
-      selling: 30,
-      other: 5,
-      bonusSale: 27,
-      bonusRD: 4,
-      bonusCSKH: 1,
-      bonusKT: 1.2,
-      bonusMedia: 1,
-      revenue1: 1800,
-      revenue2: 1862,
-      revenue3: 2800,
+      cogs: 51, selling: 30, other: 5,
+      bonusSale: 27, bonusRD: 4, bonusCSKH: 1, bonusKT: 1.2, bonusMedia: 1,
+      revenue1: 1800, revenue2: 1862, revenue3: 2800,
     },
     Shopee: {
       fixedCost: 120,
-      cogs: 53,
-      selling: 30,
-      other: 5,
-      bonusSale: 7,
-      bonusRD: 4,
-      bonusCSKH: 1,
-      bonusKT: 1.2,
-      bonusMedia: 1,
-      revenue1: 800,
-      revenue2: 1030,
-      revenue3: 1200,
+      cogs: 53, selling: 30, other: 5,
+      bonusSale: 7, bonusRD: 4, bonusCSKH: 1, bonusKT: 1.2, bonusMedia: 1,
+      revenue1: 800, revenue2: 1030, revenue3: 1200,
     },
     Website: {
       fixedCost: 75,
-      cogs: 60,
-      selling: 15,
-      other: 5,
-      bonusSale: 25,
-      bonusRD: 4,
-      bonusCSKH: 1,
-      bonusKT: 1.2,
-      bonusMedia: 1,
-      revenue1: 245,
-      revenue2: 245,
-      revenue3: 320,
+      cogs: 60, selling: 15, other: 5,
+      bonusSale: 25, bonusRD: 4, bonusCSKH: 1, bonusKT: 1.2, bonusMedia: 1,
+      revenue1: 245, revenue2: 245, revenue3: 320,
     },
     B2B: {
       fixedCost: 75,
-      cogs: 60,
-      selling: 15,
-      other: 5,
+      cogs: 60, selling: 15, other: 5,
       bonusSale: 20, // Sale B2B ăn 20% LNR
-      bonusRD: 4,
-      bonusCSKH: 1,
-      bonusKT: 1.2,
-      bonusMedia: 1,
-      revenue1: 245,
-      revenue2: 245,
-      revenue3: 320,
+      bonusRD: 4, bonusCSKH: 1, bonusKT: 1.2, bonusMedia: 1,
+      revenue1: 245, revenue2: 245, revenue3: 320,
     },
   };
 
-  // ================== TẠO TEAM DEFAULT ==================
+  // ===== Team factory =====
   const createDefaultTeam = (name) => {
     const baseName = name || 'Team mới';
     const d = DEFAULT_TEAMS[baseName] || {};
     const fixedCost = d.fixedCost ?? 100;
-    const cogs      = d.cogs      ?? 60;
-    const selling   = d.selling   ?? 10;
-    const other     = d.other     ?? 5;
+    const cogs      = d.cogs ?? 60;
+    const selling   = d.selling ?? 10;
+    const other     = d.other ?? 5;
 
     return {
       id: Date.now().toString() + Math.random().toString(16).slice(2),
       name: baseName,
-      fixedCost,
-      cogs,
-      selling,
-      other,
-      bonusSale:   d.bonusSale   ?? 10,
-      bonusRD:     d.bonusRD     ?? 4,
-      bonusCSKH:   d.bonusCSKH   ?? 1,
-      bonusKT:     d.bonusKT     ?? 1.2,
-      bonusMedia:  d.bonusMedia  ?? 1,
-      revenue1:    d.revenue1    ?? 1000,
-      revenue2:    d.revenue2    ?? 1500,
-      revenue3:    d.revenue3    ?? 2000,
+      fixedCost, cogs, selling, other,
+      bonusSale:  d.bonusSale  ?? 10,
+      bonusRD:    d.bonusRD    ?? 4,
+      bonusCSKH:  d.bonusCSKH  ?? 1,
+      bonusKT:    d.bonusKT    ?? 1.2,
+      bonusMedia: d.bonusMedia ?? 1,
+      revenue1: d.revenue1 ?? 1000,
+      revenue2: d.revenue2 ?? 1500,
+      revenue3: d.revenue3 ?? 2000,
       targetFixedCost: d.fixedCost ?? fixedCost,
       targetCogs:      d.cogs      ?? cogs,
       targetSelling:   d.selling   ?? selling,
@@ -489,8 +448,18 @@
     createDefaultTeam('B2B'),
   ]);
 
-  // ================== STATE LOAD/SAVE ==================
-  const loadState   = () => loadJSON(STORAGE_KEY_STATE);
+  // ===== State init =====
+  let teams;
+  const storedState = loadJSON(STORAGE_KEY_STATE);
+  if (storedState && storedState.length) {
+    teams = storedState.map(t => ({
+      ...createDefaultTeam(t.name || 'Team'),
+      ...t,
+    }));
+  } else {
+    teams = createInitialTeamsFromCodeDefaults();
+  }
+
   const saveState   = () => saveJSON(STORAGE_KEY_STATE, teams);
   const loadDefaults = () => loadJSON(STORAGE_KEY_DEFAULTS);
 
@@ -512,64 +481,65 @@
     render();
   };
 
-  // ================== GOOGLE SHEET SYNC (POST) ==================
+  // ===== Apps Script sync =====
   const saveToServer = async () => {
-    if (!API_URL || API_URL.includes('XXXXXXX')) {
-      alert('Chưa cấu hình API_URL (URL Web App của Apps Script).');
+    if (!API_URL) {
+      alert('Chưa cấu hình API_URL.');
       return;
     }
 
     try {
-      const payload = {
-        action: 'save',
-        id: SCENARIO_ID,
-        teams,
-      };
-
+      const payload = { id: SCENARIO_ID, teams };
       const res = await fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
 
-      const data = await res.json();
+      let data;
+      try {
+        data = await res.json();
+      } catch (e) {
+        throw new Error('Phản hồi không phải JSON: ' + e.message);
+      }
+
       if (!res.ok || !data.ok) {
-        throw new Error(data.error || 'Lỗi không xác định');
+        throw new Error(data && data.error ? data.error : 'Lỗi không xác định từ server');
       }
 
       alert(`Đã gửi dữ liệu lên Google Sheet (scenario: ${SCENARIO_ID}). Mở sheet sẽ thấy dòng "${SCENARIO_ID}" được cập nhật.`);
     } catch (err) {
-      console.error(err);
+      console.error('saveToServer error:', err);
       alert('Không lưu được lên Google Sheet: ' + err.message);
     }
   };
 
   const loadFromServer = async () => {
-    if (!API_URL || API_URL.includes('XXXXXXX')) {
-      alert('Chưa cấu hình API_URL (URL Web App của Apps Script).');
+    if (!API_URL) {
+      alert('Chưa cấu hình API_URL.');
       return;
     }
 
     try {
-      const payload = {
-        action: 'load',
-        id: SCENARIO_ID,
-      };
+      const url = `${API_URL}?id=${encodeURIComponent(SCENARIO_ID)}`;
+      const res = await fetch(url, { method: 'GET' });
 
-      const res = await fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
+      let dataText = await res.text();
+      let data;
+      try {
+        data = JSON.parse(dataText);
+      } catch (e) {
+        console.error('Raw response:', dataText);
+        throw new Error('Phản hồi không phải JSON hợp lệ.');
+      }
 
-      const data = await res.json();
       if (!res.ok || !data.ok) {
-        throw new Error(data.error || 'Lỗi không xác định');
+        throw new Error(data && data.error ? data.error : 'Lỗi không xác định từ server');
       }
 
       const incoming = Array.isArray(data.teams) ? data.teams : [];
       if (!incoming.length) {
-        alert('Chưa có dữ liệu trên Google Sheet cho scenario này. Hãy bấm "Lưu lên Google Sheet" trước.');
+        alert('Chưa có dữ liệu trên Google Sheet cho scenario này.');
         return;
       }
 
@@ -584,39 +554,17 @@
       render();
       alert(`Đã tải cấu hình từ Google Sheet (scenario: ${SCENARIO_ID}).`);
     } catch (err) {
-      console.error(err);
+      console.error('loadFromServer error:', err);
       alert('Không tải được dữ liệu từ Google Sheet: ' + err.message);
     }
   };
 
-  // ================== CORE LOGIC ==================
-  const formatMoneyInputField = (teamId, field, raw) => {
-    const num = parseMoneyInput(raw);
-    handleInput(teamId, field, num);
-  };
-
-  const focusTeam = (name) => {
-    document.querySelectorAll('.chip-button').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.name === name);
-    });
-
-    let t = teams.find(team => team.name.toLowerCase() === name.toLowerCase());
-    if (!t) {
-      t = createDefaultTeam(name);
-      teams = [...teams, t];
-    }
-    render();
-
-    requestAnimationFrame(() => {
-      const el = document.querySelector(`.card[data-team-id="${t.id}"]`);
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
-  };
-
+  // ===== Core calc =====
   const computeTeamMetrics = (team) => {
-    const varPct = (Number(team.cogs) || 0) +
-                   (Number(team.selling) || 0) +
-                   (Number(team.other) || 0);
+    const varPct =
+      (Number(team.cogs)    || 0) +
+      (Number(team.selling) || 0) +
+      (Number(team.other)   || 0);
 
     const calcForRevenue = (r) => {
       const revenue = Number(r) || 0;
@@ -666,6 +614,7 @@
     };
   };
 
+  // ===== Handlers =====
   const handleInput = (teamId, field, value) => {
     teams = teams.map(t => t.id === teamId ? { ...t, [field]: value } : t);
     render();
@@ -695,7 +644,6 @@
     render();
   };
 
-  // so sánh % chi phí: chênh lệch theo tỉ lệ % so với target
   const comparePercent = (actual, target) => {
     actual = Number(actual) || 0;
     target = Number(target) || 0;
@@ -703,12 +651,30 @@
 
     const diffPct = ((actual - target) / target) * 100;
     const sign = diffPct >= 0 ? '+' : '';
-    const txt = `${sign}${diffPct.toFixed(1)}%`;
-    const cls = diffPct <= 0 ? 'positive' : 'negative'; // xanh nếu ≤ target, đỏ nếu vượt
+    const txt  = `${sign}${diffPct.toFixed(1)}%`;
+    const cls  = diffPct <= 0 ? 'positive' : 'negative'; // xanh nếu ≤ target
     return { txt, cls };
   };
 
-  // ================== RENDER TEAMS ==================
+  const focusTeam = (name) => {
+    document.querySelectorAll('.chip-button').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.name === name);
+    });
+
+    let t = teams.find(team => team.name.toLowerCase() === name.toLowerCase());
+    if (!t) {
+      t = createDefaultTeam(name);
+      teams = [...teams, t];
+    }
+    render();
+
+    requestAnimationFrame(() => {
+      const el = document.querySelector(`.card[data-team-id="${t.id}"]`);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  };
+
+  // ===== RENDER TEAMS =====
   const renderTeams = () => {
     const container = document.getElementById('teamsContainer');
     container.innerHTML = '';
@@ -723,14 +689,14 @@
         ? `${formatCurrency(metrics.breakEven)}`
         : 'Không xác định';
 
-      // So sánh target vs thực tế
+      // so sánh target vs thực tế
       const fixedActual = Number(team.fixedCost) || 0;
       const fixedTarget = Number(team.targetFixedCost) || 0;
       let fixedDiffTxt = '--', fixedDiffClass = '';
       if (fixedTarget > 0) {
         const diffPct = ((fixedActual - fixedTarget) / fixedTarget) * 100;
         const sign = diffPct >= 0 ? '+' : '';
-        fixedDiffTxt = `${sign}${diffPct.toFixed(1)}%`;
+        fixedDiffTxt   = `${sign}${diffPct.toFixed(1)}%`;
         fixedDiffClass = diffPct <= 0 ? 'positive' : 'negative';
       }
 
@@ -780,7 +746,6 @@
 
         bodyHtml = `
           <div class="grid">
-            <!-- Bảng so sánh: Target & Thực tế -->
             <div class="col-12">
               <table class="mini-compare">
                 <thead>
@@ -880,63 +845,47 @@
               = Giá vốn + Chi phí bán hàng + Chi phí khác → <b>Tổng biến phí: ${formatPercent(metrics.varPct)}</b>
             </div>
 
-            <!-- Khối % thưởng -->
             <div class="col-12" style="margin-top:6px;">
               <p><strong>% thưởng trên LỢI NHUẬN (chỉ tính khi lợi nhuận &gt; 0)</strong></p>
             </div>
             <div class="col-2">
               <div class="bonus-field">
                 <span class="bonus-label">Sale</span>
-                <input
-                  type="number"
-                  class="bonus-input"
+                <input type="number" class="bonus-input"
                   value="${team.bonusSale}"
-                  onchange="handleInput('${team.id}','bonusSale',this.value)"
-                />
+                  onchange="handleInput('${team.id}','bonusSale',this.value)" />
               </div>
             </div>
             <div class="col-2">
               <div class="bonus-field">
                 <span class="bonus-label">RD</span>
-                <input
-                  type="number"
-                  class="bonus-input"
+                <input type="number" class="bonus-input"
                   value="${team.bonusRD}"
-                  onchange="handleInput('${team.id}','bonusRD',this.value)"
-                />
+                  onchange="handleInput('${team.id}','bonusRD',this.value)" />
               </div>
             </div>
             <div class="col-2">
               <div class="bonus-field">
                 <span class="bonus-label">CSKH</span>
-                <input
-                  type="number"
-                  class="bonus-input"
+                <input type="number" class="bonus-input"
                   value="${team.bonusCSKH}"
-                  onchange="handleInput('${team.id}','bonusCSKH',this.value)"
-                />
+                  onchange="handleInput('${team.id}','bonusCSKH',this.value)" />
               </div>
             </div>
             <div class="col-2">
               <div class="bonus-field">
                 <span class="bonus-label">KT + HCNS</span>
-                <input
-                  type="number"
-                  class="bonus-input"
+                <input type="number" class="bonus-input"
                   value="${team.bonusKT}"
-                  onchange="handleInput('${team.id}','bonusKT',this.value)"
-                />
+                  onchange="handleInput('${team.id}','bonusKT',this.value)" />
               </div>
             </div>
             <div class="col-2">
               <div class="bonus-field">
                 <span class="bonus-label">Media</span>
-                <input
-                  type="number"
-                  class="bonus-input"
+                <input type="number" class="bonus-input"
                   value="${team.bonusMedia}"
-                  onchange="handleInput('${team.id}','bonusMedia',this.value)"
-                />
+                  onchange="handleInput('${team.id}','bonusMedia',this.value)" />
               </div>
             </div>
             <div class="col-12 muted">
@@ -957,28 +906,19 @@
               <tr>
                 <td>Doanh thu</td>
                 <td>
-                  <input
-                    type="text"
-                    class="table-input"
+                  <input type="text" class="table-input"
                     value="${formatMoneyInput(team.revenue1)}"
-                    onchange="handleMoney('${team.id}','revenue1',this.value)"
-                  />
+                    onchange="handleMoney('${team.id}','revenue1',this.value)" />
                 </td>
                 <td>
-                  <input
-                    type="text"
-                    class="table-input"
+                  <input type="text" class="table-input"
                     value="${formatMoneyInput(team.revenue2)}"
-                    onchange="handleMoney('${team.id}','revenue2',this.value)"
-                  />
+                    onchange="handleMoney('${team.id}','revenue2',this.value)" />
                 </td>
                 <td>
-                  <input
-                    type="text"
-                    class="table-input"
+                  <input type="text" class="table-input"
                     value="${formatMoneyInput(team.revenue3)}"
-                    onchange="handleMoney('${team.id}','revenue3',this.value)"
-                  />
+                    onchange="handleMoney('${team.id}','revenue3',this.value)" />
                 </td>
               </tr>
               <tr>
@@ -1001,15 +941,9 @@
               </tr>
               <tr>
                 <td>Lợi nhuận trước thưởng</td>
-                <td class="${profitClassM1}">
-                  ${cellValPct(metrics.m1.netProfit, metrics.m1.revenue)}
-                </td>
-                <td class="${profitClassM2}">
-                  ${cellValPct(metrics.m2.netProfit, metrics.m2.revenue)}
-                </td>
-                <td class="${profitClassM3}">
-                  ${cellValPct(metrics.m3.netProfit, metrics.m3.revenue)}
-                </td>
+                <td class="${profitClassM1}">${cellValPct(metrics.m1.netProfit, metrics.m1.revenue)}</td>
+                <td class="${profitClassM2}">${cellValPct(metrics.m2.netProfit, metrics.m2.revenue)}</td>
+                <td class="${profitClassM3}">${cellValPct(metrics.m3.netProfit, metrics.m3.revenue)}</td>
               </tr>
               <tr>
                 <td>Thưởng Sale</td>
@@ -1049,15 +983,9 @@
               </tr>
               <tr class="row-profit">
                 <td><strong>Lợi nhuận sau thưởng</strong></td>
-                <td class="${paClassM1}">
-                  ${cellValPct(metrics.m1.profitAfterBonus, metrics.m1.revenue)}
-                </td>
-                <td class="${paClassM2}">
-                  ${cellValPct(metrics.m2.profitAfterBonus, metrics.m2.revenue)}
-                </td>
-                <td class="${paClassM3}">
-                  ${cellValPct(metrics.m3.profitAfterBonus, metrics.m3.revenue)}
-                </td>
+                <td class="${paClassM1}">${cellValPct(metrics.m1.profitAfterBonus, metrics.m1.revenue)}</td>
+                <td class="${paClassM2}">${cellValPct(metrics.m2.profitAfterBonus, metrics.m2.revenue)}</td>
+                <td class="${paClassM3}">${cellValPct(metrics.m3.profitAfterBonus, metrics.m3.revenue)}</td>
               </tr>
             </tbody>
           </table>
@@ -1069,7 +997,7 @@
     });
   };
 
-  // ================== RENDER SUMMARY ==================
+  // ===== RENDER SUMMARY =====
   const renderSummary = () => {
     const container = document.getElementById('summaryContainer');
     if (!teams.length) {
@@ -1081,17 +1009,18 @@
 
     let totalRevenue = 0;
     let totalCostBeforeBonus = 0;
-    let totalGross  = 0;
-    let totalProfit = 0;
-    let totalSale   = 0;
-    let totalRD     = 0;
-    let totalCSKH   = 0;
-    let totalKT     = 0;
-    let totalMedia  = 0;
-    let totalBonus  = 0;
+    let totalGross   = 0;
+    let totalProfit  = 0;
+    let totalSale    = 0;
+    let totalRD      = 0;
+    let totalCSKH    = 0;
+    let totalKT      = 0;
+    let totalMedia   = 0;
+    let totalBonus   = 0;
 
     teams.forEach(team => {
-      const m = computeTeamMetrics(team).m3; // dùng Mốc 3 – thực tế
+      const m = computeTeamMetrics(team).m3; // Mốc 3
+
       const costBeforeBonus = m.variableCost + m.fixedCost;
 
       totalRevenue         += m.revenue;
@@ -1173,26 +1102,15 @@
     container.innerHTML = tableHtml;
   };
 
-  // ================== MAIN RENDER ==================
+  // ===== MASTER RENDER =====
   const render = () => {
     renderTeams();
     renderSummary();
     saveState();
   };
 
-  // ================== INIT ==================
-  (() => {
-    const storedState = loadState();
-    if (storedState && storedState.length) {
-      teams = storedState.map(t => ({
-        ...createDefaultTeam(t.name || 'Team'),
-        ...t,
-      }));
-    } else {
-      teams = createInitialTeamsFromCodeDefaults();
-    }
-    render();
-  })();
+  // Khởi tạo
+  render();
 </script>
 </body>
 </html>
