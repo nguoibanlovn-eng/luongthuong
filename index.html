@@ -88,10 +88,13 @@
       margin-top: 6px;
     }
     .col-2 { grid-column: span 2; }
+    .col-3 { grid-column: span 3; }
+    .col-4 { grid-column: span 4; }
+    .col-6 { grid-column: span 6; }
     .col-12 { grid-column: span 12; }
 
     @media (max-width: 768px) {
-      .col-2 { grid-column: span 12; }
+      .col-2, .col-3, .col-4, .col-6 { grid-column: span 12; }
     }
 
     .card {
@@ -128,6 +131,19 @@
       background: rgba(148,163,184,0.15);
       font-weight: 600;
     }
+
+    .pill-input {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px dashed rgba(148,163,184,0.9);
+      background: rgba(249,250,251,0.9);
+    }
+    .pill-input span { opacity: 0.7; }
+    .pill-input strong { font-variant-numeric: tabular-nums; }
 
     table {
       width: 100%;
@@ -296,844 +312,868 @@
     </div>
   </div>
 
-  <script>
-    // ===== API Google Apps Script =====
-    // TODO: Đổi URL này thành Web App URL của anh (đuôi /exec)
-    const API_URL = 'https://script.google.com/macros/s/AKfycbysUTqWwniAzlSh3dzoaiy3UQOu7JYbfqLIfJ02G-YuCd9oLynoumVAwTi8requOT4kVw/exec';
-    const SCENARIO_ID = 'default';
+<script>
+  // =========================
+  // 1) CẤU HÌNH API
+  // =========================
+  // 👉 THAY BẰNG URL ỨNG DỤNG WEB APPS SCRIPT CỦA ANH (kết thúc bằng /exec)
+  const API_URL = 'https://script.google.com/macros/s/AKfycbza7fZ1m48CexYuYrN36rmV4LVQ4t8H6r7W76aGoluIiyRhQU5VhHVQwVm18ejSxPzT1Q/exec';
+  const SCENARIO_ID = 'default';
 
-    // ===== Storage keys =====
-    const STORAGE_KEY_STATE    = 'thuong_tool_state_v1';
-    const STORAGE_KEY_DEFAULTS = 'thuong_tool_defaults_v1';
+  // =========================
+  // 2) LOCALSTORAGE
+  // =========================
+  const STORAGE_KEY_STATE    = 'thuong_tool_state_v2';
+  const STORAGE_KEY_DEFAULTS = 'thuong_tool_defaults_v2';
 
-    // ===== LocalStorage helpers =====
-    const loadJSON = (key) => {
-      try {
-        const raw = localStorage.getItem(key);
-        if (!raw) return null;
-        return JSON.parse(raw);
-      } catch (e) {
-        console.warn('Không đọc được', key, e);
-        return null;
-      }
+  const loadJSON = (key) => {
+    try {
+      const raw = localStorage.getItem(key);
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch (e) {
+      console.warn('Không đọc được', key, e);
+      return null;
+    }
+  };
+
+  const saveJSON = (key, value) => {
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch (e) {
+      console.warn('Không lưu được', key, e);
+    }
+  };
+
+  // =========================
+  // 3) HELPER FORMAT
+  // =========================
+  const formatCurrency = (n) => {
+    if (isNaN(n)) return '-';
+    return Number(n).toLocaleString('vi-VN', { maximumFractionDigits: 0 });
+  };
+
+  const formatPercent = (n) => {
+    if (isNaN(n)) return '-';
+    return Number(n).toLocaleString('vi-VN', { maximumFractionDigits: 1 }) + ' %';
+  };
+
+  const formatMoneyInput = (n) => {
+    if (n === null || n === undefined || n === '' || isNaN(n)) return '';
+    return Number(n).toLocaleString('vi-VN');
+  };
+
+  const parseMoneyInput = (str) => {
+    if (str === null || str === undefined) return 0;
+    const cleaned = String(str).replace(/[^\d-]/g, '');
+    const num = Number(cleaned);
+    return isNaN(num) ? 0 : num;
+  };
+
+  const cellValPct = (val, revenue) => {
+    if (isNaN(val)) return '-';
+    const base = formatCurrency(val);
+    if (!revenue || isNaN(revenue) || revenue === 0) return base;
+    const pct = (val / revenue) * 100;
+    return `${base}<span class="muted-percent">(${pct.toFixed(1)}%)</span>`;
+  };
+
+  // =========================
+  // 4) DEFAULT TEAM CONFIG
+  // =========================
+  const DEFAULT_TEAMS = {
+    Facebook: {
+      fixedCost: 320,
+      cogs: 60,
+      selling: 15,
+      other: 5,
+      bonusSale: 27,
+      bonusRD: 4,
+      bonusCSKH: 1,
+      bonusKT: 1.2,
+      bonusMedia: 1,
+      revenue1: 1250,
+      revenue2: 2309,
+      revenue3: 2800,
+    },
+    TikTok: {
+      fixedCost: 320,
+      cogs: 51,
+      selling: 30,
+      other: 5,
+      bonusSale: 27,
+      bonusRD: 4,
+      bonusCSKH: 1,
+      bonusKT: 1.2,
+      bonusMedia: 1,
+      revenue1: 1800,
+      revenue2: 1862,
+      revenue3: 2800,
+    },
+    Shopee: {
+      fixedCost: 120,
+      cogs: 53,
+      selling: 30,
+      other: 5,
+      bonusSale: 7,
+      bonusRD: 4,
+      bonusCSKH: 1,
+      bonusKT: 1.2,
+      bonusMedia: 1,
+      revenue1: 800,
+      revenue2: 1030,
+      revenue3: 1200,
+    },
+    Website: {
+      fixedCost: 75,
+      cogs: 60,
+      selling: 15,
+      other: 5,
+      bonusSale: 25,
+      bonusRD: 4,
+      bonusCSKH: 1,
+      bonusKT: 1.2,
+      bonusMedia: 1,
+      revenue1: 245,
+      revenue2: 245,
+      revenue3: 320,
+    },
+    B2B: {
+      fixedCost: 75,
+      cogs: 60,
+      selling: 15,
+      other: 5,
+      bonusSale: 20, // Sale B2B ăn 20% LNR
+      bonusRD: 4,
+      bonusCSKH: 1,
+      bonusKT: 1.2,
+      bonusMedia: 1,
+      revenue1: 245,
+      revenue2: 245,
+      revenue3: 320,
+    },
+  };
+
+  const createDefaultTeam = (name) => {
+    const baseName = name || 'Team mới';
+    const d = DEFAULT_TEAMS[baseName] || {};
+    const fixedCost = d.fixedCost ?? 100;
+    const cogs = d.cogs ?? 60;
+    const selling = d.selling ?? 10;
+    const other = d.other ?? 5;
+
+    return {
+      id: Date.now().toString() + Math.random().toString(16).slice(2),
+      name: baseName,
+      fixedCost,
+      cogs,
+      selling,
+      other,
+      bonusSale: d.bonusSale ?? 10,
+      bonusRD: d.bonusRD ?? 4,
+      bonusCSKH: d.bonusCSKH ?? 1,
+      bonusKT: d.bonusKT ?? 1.2,
+      bonusMedia: d.bonusMedia ?? 1,
+      revenue1: d.revenue1 ?? 1000,
+      revenue2: d.revenue2 ?? 1500,
+      revenue3: d.revenue3 ?? 2000,
+      targetFixedCost: d.fixedCost ?? fixedCost,
+      targetCogs: d.cogs ?? cogs,
+      targetSelling: d.selling ?? selling,
+      targetOther: d.other ?? other,
+      collapsed: false,
     };
+  };
 
-    const saveJSON = (key, value) => {
-      try {
-        localStorage.setItem(key, JSON.stringify(value));
-      } catch (e) {
-        console.warn('Không lưu được', key, e);
-      }
-    };
+  const createInitialTeamsFromCodeDefaults = () => ([
+    createDefaultTeam('TikTok'),
+    createDefaultTeam('Shopee'),
+    createDefaultTeam('Website'),
+    createDefaultTeam('Facebook'),
+    createDefaultTeam('B2B'),
+  ]);
 
-    // ===== Format helpers =====
-    const formatCurrency = (n) => {
-      if (isNaN(n)) return '-';
-      return Number(n).toLocaleString('vi-VN', { maximumFractionDigits: 0 });
-    };
+  // =========================
+  // 5) STATE
+  // =========================
+  let teams = [];
 
-    const formatPercent = (n) => {
-      if (isNaN(n)) return '-';
-      return Number(n).toLocaleString('vi-VN', { maximumFractionDigits: 1 }) + ' %';
-    };
+  const loadState = () => loadJSON(STORAGE_KEY_STATE);
+  const saveState = () => saveJSON(STORAGE_KEY_STATE, teams);
+  const loadDefaults = () => loadJSON(STORAGE_KEY_DEFAULTS);
 
-    const formatMoneyInput = (n) => {
-      if (n === null || n === undefined || n === '' || isNaN(n)) return '';
-      return Number(n).toLocaleString('vi-VN');
-    };
+  const saveDefaultsFromCurrent = () => {
+    saveJSON(STORAGE_KEY_DEFAULTS, teams);
+    alert('Đã lưu cấu hình hiện tại làm mặc định.');
+  };
 
-    const parseMoneyInput = (str) => {
-      if (str === null || str === undefined) return 0;
-      const cleaned = String(str).replace(/[^\d-]/g, '');
-      const num = Number(cleaned);
-      return isNaN(num) ? 0 : num;
-    };
+  const resetToDefaults = () => {
+    const storedDefaults = loadDefaults();
+    if (storedDefaults && storedDefaults.length) {
+      teams = storedDefaults.map(t => ({
+        ...createDefaultTeam(t.name || 'Team'),
+        ...t,
+      }));
+    } else {
+      teams = createInitialTeamsFromCodeDefaults();
+    }
+    render();
+  };
 
-    const cellValPct = (val, revenue) => {
-      if (isNaN(val)) return '-';
-      const base = formatCurrency(val);
-      if (!revenue || isNaN(revenue) || revenue === 0) return base;
-      const pct = (val / revenue) * 100;
-      return base + '<span class="muted-percent">(' + pct.toFixed(1) + '%)</span>';
-    };
+  // =========================
+  // 6) TÍNH TOÁN
+  // =========================
+  const computeTeamMetrics = (team) => {
+    const varPct = (Number(team.cogs) || 0) +
+                   (Number(team.selling) || 0) +
+                   (Number(team.other) || 0);
 
-    // ===== Default config per channel =====
-    const DEFAULT_TEAMS = {
-      Facebook: {
-        fixedCost: 320,
-        cogs: 60,
-        selling: 15,
-        other: 5,
-        bonusSale: 27,
-        bonusRD: 4,
-        bonusCSKH: 1,
-        bonusKT: 1.2,
-        bonusMedia: 1,
-        revenue1: 1250,
-        revenue2: 2309,
-        revenue3: 2800,
-      },
-      TikTok: {
-        fixedCost: 320,
-        cogs: 51,
-        selling: 30,
-        other: 5,
-        bonusSale: 27,
-        bonusRD: 4,
-        bonusCSKH: 1,
-        bonusKT: 1.2,
-        bonusMedia: 1,
-        revenue1: 1800,
-        revenue2: 1862,
-        revenue3: 2800,
-      },
-      Shopee: {
-        fixedCost: 120,
-        cogs: 53,
-        selling: 30,
-        other: 5,
-        bonusSale: 7,
-        bonusRD: 4,
-        bonusCSKH: 1,
-        bonusKT: 1.2,
-        bonusMedia: 1,
-        revenue1: 800,
-        revenue2: 1030,
-        revenue3: 1200,
-      },
-      Website: {
-        fixedCost: 75,
-        cogs: 60,
-        selling: 15,
-        other: 5,
-        bonusSale: 25,
-        bonusRD: 4,
-        bonusCSKH: 1,
-        bonusKT: 1.2,
-        bonusMedia: 1,
-        revenue1: 245,
-        revenue2: 245,
-        revenue3: 320,
-      },
-      B2B: {
-        fixedCost: 75,
-        cogs: 60,
-        selling: 15,
-        other: 5,
-        bonusSale: 20, // Sale B2B ăn 20% LNR
-        bonusRD: 4,
-        bonusCSKH: 1,
-        bonusKT: 1.2,
-        bonusMedia: 1,
-        revenue1: 245,
-        revenue2: 245,
-        revenue3: 320,
-      },
-    };
+    const calcForRevenue = (r) => {
+      const revenue = Number(r) || 0;
+      const variableCost = revenue * (varPct / 100);
+      const grossProfit = revenue - variableCost;
+      const fixedCost = Number(team.fixedCost) || 0;
+      const netProfit = grossProfit - fixedCost;
+      const safeProfit = Math.max(0, netProfit);
 
-    // ===== Create default team object =====
-    const createDefaultTeam = (name) => {
-      const baseName = name || 'Team mới';
-      const d = DEFAULT_TEAMS[baseName] || {};
-      const fixedCost = d.fixedCost ?? 100;
-      const cogs = d.cogs ?? 60;
-      const selling = d.selling ?? 10;
-      const other = d.other ?? 5;
+      const bonusSale   = safeProfit * ((Number(team.bonusSale)   || 0) / 100);
+      const bonusRD     = safeProfit * ((Number(team.bonusRD)     || 0) / 100);
+      const bonusCSKH   = safeProfit * ((Number(team.bonusCSKH)   || 0) / 100);
+      const bonusKT     = safeProfit * ((Number(team.bonusKT)     || 0) / 100);
+      const bonusMedia  = safeProfit * ((Number(team.bonusMedia)  || 0) / 100);
+
+      const totalBonus = bonusSale + bonusRD + bonusCSKH + bonusKT + bonusMedia;
+      const profitAfterBonus = netProfit - totalBonus;
 
       return {
-        id: Date.now().toString() + Math.random().toString(16).slice(2),
-        name: baseName,
+        revenue,
+        variableCost,
+        grossProfit,
         fixedCost,
-        cogs,
-        selling,
-        other,
-        bonusSale: d.bonusSale ?? 10,
-        bonusRD: d.bonusRD ?? 4,
-        bonusCSKH: d.bonusCSKH ?? 1,
-        bonusKT: d.bonusKT ?? 1.2,
-        bonusMedia: d.bonusMedia ?? 1,
-        revenue1: d.revenue1 ?? 1000,
-        revenue2: d.revenue2 ?? 1500,
-        revenue3: d.revenue3 ?? 2000,
-        targetFixedCost: d.fixedCost ?? fixedCost,
-        targetCogs: d.cogs ?? cogs,
-        targetSelling: d.selling ?? selling,
-        targetOther: d.other ?? other,
-        collapsed: false,
+        netProfit,
+        bonusSale,
+        bonusRD,
+        bonusCSKH,
+        bonusKT,
+        bonusMedia,
+        totalBonus,
+        profitAfterBonus
       };
     };
 
-    const createInitialTeamsFromCodeDefaults = () => ([
-      createDefaultTeam('TikTok'),
-      createDefaultTeam('Shopee'),
-      createDefaultTeam('Website'),
-      createDefaultTeam('Facebook'),
-      createDefaultTeam('B2B'),
-    ]);
+    let breakEven = null;
+    const fixedCostOuter = Number(team.fixedCost) || 0;
+    if (varPct < 100 && fixedCostOuter > 0) {
+      breakEven = fixedCostOuter / (1 - varPct / 100);
+    }
 
-    // ===== State load/save =====
-    const loadState = () => loadJSON(STORAGE_KEY_STATE);
-    const saveState = () => saveJSON(STORAGE_KEY_STATE, teams);
-    const loadDefaults = () => loadJSON(STORAGE_KEY_DEFAULTS);
-
-    const saveDefaultsFromCurrent = () => {
-      saveJSON(STORAGE_KEY_DEFAULTS, teams);
-      alert('Đã lưu cấu hình hiện tại làm mặc định.');
+    return {
+      varPct,
+      breakEven,
+      m1: calcForRevenue(team.revenue1),
+      m2: calcForRevenue(team.revenue2),
+      m3: calcForRevenue(team.revenue3)
     };
+  };
 
-    const resetToDefaults = () => {
-      const storedDefaults = loadDefaults();
-      if (storedDefaults && storedDefaults.length) {
-        teams = storedDefaults.map(t => ({
-          ...createDefaultTeam(t.name || 'Team'),
-          ...t,
-        }));
-      } else {
-        teams = createInitialTeamsFromCodeDefaults();
-      }
-      saveState();
-      render();
-    };
+  // so sánh % chi phí: chênh lệch theo tỉ lệ % so với target
+  const comparePercent = (actual, target) => {
+    actual = Number(actual) || 0;
+    target = Number(target) || 0;
+    if (!target) return { txt: '--', cls: '' };
 
-    // ===== Đồng bộ với Google Sheet qua Apps Script =====
-    const saveToServer = async () => {
-      if (!API_URL) {
-        alert('Chưa cấu hình API_URL.');
-        return;
-      }
+    const diffPct = ((actual - target) / target) * 100;
+    const sign = diffPct >= 0 ? '+' : '';
+    const txt = `${sign}${diffPct.toFixed(1)}%`;
+    const cls = diffPct <= 0 ? 'positive' : 'negative'; // xanh nếu ≤ target, đỏ nếu vượt
+    return { txt, cls };
+  };
 
-      try {
-        const payload = { id: SCENARIO_ID, teams };
-        const body = 'data=' + encodeURIComponent(JSON.stringify(payload));
+  // =========================
+  // 7) HANDLER
+  // =========================
+  const handleInput = (teamId, field, value) => {
+    teams = teams.map(t => t.id === teamId ? { ...t, [field]: value } : t);
+    render();
+  };
 
-        const res = await fetch(API_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body,
-        });
+  const handleMoney = (teamId, field, raw) => {
+    const num = parseMoneyInput(raw);
+    handleInput(teamId, field, num);
+  };
 
-        const data = await res.json();
-        if (!res.ok || !data.ok) {
-          throw new Error(data.error || 'Lỗi không xác định');
-        }
+  const toggleCollapse = (teamId) => {
+    teams = teams.map(t => t.id === teamId ? { ...t, collapsed: !t.collapsed } : t);
+    render();
+  };
 
-        alert('Đã lưu lên Google Sheet (scenario: ' + SCENARIO_ID + ').');
-      } catch (err) {
-        console.error(err);
-        alert('Không lưu được lên Google Sheet: ' + err.message);
-      }
-    };
+  const deleteTeam = (teamId) => {
+    if (teams.length === 1) {
+      alert('Cần ít nhất 1 team.');
+      return;
+    }
+    teams = teams.filter(t => t.id !== teamId);
+    render();
+  };
 
-    const loadFromServer = async () => {
-      if (!API_URL) {
-        alert('Chưa cấu hình API_URL.');
-        return;
-      }
+  const addTeam = () => {
+    teams = [...teams, createDefaultTeam('Team mới')];
+    render();
+  };
 
-      try {
-        const res = await fetch(API_URL + '?id=' + encodeURIComponent(SCENARIO_ID));
-        const data = await res.json();
+  const focusTeam = (name) => {
+    document.querySelectorAll('.chip-button').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.name === name);
+    });
 
-        if (!res.ok || !data.ok) {
-          throw new Error(data.error || 'Lỗi không xác định');
-        }
+    let t = teams.find(team => team.name.toLowerCase() === name.toLowerCase());
+    if (!t) {
+      t = createDefaultTeam(name);
+      teams = [...teams, t];
+    }
+    render();
 
-        const incoming = Array.isArray(data.teams) ? data.teams : [];
-        if (!incoming.length) {
-          alert('Chưa có dữ liệu trên Google Sheet cho scenario này.');
-          return;
-        }
+    requestAnimationFrame(() => {
+      const el = document.querySelector(`.card[data-team-id="${t.id}"]`);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  };
 
-        teams = incoming.map(t =>
-          Object.assign({}, createDefaultTeam(t.name || 'Team'), t)
-        );
+  // =========================
+  // 8) RENDER TEAMS
+  // =========================
+  const renderTeams = () => {
+    const container = document.getElementById('teamsContainer');
+    container.innerHTML = '';
 
-        render();
-        alert('Đã tải cấu hình từ Google Sheet (scenario: ' + SCENARIO_ID + ').');
-      } catch (err) {
-        console.error(err);
-        alert('Không tải được dữ liệu từ Google Sheet: ' + err.message);
-      }
-    };
+    teams.forEach((team, index) => {
+      const metrics = computeTeamMetrics(team);
+      const card = document.createElement('div');
+      card.className = `card team-${index % 4}`;
+      card.dataset.teamId = team.id;
 
-    // ===== Core logic =====
-    const computeTeamMetrics = (team) => {
-      const varPct = (Number(team.cogs) || 0) +
-                     (Number(team.selling) || 0) +
-                     (Number(team.other) || 0);
+      const breakEvenText = metrics.breakEven
+        ? `${formatCurrency(metrics.breakEven)}`
+        : 'Không xác định';
 
-      const calcForRevenue = (r) => {
-        const revenue = Number(r) || 0;
-        const variableCost = revenue * (varPct / 100);
-        const grossProfit = revenue - variableCost;
-        const fixedCost = Number(team.fixedCost) || 0;
-        const netProfit = grossProfit - fixedCost;
-        const safeProfit = Math.max(0, netProfit);
-
-        const bonusSale   = safeProfit * ((Number(team.bonusSale)   || 0) / 100);
-        const bonusRD     = safeProfit * ((Number(team.bonusRD)     || 0) / 100);
-        const bonusCSKH   = safeProfit * ((Number(team.bonusCSKH)   || 0) / 100);
-        const bonusKT     = safeProfit * ((Number(team.bonusKT)     || 0) / 100);
-        const bonusMedia  = safeProfit * ((Number(team.bonusMedia)  || 0) / 100);
-
-        const totalBonus = bonusSale + bonusRD + bonusCSKH + bonusKT + bonusMedia;
-        const profitAfterBonus = netProfit - totalBonus;
-
-        return {
-          revenue,
-          variableCost,
-          grossProfit,
-          fixedCost,
-          netProfit,
-          bonusSale,
-          bonusRD,
-          bonusCSKH,
-          bonusKT,
-          bonusMedia,
-          totalBonus,
-          profitAfterBonus
-        };
-      };
-
-      let breakEven = null;
-      const fixedCostOuter = Number(team.fixedCost) || 0;
-      if (varPct < 100 && fixedCostOuter > 0) {
-        breakEven = fixedCostOuter / (1 - varPct / 100);
+      const fixedActual  = Number(team.fixedCost) || 0;
+      const fixedTarget  = Number(team.targetFixedCost) || 0;
+      let fixedDiffTxt = '--', fixedDiffClass = '';
+      if (fixedTarget > 0) {
+        const diffPct = ((fixedActual - fixedTarget) / fixedTarget) * 100;
+        const sign = diffPct >= 0 ? '+' : '';
+        fixedDiffTxt = `${sign}${diffPct.toFixed(1)}%`;
+        fixedDiffClass = diffPct <= 0 ? 'positive' : 'negative';
       }
 
-      return {
-        varPct,
-        breakEven,
-        m1: calcForRevenue(team.revenue1),
-        m2: calcForRevenue(team.revenue2),
-        m3: calcForRevenue(team.revenue3)
-      };
-    };
+      const cogsCmp  = comparePercent(team.cogs,    team.targetCogs);
+      const sellCmp  = comparePercent(team.selling, team.targetSelling);
+      const otherCmp = comparePercent(team.other,   team.targetOther);
 
-    const comparePercent = (actual, target) => {
-      actual = Number(actual) || 0;
-      target = Number(target) || 0;
-      if (!target) return { txt: '--', cls: '' };
-
-      const diffPct = ((actual - target) / target) * 100;
-      const sign = diffPct >= 0 ? '+' : '';
-      const txt = sign + diffPct.toFixed(1) + '%';
-      const cls = diffPct <= 0 ? 'positive' : 'negative'; // xanh nếu ≤ target, đỏ nếu vượt
-      return { txt, cls };
-    };
-
-    // ===== UI helpers =====
-    const handleInput = (teamId, field, value) => {
-      teams = teams.map(t => t.id === teamId ? { ...t, [field]: value } : t);
-      render();
-    };
-
-    const handleMoney = (teamId, field, raw) => {
-      const num = parseMoneyInput(raw);
-      handleInput(teamId, field, num);
-    };
-
-    const toggleCollapse = (teamId) => {
-      teams = teams.map(t => t.id === teamId ? { ...t, collapsed: !t.collapsed } : t);
-      render();
-    };
-
-    const deleteTeam = (teamId) => {
-      if (teams.length === 1) {
-        alert('Cần ít nhất 1 team.');
-        return;
-      }
-      teams = teams.filter(t => t.id !== teamId);
-      render();
-    };
-
-    const addTeam = () => {
-      teams = [...teams, createDefaultTeam('Team mới')];
-      render();
-    };
-
-    const focusTeam = (name) => {
-      document.querySelectorAll('.chip-button').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.name === name);
-      });
-
-      let t = teams.find(team => team.name.toLowerCase() === name.toLowerCase());
-      if (!t) {
-        t = createDefaultTeam(name);
-        teams = [...teams, t];
-      }
-      render();
-
-      requestAnimationFrame(() => {
-        const el = document.querySelector('.card[data-team-id="' + t.id + '"]');
-        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      });
-    };
-
-    // ===== Render teams =====
-    const renderTeams = () => {
-      const container = document.getElementById('teamsContainer');
-      container.innerHTML = '';
-
-      teams.forEach((team, index) => {
-        const metrics = computeTeamMetrics(team);
-        const card = document.createElement('div');
-        card.className = 'card team-' + (index % 4);
-        card.dataset.teamId = team.id;
-
-        const breakEvenText = metrics.breakEven
-          ? formatCurrency(metrics.breakEven)
-          : 'Không xác định';
-
-        const fixedActual  = Number(team.fixedCost) || 0;
-        const fixedTarget  = Number(team.targetFixedCost) || 0;
-        let fixedDiffTxt = '--', fixedDiffClass = '';
-        if (fixedTarget > 0) {
-          const diffPct = ((fixedActual - fixedTarget) / fixedTarget) * 100;
-          const sign = diffPct >= 0 ? '+' : '';
-          fixedDiffTxt = sign + diffPct.toFixed(1) + '%';
-          fixedDiffClass = diffPct <= 0 ? 'positive' : 'negative';
-        }
-
-        const cogsCmp  = comparePercent(team.cogs,    team.targetCogs);
-        const sellCmp  = comparePercent(team.selling, team.targetSelling);
-        const otherCmp = comparePercent(team.other,   team.targetOther);
-
-        const headerHtml = `
-          <div class="card-header">
-            <div class="card-header-left">
-              <span class="badge">Team ${index + 1}</span>
-              <input
-                type="text"
-                class="team-name"
-                value="${team.name}"
-                onchange="handleInput('${team.id}','name',this.value)"
-              />
-              <span class="badge">
-                Tổng biến phí: ${formatPercent(metrics.varPct)}
-              </span>
-              <span class="badge">
-                Điểm hòa vốn: ${breakEvenText}
-              </span>
-            </div>
-            <div>
-              <button class="small" onclick="toggleCollapse('${team.id}')">
-                ${team.collapsed ? 'Xem chi tiết' : 'Ẩn chi tiết'}
-              </button>
-              <button class="small danger" onclick="deleteTeam('${team.id}')">
-                Xóa
-              </button>
-            </div>
+      const headerHtml = `
+        <div class="card-header">
+          <div class="card-header-left">
+            <span class="badge">Team ${index + 1}</span>
+            <input
+              type="text"
+              class="team-name"
+              value="${team.name}"
+              onchange="handleInput('${team.id}','name',this.value)"
+            />
+            <span class="pill-input">
+              <span>Tổng biến phí:</span>
+              <strong>${formatPercent(metrics.varPct)}</strong>
+            </span>
+            <span class="pill-input">
+              <span>Điểm hòa vốn:</span>
+              <strong>${breakEvenText}</strong>
+            </span>
           </div>
-        `;
-
-        let bodyHtml = '';
-        if (!team.collapsed) {
-          const profitClassM1 = metrics.m1.netProfit >= 0 ? 'positive' : 'negative';
-          const profitClassM2 = metrics.m2.netProfit >= 0 ? 'positive' : 'negative';
-          const profitClassM3 = metrics.m3.netProfit >= 0 ? 'positive' : 'negative';
-
-          const paClassM1 = metrics.m1.profitAfterBonus >= 0 ? 'positive' : 'negative';
-          const paClassM2 = metrics.m2.profitAfterBonus >= 0 ? 'positive' : 'negative';
-          const paClassM3 = metrics.m3.profitAfterBonus >= 0 ? 'positive' : 'negative';
-
-          bodyHtml = `
-            <div class="grid">
-              <div class="col-12">
-                <table class="mini-compare">
-                  <thead>
-                    <tr>
-                      <th>Chỉ tiêu</th>
-                      <th>Target</th>
-                      <th>Thực tế</th>
-                      <th>Chênh lệch</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>Chi phí cố định / kỳ</td>
-                      <td>
-                        <input
-                          type="text"
-                          class="table-input"
-                          value="${formatMoneyInput(team.targetFixedCost)}"
-                          onchange="handleMoney('${team.id}','targetFixedCost',this.value)"
-                        />
-                      </td>
-                      <td>
-                        <input
-                          type="text"
-                          class="table-input"
-                          value="${formatMoneyInput(team.fixedCost)}"
-                          onchange="handleMoney('${team.id}','fixedCost',this.value)"
-                        />
-                      </td>
-                      <td class="${fixedDiffClass}">${fixedDiffTxt}</td>
-                    </tr>
-                    <tr>
-                      <td>Giá vốn (COGS)</td>
-                      <td>
-                        <input
-                          type="number"
-                          class="table-input"
-                          value="${team.targetCogs}"
-                          onchange="handleInput('${team.id}','targetCogs',this.value)"
-                        />
-                      </td>
-                      <td>
-                        <input
-                          type="number"
-                          class="table-input"
-                          value="${team.cogs}"
-                          onchange="handleInput('${team.id}','cogs',this.value)"
-                        />
-                      </td>
-                      <td class="${cogsCmp.cls}">${cogsCmp.txt}</td>
-                    </tr>
-                    <tr>
-                      <td>Chi phí bán hàng</td>
-                      <td>
-                        <input
-                          type="number"
-                          class="table-input"
-                          value="${team.targetSelling}"
-                          onchange="handleInput('${team.id}','targetSelling',this.value)"
-                        />
-                      </td>
-                      <td>
-                        <input
-                          type="number"
-                          class="table-input"
-                          value="${team.selling}"
-                          onchange="handleInput('${team.id}','selling',this.value)"
-                        />
-                      </td>
-                      <td class="${sellCmp.cls}">${sellCmp.txt}</td>
-                    </tr>
-                    <tr>
-                      <td>Chi phí khác (biến phí)</td>
-                      <td>
-                        <input
-                          type="number"
-                          class="table-input"
-                          value="${team.targetOther}"
-                          onchange="handleInput('${team.id}','targetOther',this.value)"
-                        />
-                      </td>
-                      <td>
-                        <input
-                          type="number"
-                          class="table-input"
-                          value="${team.other}"
-                          onchange="handleInput('${team.id}','other',this.value)"
-                        />
-                      </td>
-                      <td class="${otherCmp.cls}">${otherCmp.txt}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-
-              <div class="col-12 muted">
-                = Giá vốn + Chi phí bán hàng + Chi phí khác → <b>Tổng biến phí: ${formatPercent(metrics.varPct)}</b>
-              </div>
-
-              <div class="col-12" style="margin-top:6px;">
-                <p><strong>% thưởng trên LỢI NHUẬN (chỉ tính khi lợi nhuận &gt; 0)</strong></p>
-              </div>
-              <div class="col-2">
-                <div class="bonus-field">
-                  <span class="bonus-label">Sale</span>
-                  <input
-                    type="number"
-                    class="bonus-input"
-                    value="${team.bonusSale}"
-                    onchange="handleInput('${team.id}','bonusSale',this.value)"
-                  />
-                </div>
-              </div>
-              <div class="col-2">
-                <div class="bonus-field">
-                  <span class="bonus-label">RD</span>
-                  <input
-                    type="number"
-                    class="bonus-input"
-                    value="${team.bonusRD}"
-                    onchange="handleInput('${team.id}','bonusRD',this.value)"
-                  />
-                </div>
-              </div>
-              <div class="col-2">
-                <div class="bonus-field">
-                  <span class="bonus-label">CSKH</span>
-                  <input
-                    type="number"
-                    class="bonus-input"
-                    value="${team.bonusCSKH}"
-                    onchange="handleInput('${team.id}','bonusCSKH',this.value)"
-                  />
-                </div>
-              </div>
-              <div class="col-2">
-                <div class="bonus-field">
-                  <span class="bonus-label">KT + HCNS</span>
-                  <input
-                    type="number"
-                    class="bonus-input"
-                    value="${team.bonusKT}"
-                    onchange="handleInput('${team.id}','bonusKT',this.value)"
-                  />
-                </div>
-              </div>
-              <div class="col-2">
-                <div class="bonus-field">
-                  <span class="bonus-label">Media</span>
-                  <input
-                    type="number"
-                    class="bonus-input"
-                    value="${team.bonusMedia}"
-                    onchange="handleInput('${team.id}','bonusMedia',this.value)"
-                  />
-                </div>
-              </div>
-              <div class="col-12 muted">
-                Tổng % thưởng = Sale + RD + CSKH + KT + Media. Thưởng tính trên LNR &gt; 0 của từng mốc.
-              </div>
-            </div>
-
-            <table>
-              <thead>
-                <tr>
-                  <th>Chỉ tiêu</th>
-                  <th>Mốc 1</th>
-                  <th>Mốc 2</th>
-                  <th>Mốc 3</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Doanh thu</td>
-                  <td>
-                    <input
-                      type="text"
-                      class="table-input"
-                      value="${formatMoneyInput(team.revenue1)}"
-                      onchange="handleMoney('${team.id}','revenue1',this.value)"
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="text"
-                      class="table-input"
-                      value="${formatMoneyInput(team.revenue2)}"
-                      onchange="handleMoney('${team.id}','revenue2',this.value)"
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="text"
-                      class="table-input"
-                      value="${formatMoneyInput(team.revenue3)}"
-                      onchange="handleMoney('${team.id}','revenue3',this.value)"
-                    />
-                  </td>
-                </tr>
-                <tr>
-                  <td>Biến phí</td>
-                  <td>${cellValPct(metrics.m1.variableCost, metrics.m1.revenue)}</td>
-                  <td>${cellValPct(metrics.m2.variableCost, metrics.m2.revenue)}</td>
-                  <td>${cellValPct(metrics.m3.variableCost, metrics.m3.revenue)}</td>
-                </tr>
-                <tr>
-                  <td>Lợi nhuận gộp (sau biến phí)</td>
-                  <td>${cellValPct(metrics.m1.grossProfit, metrics.m1.revenue)}</td>
-                  <td>${cellValPct(metrics.m2.grossProfit, metrics.m2.revenue)}</td>
-                  <td>${cellValPct(metrics.m3.grossProfit, metrics.m3.revenue)}</td>
-                </tr>
-                <tr>
-                  <td>Chi phí cố định</td>
-                  <td>${cellValPct(metrics.m1.fixedCost, metrics.m1.revenue)}</td>
-                  <td>${cellValPct(metrics.m2.fixedCost, metrics.m2.revenue)}</td>
-                  <td>${cellValPct(metrics.m3.fixedCost, metrics.m3.revenue)}</td>
-                </tr>
-                <tr>
-                  <td>Lợi nhuận trước thưởng</td>
-                  <td class="${profitClassM1}">
-                    ${cellValPct(metrics.m1.netProfit, metrics.m1.revenue)}
-                  </td>
-                  <td class="${profitClassM2}">
-                    ${cellValPct(metrics.m2.netProfit, metrics.m2.revenue)}
-                  </td>
-                  <td class="${profitClassM3}">
-                    ${cellValPct(metrics.m3.netProfit, metrics.m3.revenue)}
-                  </td>
-                </tr>
-                <tr>
-                  <td>Thưởng Sale</td>
-                  <td>${cellValPct(metrics.m1.bonusSale, metrics.m1.revenue)}</td>
-                  <td>${cellValPct(metrics.m2.bonusSale, metrics.m2.revenue)}</td>
-                  <td>${cellValPct(metrics.m3.bonusSale, metrics.m3.revenue)}</td>
-                </tr>
-                <tr>
-                  <td>Thưởng RD</td>
-                  <td>${cellValPct(metrics.m1.bonusRD, metrics.m1.revenue)}</td>
-                  <td>${cellValPct(metrics.m2.bonusRD, metrics.m2.revenue)}</td>
-                  <td>${cellValPct(metrics.m3.bonusRD, metrics.m3.revenue)}</td>
-                </tr>
-                <tr>
-                  <td>Thưởng CSKH</td>
-                  <td>${cellValPct(metrics.m1.bonusCSKH, metrics.m1.revenue)}</td>
-                  <td>${cellValPct(metrics.m2.bonusCSKH, metrics.m2.revenue)}</td>
-                  <td>${cellValPct(metrics.m3.bonusCSKH, metrics.m3.revenue)}</td>
-                </tr>
-                <tr>
-                  <td>Thưởng KT + HCNS</td>
-                  <td>${cellValPct(metrics.m1.bonusKT, metrics.m1.revenue)}</td>
-                  <td>${cellValPct(metrics.m2.bonusKT, metrics.m2.revenue)}</td>
-                  <td>${cellValPct(metrics.m3.bonusKT, metrics.m3.revenue)}</td>
-                </tr>
-                <tr>
-                  <td>Thưởng Media</td>
-                  <td>${cellValPct(metrics.m1.bonusMedia, metrics.m1.revenue)}</td>
-                  <td>${cellValPct(metrics.m2.bonusMedia, metrics.m2.revenue)}</td>
-                  <td>${cellValPct(metrics.m3.bonusMedia, metrics.m3.revenue)}</td>
-                </tr>
-                <tr class="row-total">
-                  <td><strong>Tổng thưởng</strong></td>
-                  <td>${cellValPct(metrics.m1.totalBonus, metrics.m1.revenue)}</td>
-                  <td>${cellValPct(metrics.m2.totalBonus, metrics.m2.revenue)}</td>
-                  <td>${cellValPct(metrics.m3.totalBonus, metrics.m3.revenue)}</td>
-                </tr>
-                <tr class="row-profit">
-                  <td><strong>Lợi nhuận sau thưởng</strong></td>
-                  <td class="${paClassM1}">
-                    ${cellValPct(metrics.m1.profitAfterBonus, metrics.m1.revenue)}
-                  </td>
-                  <td class="${paClassM2}">
-                    ${cellValPct(metrics.m2.profitAfterBonus, metrics.m2.revenue)}
-                  </td>
-                  <td class="${paClassM3}">
-                    ${cellValPct(metrics.m3.profitAfterBonus, metrics.m3.revenue)}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          `;
-        }
-
-        card.innerHTML = headerHtml + bodyHtml;
-        container.appendChild(card);
-      });
-    };
-
-    // ===== Render summary =====
-    const renderSummary = () => {
-      const container = document.getElementById('summaryContainer');
-      if (!teams.length) {
-        container.innerHTML = "<p class='muted'>Chưa có team nào.</p>";
-        return;
-      }
-
-      let rowsHtml = '';
-
-      let totalRevenue = 0;
-      let totalCostBeforeBonus = 0;
-      let totalGross   = 0;
-      let totalProfit  = 0;
-      let totalSale    = 0;
-      let totalRD      = 0;
-      let totalCSKH    = 0;
-      let totalKT      = 0;
-      let totalMedia   = 0;
-      let totalBonus   = 0;
-
-      teams.forEach(team => {
-        const m = computeTeamMetrics(team).m3; // Mốc 3 – thực tế
-        const costBeforeBonus = m.variableCost + m.fixedCost;
-
-        totalRevenue         += m.revenue;
-        totalCostBeforeBonus += costBeforeBonus;
-        totalGross           += m.grossProfit;
-        totalProfit          += m.profitAfterBonus;
-        totalSale            += m.bonusSale;
-        totalRD              += m.bonusRD;
-        totalCSKH            += m.bonusCSKH;
-        totalKT              += m.bonusKT;
-        totalMedia           += m.bonusMedia;
-        totalBonus           += m.totalBonus;
-
-        const grossCls  = m.grossProfit      >= 0 ? 'positive' : 'negative';
-        const profitCls = m.profitAfterBonus >= 0 ? 'positive' : 'negative';
-
-        rowsHtml += `
-          <tr>
-            <td>${team.name}</td>
-            <td>${formatCurrency(m.revenue)}</td>
-            <td>${cellValPct(costBeforeBonus, m.revenue)}</td>
-            <td class="${grossCls}">${cellValPct(m.grossProfit, m.revenue)}</td>
-            <td class="${profitCls}">${cellValPct(m.profitAfterBonus, m.revenue)}</td>
-            <td>${cellValPct(m.bonusSale, m.revenue)}</td>
-            <td>${cellValPct(m.bonusRD, m.revenue)}</td>
-            <td>${cellValPct(m.bonusCSKH, m.revenue)}</td>
-            <td>${cellValPct(m.bonusKT, m.revenue)}</td>
-            <td>${cellValPct(m.bonusMedia, m.revenue)}</td>
-            <td>${cellValPct(m.totalBonus, m.revenue)}</td>
-          </tr>
-        `;
-      });
-
-      const totalGrossCls  = totalGross  >= 0 ? 'positive' : 'negative';
-      const totalProfitCls = totalProfit >= 0 ? 'positive' : 'negative';
-
-      const tableHtml = `
-        <table>
-          <thead>
-            <tr>
-              <th>Team</th>
-              <th>Doanh thu Mốc 3</th>
-              <th>Chi phí (trước thưởng)</th>
-              <th>Lợi nhuận gộp</th>
-              <th>Lợi nhuận sau thưởng</th>
-              <th>Thưởng Sale</th>
-              <th>Thưởng RD</th>
-              <th>Thưởng CSKH</th>
-              <th>Thưởng KT+HCNS</th>
-              <th>Thưởng Media</th>
-              <th>Tổng thưởng</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${rowsHtml}
-          </tbody>
-          <tfoot>
-            <tr>
-              <td><strong>Tổng doanh nghiệp</strong></td>
-              <td>${formatCurrency(totalRevenue)}</td>
-              <td>${cellValPct(totalCostBeforeBonus, totalRevenue)}</td>
-              <td class="${totalGrossCls}">
-                ${cellValPct(totalGross, totalRevenue)}
-              </td>
-              <td class="${totalProfitCls}">
-                ${cellValPct(totalProfit, totalRevenue)}
-              </td>
-              <td>${cellValPct(totalSale, totalRevenue)}</td>
-              <td>${cellValPct(totalRD, totalRevenue)}</td>
-              <td>${cellValPct(totalCSKH, totalRevenue)}</td>
-              <td>${cellValPct(totalKT, totalRevenue)}</td>
-              <td>${cellValPct(totalMedia, totalRevenue)}</td>
-              <td>${cellValPct(totalBonus, totalRevenue)}</td>
-            </tr>
-          </tfoot>
-        </table>
+          <div>
+            <button class="small" onclick="toggleCollapse('${team.id}')">
+              ${team.collapsed ? 'Xem chi tiết' : 'Ẩn chi tiết'}
+            </button>
+            <button class="small danger" onclick="deleteTeam('${team.id}')">
+              Xóa
+            </button>
+          </div>
+        </div>
       `;
 
-      container.innerHTML = tableHtml;
-    };
+      let bodyHtml = '';
+      if (!team.collapsed) {
+        const profitClassM1 = metrics.m1.netProfit >= 0 ? 'positive' : 'negative';
+        const profitClassM2 = metrics.m2.netProfit >= 0 ? 'positive' : 'negative';
+        const profitClassM3 = metrics.m3.netProfit >= 0 ? 'positive' : 'negative';
 
-    // ===== Init state & render =====
-    let teams;
+        const paClassM1 = metrics.m1.profitAfterBonus >= 0 ? 'positive' : 'negative';
+        const paClassM2 = metrics.m2.profitAfterBonus >= 0 ? 'positive' : 'negative';
+        const paClassM3 = metrics.m3.profitAfterBonus >= 0 ? 'positive' : 'negative';
+
+        bodyHtml = `
+          <div class="grid">
+            <!-- Bảng so sánh: Target & Thực tế -->
+            <div class="col-12">
+              <table class="mini-compare">
+                <thead>
+                  <tr>
+                    <th>Chỉ tiêu</th>
+                    <th>Target</th>
+                    <th>Thực tế</th>
+                    <th>Chênh lệch</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Chi phí cố định / kỳ</td>
+                    <td>
+                      <input
+                        type="text"
+                        class="table-input"
+                        value="${formatMoneyInput(team.targetFixedCost)}"
+                        onchange="handleMoney('${team.id}','targetFixedCost',this.value)"
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="text"
+                        class="table-input"
+                        value="${formatMoneyInput(team.fixedCost)}"
+                        onchange="handleMoney('${team.id}','fixedCost',this.value)"
+                      />
+                    </td>
+                    <td class="${fixedDiffClass}">${fixedDiffTxt}</td>
+                  </tr>
+                  <tr>
+                    <td>Giá vốn (COGS)</td>
+                    <td>
+                      <input
+                        type="number"
+                        class="table-input"
+                        value="${team.targetCogs}"
+                        onchange="handleInput('${team.id}','targetCogs',this.value)"
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="number"
+                        class="table-input"
+                        value="${team.cogs}"
+                        onchange="handleInput('${team.id}','cogs',this.value)"
+                      />
+                    </td>
+                    <td class="${cogsCmp.cls}">${cogsCmp.txt}</td>
+                  </tr>
+                  <tr>
+                    <td>Chi phí bán hàng</td>
+                    <td>
+                      <input
+                        type="number"
+                        class="table-input"
+                        value="${team.targetSelling}"
+                        onchange="handleInput('${team.id}','targetSelling',this.value)"
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="number"
+                        class="table-input"
+                        value="${team.selling}"
+                        onchange="handleInput('${team.id}','selling',this.value)"
+                      />
+                    </td>
+                    <td class="${sellCmp.cls}">${sellCmp.txt}</td>
+                  </tr>
+                  <tr>
+                    <td>Chi phí khác (biến phí)</td>
+                    <td>
+                      <input
+                        type="number"
+                        class="table-input"
+                        value="${team.targetOther}"
+                        onchange="handleInput('${team.id}','targetOther',this.value)"
+                      />
+                    </td>
+                    <td>
+                      <input
+                        type="number"
+                        class="table-input"
+                        value="${team.other}"
+                        onchange="handleInput('${team.id}','other',this.value)"
+                      />
+                    </td>
+                    <td class="${otherCmp.cls}">${otherCmp.txt}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="col-12 muted">
+              = Giá vốn + Chi phí bán hàng + Chi phí khác → <b>Tổng biến phí: ${formatPercent(metrics.varPct)}</b>
+            </div>
+
+            <!-- Khối % thưởng -->
+            <div class="col-12" style="margin-top:6px;">
+              <p><strong>% thưởng trên LỢI NHUẬN (chỉ tính khi lợi nhuận &gt; 0)</strong></p>
+            </div>
+            <div class="col-2">
+              <div class="bonus-field">
+                <span class="bonus-label">Sale</span>
+                <input
+                  type="number"
+                  class="bonus-input"
+                  value="${team.bonusSale}"
+                  onchange="handleInput('${team.id}','bonusSale',this.value)"
+                />
+              </div>
+            </div>
+            <div class="col-2">
+              <div class="bonus-field">
+                <span class="bonus-label">RD</span>
+                <input
+                  type="number"
+                  class="bonus-input"
+                  value="${team.bonusRD}"
+                  onchange="handleInput('${team.id}','bonusRD',this.value)"
+                />
+              </div>
+            </div>
+            <div class="col-2">
+              <div class="bonus-field">
+                <span class="bonus-label">CSKH</span>
+                <input
+                  type="number"
+                  class="bonus-input"
+                  value="${team.bonusCSKH}"
+                  onchange="handleInput('${team.id}','bonusCSKH',this.value)"
+                />
+              </div>
+            </div>
+            <div class="col-2">
+              <div class="bonus-field">
+                <span class="bonus-label">KT + HCNS</span>
+                <input
+                  type="number"
+                  class="bonus-input"
+                  value="${team.bonusKT}"
+                  onchange="handleInput('${team.id}','bonusKT',this.value)"
+                />
+              </div>
+            </div>
+            <div class="col-2">
+              <div class="bonus-field">
+                <span class="bonus-label">Media</span>
+                <input
+                  type="number"
+                  class="bonus-input"
+                  value="${team.bonusMedia}"
+                  onchange="handleInput('${team.id}','bonusMedia',this.value)"
+                />
+              </div>
+            </div>
+            <div class="col-12 muted">
+              Tổng % thưởng = Sale + RD + CSKH + KT + Media. Thưởng tính trên LNR &gt; 0 của từng mốc.
+            </div>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Chỉ tiêu</th>
+                <th>Mốc 1</th>
+                <th>Mốc 2</th>
+                <th>Mốc 3</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Doanh thu</td>
+                <td>
+                  <input
+                    type="text"
+                    class="table-input"
+                    value="${formatMoneyInput(team.revenue1)}"
+                    onchange="handleMoney('${team.id}','revenue1',this.value)"
+                  />
+                </td>
+                <td>
+                  <input
+                    type="text"
+                    class="table-input"
+                    value="${formatMoneyInput(team.revenue2)}"
+                    onchange="handleMoney('${team.id}','revenue2',this.value)"
+                  />
+                </td>
+                <td>
+                  <input
+                    type="text"
+                    class="table-input"
+                    value="${formatMoneyInput(team.revenue3)}"
+                    onchange="handleMoney('${team.id}','revenue3',this.value)"
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td>Biến phí</td>
+                <td>${cellValPct(metrics.m1.variableCost, metrics.m1.revenue)}</td>
+                <td>${cellValPct(metrics.m2.variableCost, metrics.m2.revenue)}</td>
+                <td>${cellValPct(metrics.m3.variableCost, metrics.m3.revenue)}</td>
+              </tr>
+              <tr>
+                <td>Lợi nhuận gộp (sau biến phí)</td>
+                <td>${cellValPct(metrics.m1.grossProfit, metrics.m1.revenue)}</td>
+                <td>${cellValPct(metrics.m2.grossProfit, metrics.m2.revenue)}</td>
+                <td>${cellValPct(metrics.m3.grossProfit, metrics.m3.revenue)}</td>
+              </tr>
+              <tr>
+                <td>Chi phí cố định</td>
+                <td>${cellValPct(metrics.m1.fixedCost, metrics.m1.revenue)}</td>
+                <td>${cellValPct(metrics.m2.fixedCost, metrics.m2.revenue)}</td>
+                <td>${cellValPct(metrics.m3.fixedCost, metrics.m3.revenue)}</td>
+              </tr>
+              <tr>
+                <td>Lợi nhuận trước thưởng</td>
+                <td class="${profitClassM1}">
+                  ${cellValPct(metrics.m1.netProfit, metrics.m1.revenue)}
+                </td>
+                <td class="${profitClassM2}">
+                  ${cellValPct(metrics.m2.netProfit, metrics.m2.revenue)}
+                </td>
+                <td class="${profitClassM3}">
+                  ${cellValPct(metrics.m3.netProfit, metrics.m3.revenue)}
+                </td>
+              </tr>
+              <tr>
+                <td>Thưởng Sale</td>
+                <td>${cellValPct(metrics.m1.bonusSale, metrics.m1.revenue)}</td>
+                <td>${cellValPct(metrics.m2.bonusSale, metrics.m2.revenue)}</td>
+                <td>${cellValPct(metrics.m3.bonusSale, metrics.m3.revenue)}</td>
+              </tr>
+              <tr>
+                <td>Thưởng RD</td>
+                <td>${cellValPct(metrics.m1.bonusRD, metrics.m1.revenue)}</td>
+                <td>${cellValPct(metrics.m2.bonusRD, metrics.m2.revenue)}</td>
+                <td>${cellValPct(metrics.m3.bonusRD, metrics.m3.revenue)}</td>
+              </tr>
+              <tr>
+                <td>Thưởng CSKH</td>
+                <td>${cellValPct(metrics.m1.bonusCSKH, metrics.m1.revenue)}</td>
+                <td>${cellValPct(metrics.m2.bonusCSKH, metrics.m2.revenue)}</td>
+                <td>${cellValPct(metrics.m3.bonusCSKH, metrics.m3.revenue)}</td>
+              </tr>
+              <tr>
+                <td>Thưởng KT + HCNS</td>
+                <td>${cellValPct(metrics.m1.bonusKT, metrics.m1.revenue)}</td>
+                <td>${cellValPct(metrics.m2.bonusKT, metrics.m2.revenue)}</td>
+                <td>${cellValPct(metrics.m3.bonusKT, metrics.m3.revenue)}</td>
+              </tr>
+              <tr>
+                <td>Thưởng Media</td>
+                <td>${cellValPct(metrics.m1.bonusMedia, metrics.m1.revenue)}</td>
+                <td>${cellValPct(metrics.m2.bonusMedia, metrics.m2.revenue)}</td>
+                <td>${cellValPct(metrics.m3.bonusMedia, metrics.m3.revenue)}</td>
+              </tr>
+              <tr class="row-total">
+                <td><strong>Tổng thưởng</strong></td>
+                <td>${cellValPct(metrics.m1.totalBonus, metrics.m1.revenue)}</td>
+                <td>${cellValPct(metrics.m2.totalBonus, metrics.m2.revenue)}</td>
+                <td>${cellValPct(metrics.m3.totalBonus, metrics.m3.revenue)}</td>
+              </tr>
+              <tr class="row-profit">
+                <td><strong>Lợi nhuận sau thưởng</strong></td>
+                <td class="${paClassM1}">
+                  ${cellValPct(metrics.m1.profitAfterBonus, metrics.m1.revenue)}
+                </td>
+                <td class="${paClassM2}">
+                  ${cellValPct(metrics.m2.profitAfterBonus, metrics.m2.revenue)}
+                </td>
+                <td class="${paClassM3}">
+                  ${cellValPct(metrics.m3.profitAfterBonus, metrics.m3.revenue)}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        `;
+      }
+
+      card.innerHTML = headerHtml + bodyHtml;
+      container.appendChild(card);
+    });
+  };
+
+  // =========================
+  // 9) RENDER SUMMARY
+  // =========================
+  const renderSummary = () => {
+    const container = document.getElementById('summaryContainer');
+    if (!teams.length) {
+      container.innerHTML = "<p class='muted'>Chưa có team nào.</p>";
+      return;
+    }
+
+    let rowsHtml = '';
+
+    let totalRevenue = 0;
+    let totalCostBeforeBonus = 0;
+    let totalGross   = 0;
+    let totalProfit  = 0;
+    let totalSale    = 0;
+    let totalRD      = 0;
+    let totalCSKH    = 0;
+    let totalKT      = 0;
+    let totalMedia   = 0;
+    let totalBonus   = 0;
+
+    teams.forEach(team => {
+      const m = computeTeamMetrics(team).m3; // Mốc 3 – thực tế
+      const costBeforeBonus = m.variableCost + m.fixedCost;
+
+      totalRevenue         += m.revenue;
+      totalCostBeforeBonus += costBeforeBonus;
+      totalGross           += m.grossProfit;
+      totalProfit          += m.profitAfterBonus;
+      totalSale            += m.bonusSale;
+      totalRD              += m.bonusRD;
+      totalCSKH            += m.bonusCSKH;
+      totalKT              += m.bonusKT;
+      totalMedia           += m.bonusMedia;
+      totalBonus           += m.totalBonus;
+
+      const grossCls  = m.grossProfit      >= 0 ? 'positive' : 'negative';
+      const profitCls = m.profitAfterBonus >= 0 ? 'positive' : 'negative';
+
+      rowsHtml += `
+        <tr>
+          <td>${team.name}</td>
+          <td>${formatCurrency(m.revenue)}</td>
+          <td>${cellValPct(costBeforeBonus, m.revenue)}</td>
+          <td class="${grossCls}">${cellValPct(m.grossProfit, m.revenue)}</td>
+          <td class="${profitCls}">${cellValPct(m.profitAfterBonus, m.revenue)}</td>
+          <td>${cellValPct(m.bonusSale, m.revenue)}</td>
+          <td>${cellValPct(m.bonusRD, m.revenue)}</td>
+          <td>${cellValPct(m.bonusCSKH, m.revenue)}</td>
+          <td>${cellValPct(m.bonusKT, m.revenue)}</td>
+          <td>${cellValPct(m.bonusMedia, m.revenue)}</td>
+          <td>${cellValPct(m.totalBonus, m.revenue)}</td>
+        </tr>
+      `;
+    });
+
+    const totalGrossCls  = totalGross  >= 0 ? 'positive' : 'negative';
+    const totalProfitCls = totalProfit >= 0 ? 'positive' : 'negative';
+
+    const tableHtml = `
+      <table>
+        <thead>
+          <tr>
+            <th>Team</th>
+            <th>Doanh thu Mốc 3</th>
+            <th>Chi phí (trước thưởng)</th>
+            <th>Lợi nhuận gộp</th>
+            <th>Lợi nhuận sau thưởng</th>
+            <th>Thưởng Sale</th>
+            <th>Thưởng RD</th>
+            <th>Thưởng CSKH</th>
+            <th>Thưởng KT+HCNS</th>
+            <th>Thưởng Media</th>
+            <th>Tổng thưởng</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rowsHtml}
+        </tbody>
+        <tfoot>
+          <tr>
+            <td><strong>Tổng doanh nghiệp</strong></td>
+            <td>${formatCurrency(totalRevenue)}</td>
+            <td>${cellValPct(totalCostBeforeBonus, totalRevenue)}</td>
+            <td class="${totalGrossCls}">
+              ${cellValPct(totalGross, totalRevenue)}
+            </td>
+            <td class="${totalProfitCls}">
+              ${cellValPct(totalProfit, totalRevenue)}
+            </td>
+            <td>${cellValPct(totalSale, totalRevenue)}</td>
+            <td>${cellValPct(totalRD, totalRevenue)}</td>
+            <td>${cellValPct(totalCSKH, totalRevenue)}</td>
+            <td>${cellValPct(totalKT, totalRevenue)}</td>
+            <td>${cellValPct(totalMedia, totalRevenue)}</td>
+            <td>${cellValPct(totalBonus, totalRevenue)}</td>
+          </tr>
+        </tfoot>
+      </table>
+    `;
+
+    container.innerHTML = tableHtml;
+  };
+
+  // =========================
+  // 10) GOOGLE SHEET SYNC
+  // =========================
+  const saveToServer = async () => {
+    if (!API_URL || API_URL.includes('PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE')) {
+      alert('Chưa cấu hình API_URL trong code.');
+      return;
+    }
+
+    try {
+      const payload = { id: SCENARIO_ID, teams };
+
+      // Không set headers để tránh preflight CORS
+      const res = await fetch(API_URL, {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.ok) {
+        throw new Error(data.error || 'Lỗi không xác định');
+      }
+
+      alert(`Đã lưu lên Google Sheet (scenario: ${SCENARIO_ID}).`);
+    } catch (err) {
+      console.error(err);
+      alert('Không lưu được lên Google Sheet: ' + err.message);
+    }
+  };
+
+  const loadFromServer = async () => {
+    if (!API_URL || API_URL.includes('PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE')) {
+      alert('Chưa cấu hình API_URL trong code.');
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_URL}?id=${encodeURIComponent(SCENARIO_ID)}`);
+      const data = await res.json();
+
+      if (!res.ok || !data.ok) {
+        throw new Error(data.error || 'Lỗi không xác định');
+      }
+
+      const incoming = Array.isArray(data.teams) ? data.teams : [];
+      if (!incoming.length) {
+        alert('Chưa có dữ liệu trên Google Sheet cho scenario này.');
+        return;
+      }
+
+      teams = incoming.map(t =>
+        Object.assign({}, createDefaultTeam(t.name || 'Team'), t)
+      );
+
+      render();
+      alert(`Đã tải cấu hình từ Google Sheet (scenario: ${SCENARIO_ID}).`);
+    } catch (err) {
+      console.error(err);
+      alert('Không tải được dữ liệu từ Google Sheet: ' + err.message);
+    }
+  };
+
+  // =========================
+  // 11) INIT
+  // =========================
+  const init = () => {
     const storedState = loadState();
     if (storedState && storedState.length) {
       teams = storedState.map(t => ({
@@ -1143,15 +1183,16 @@
     } else {
       teams = createInitialTeamsFromCodeDefaults();
     }
-
-    const render = () => {
-      renderTeams();
-      renderSummary();
-      saveState();
-    };
-
-    // render lần đầu
     render();
-  </script>
+  };
+
+  const render = () => {
+    renderTeams();
+    renderSummary();
+    saveState();
+  };
+
+  init();
+</script>
 </body>
 </html>
