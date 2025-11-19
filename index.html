@@ -313,18 +313,13 @@
   </div>
 
 <script>
-  // =========================
-  // 1) CẤU HÌNH API
-  // =========================
-  // 👉 THAY BẰNG URL ỨNG DỤNG WEB APPS SCRIPT CỦA ANH (kết thúc bằng /exec)
-  const API_URL = 'https://script.google.com/macros/s/AKfycbzM7u_CeZoQQ6QjagAdT6UXvnuCmVnzwDbQUQDtv1qnwGWvsWtLbcI2mTgkAq50fQ4gKg/exec';
+  // ===== API Google Apps Script (thay URL này bằng Web App URL của anh nếu cần) =====
+  const API_URL = 'https://script.google.com/macros/s/AKfycbwmSNxt3fvHzWnfl3fHMhDi4GWaDfWTMeNPtXiSOyu_h2hLfrJvTbJRP3C50ob5zeBPFQ/exec';
   const SCENARIO_ID = 'default';
 
-  // =========================
-  // 2) LOCALSTORAGE
-  // =========================
-  const STORAGE_KEY_STATE    = 'thuong_tool_state_v2';
-  const STORAGE_KEY_DEFAULTS = 'thuong_tool_defaults_v2';
+  // ===== Storage keys (localStorage) =====
+  const STORAGE_KEY_STATE    = "thuong_tool_state_v1";
+  const STORAGE_KEY_DEFAULTS = "thuong_tool_defaults_v1";
 
   const loadJSON = (key) => {
     try {
@@ -332,7 +327,7 @@
       if (!raw) return null;
       return JSON.parse(raw);
     } catch (e) {
-      console.warn('Không đọc được', key, e);
+      console.warn("Không đọc được", key, e);
       return null;
     }
   };
@@ -341,46 +336,38 @@
     try {
       localStorage.setItem(key, JSON.stringify(value));
     } catch (e) {
-      console.warn('Không lưu được', key, e);
+      console.warn("Không lưu được", key, e);
     }
   };
 
-  // =========================
-  // 3) HELPER FORMAT
-  // =========================
+  // ===== Helper format =====
   const formatCurrency = (n) => {
-    if (isNaN(n)) return '-';
-    return Number(n).toLocaleString('vi-VN', { maximumFractionDigits: 0 });
+    if (isNaN(n)) return "-";
+    return Number(n).toLocaleString("vi-VN", { maximumFractionDigits: 0 });
   };
-
   const formatPercent = (n) => {
-    if (isNaN(n)) return '-';
-    return Number(n).toLocaleString('vi-VN', { maximumFractionDigits: 1 }) + ' %';
+    if (isNaN(n)) return "-";
+    return Number(n).toLocaleString("vi-VN", { maximumFractionDigits: 1 }) + " %";
   };
-
   const formatMoneyInput = (n) => {
-    if (n === null || n === undefined || n === '' || isNaN(n)) return '';
-    return Number(n).toLocaleString('vi-VN');
+    if (n === null || n === undefined || n === "" || isNaN(n)) return "";
+    return Number(n).toLocaleString("vi-VN");
   };
-
   const parseMoneyInput = (str) => {
     if (str === null || str === undefined) return 0;
-    const cleaned = String(str).replace(/[^\d-]/g, '');
+    const cleaned = String(str).replace(/[^\d-]/g, "");
     const num = Number(cleaned);
     return isNaN(num) ? 0 : num;
   };
-
   const cellValPct = (val, revenue) => {
-    if (isNaN(val)) return '-';
+    if (isNaN(val)) return "-";
     const base = formatCurrency(val);
     if (!revenue || isNaN(revenue) || revenue === 0) return base;
     const pct = (val / revenue) * 100;
     return `${base}<span class="muted-percent">(${pct.toFixed(1)}%)</span>`;
   };
 
-  // =========================
-  // 4) DEFAULT TEAM CONFIG
-  // =========================
+  // ===== Default config per channel =====
   const DEFAULT_TEAMS = {
     Facebook: {
       fixedCost: 320,
@@ -454,13 +441,14 @@
     },
   };
 
+  // ===== Create default team object =====
   const createDefaultTeam = (name) => {
-    const baseName = name || 'Team mới';
+    const baseName = name || "Team mới";
     const d = DEFAULT_TEAMS[baseName] || {};
     const fixedCost = d.fixedCost ?? 100;
-    const cogs = d.cogs ?? 60;
-    const selling = d.selling ?? 10;
-    const other = d.other ?? 5;
+    const cogs      = d.cogs      ?? 60;
+    const selling   = d.selling   ?? 10;
+    const other     = d.other     ?? 5;
 
     return {
       id: Date.now().toString() + Math.random().toString(16).slice(2),
@@ -469,60 +457,112 @@
       cogs,
       selling,
       other,
-      bonusSale: d.bonusSale ?? 10,
-      bonusRD: d.bonusRD ?? 4,
-      bonusCSKH: d.bonusCSKH ?? 1,
-      bonusKT: d.bonusKT ?? 1.2,
+      bonusSale:  d.bonusSale  ?? 10,
+      bonusRD:    d.bonusRD    ?? 4,
+      bonusCSKH:  d.bonusCSKH  ?? 1,
+      bonusKT:    d.bonusKT    ?? 1.2,
       bonusMedia: d.bonusMedia ?? 1,
       revenue1: d.revenue1 ?? 1000,
       revenue2: d.revenue2 ?? 1500,
       revenue3: d.revenue3 ?? 2000,
       targetFixedCost: d.fixedCost ?? fixedCost,
-      targetCogs: d.cogs ?? cogs,
-      targetSelling: d.selling ?? selling,
-      targetOther: d.other ?? other,
+      targetCogs:      d.cogs      ?? cogs,
+      targetSelling:   d.selling   ?? selling,
+      targetOther:     d.other     ?? other,
       collapsed: false,
     };
   };
 
   const createInitialTeamsFromCodeDefaults = () => ([
-    createDefaultTeam('TikTok'),
-    createDefaultTeam('Shopee'),
-    createDefaultTeam('Website'),
-    createDefaultTeam('Facebook'),
-    createDefaultTeam('B2B'),
+    createDefaultTeam("TikTok"),
+    createDefaultTeam("Shopee"),
+    createDefaultTeam("Website"),
+    createDefaultTeam("Facebook"),
+    createDefaultTeam("B2B"),
   ]);
 
-  // =========================
-  // 5) STATE
-  // =========================
-  let teams = [];
-
-  const loadState = () => loadJSON(STORAGE_KEY_STATE);
-  const saveState = () => saveJSON(STORAGE_KEY_STATE, teams);
+  // ===== State load/save =====
+  const loadState  = () => loadJSON(STORAGE_KEY_STATE);
+  const saveState  = () => saveJSON(STORAGE_KEY_STATE, teams);
   const loadDefaults = () => loadJSON(STORAGE_KEY_DEFAULTS);
 
   const saveDefaultsFromCurrent = () => {
     saveJSON(STORAGE_KEY_DEFAULTS, teams);
-    alert('Đã lưu cấu hình hiện tại làm mặc định.');
+    alert("Đã lưu cấu hình hiện tại làm mặc định.");
   };
 
   const resetToDefaults = () => {
     const storedDefaults = loadDefaults();
     if (storedDefaults && storedDefaults.length) {
       teams = storedDefaults.map(t => ({
-        ...createDefaultTeam(t.name || 'Team'),
+        ...createDefaultTeam(t.name || "Team"),
         ...t,
       }));
     } else {
       teams = createInitialTeamsFromCodeDefaults();
     }
+    saveState();
     render();
   };
 
-  // =========================
-  // 6) TÍNH TOÁN
-  // =========================
+  // ===== Đồng bộ với Google Sheet (chỉ lưu lên, dùng no-cors) =====
+  const saveToServer = async () => {
+    if (!API_URL) {
+      alert("Chưa cấu hình API_URL.");
+      return;
+    }
+
+    try {
+      const payload = { id: SCENARIO_ID, teams };
+
+      // Gửi request nhưng không đọc response để tránh CORS
+      await fetch(API_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      alert(`Đã gửi dữ liệu lên Google Sheet (scenario: ${SCENARIO_ID}). Mở sheet sẽ thấy dòng "default" được cập nhật.`);
+    } catch (err) {
+      console.error(err);
+      alert("Trình duyệt không gửi được request lên Google Sheet: " + err.message);
+    }
+  };
+
+  // Tạm thời không tải lại được từ Sheet do CORS (trên bản host tĩnh này)
+  const loadFromServer = async () => {
+    alert("Chức năng 'Tải từ Google Sheet' tạm thời chưa dùng được trên bản host hiện tại. Dữ liệu vẫn được lưu local + backup lên Sheet khi anh bấm 'Lưu lên Google Sheet'.");
+  };
+
+  // ===== Init teams =====
+  const storedState = loadState();
+  let teams = storedState && storedState.length
+    ? storedState.map(t => ({
+        ...createDefaultTeam(t.name || "Team"),
+        ...t,
+      }))
+    : createInitialTeamsFromCodeDefaults();
+
+  // ===== Core logic =====
+  const focusTeam = (name) => {
+    document.querySelectorAll(".chip-button").forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.name === name);
+    });
+
+    let t = teams.find(team => team.name.toLowerCase() === name.toLowerCase());
+    if (!t) {
+      t = createDefaultTeam(name);
+      teams = [...teams, t];
+    }
+    render();
+
+    requestAnimationFrame(() => {
+      const el = document.querySelector(`.card[data-team-id="${t.id}"]`);
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  };
+
   const computeTeamMetrics = (team) => {
     const varPct = (Number(team.cogs) || 0) +
                    (Number(team.selling) || 0) +
@@ -530,11 +570,11 @@
 
     const calcForRevenue = (r) => {
       const revenue = Number(r) || 0;
-      const variableCost = revenue * (varPct / 100);
-      const grossProfit = revenue - variableCost;
-      const fixedCost = Number(team.fixedCost) || 0;
-      const netProfit = grossProfit - fixedCost;
-      const safeProfit = Math.max(0, netProfit);
+      const variableCost   = revenue * (varPct / 100);
+      const grossProfit    = revenue - variableCost;
+      const fixedCost      = Number(team.fixedCost) || 0;
+      const netProfit      = grossProfit - fixedCost;
+      const safeProfit     = Math.max(0, netProfit);
 
       const bonusSale   = safeProfit * ((Number(team.bonusSale)   || 0) / 100);
       const bonusRD     = safeProfit * ((Number(team.bonusRD)     || 0) / 100);
@@ -542,7 +582,7 @@
       const bonusKT     = safeProfit * ((Number(team.bonusKT)     || 0) / 100);
       const bonusMedia  = safeProfit * ((Number(team.bonusMedia)  || 0) / 100);
 
-      const totalBonus = bonusSale + bonusRD + bonusCSKH + bonusKT + bonusMedia;
+      const totalBonus       = bonusSale + bonusRD + bonusCSKH + bonusKT + bonusMedia;
       const profitAfterBonus = netProfit - totalBonus;
 
       return {
@@ -576,22 +616,6 @@
     };
   };
 
-  // so sánh % chi phí: chênh lệch theo tỉ lệ % so với target
-  const comparePercent = (actual, target) => {
-    actual = Number(actual) || 0;
-    target = Number(target) || 0;
-    if (!target) return { txt: '--', cls: '' };
-
-    const diffPct = ((actual - target) / target) * 100;
-    const sign = diffPct >= 0 ? '+' : '';
-    const txt = `${sign}${diffPct.toFixed(1)}%`;
-    const cls = diffPct <= 0 ? 'positive' : 'negative'; // xanh nếu ≤ target, đỏ nếu vượt
-    return { txt, cls };
-  };
-
-  // =========================
-  // 7) HANDLER
-  // =========================
   const handleInput = (teamId, field, value) => {
     teams = teams.map(t => t.id === teamId ? { ...t, [field]: value } : t);
     render();
@@ -609,7 +633,7 @@
 
   const deleteTeam = (teamId) => {
     if (teams.length === 1) {
-      alert('Cần ít nhất 1 team.');
+      alert("Cần ít nhất 1 team.");
       return;
     }
     teams = teams.filter(t => t.id !== teamId);
@@ -617,53 +641,47 @@
   };
 
   const addTeam = () => {
-    teams = [...teams, createDefaultTeam('Team mới')];
+    teams = [...teams, createDefaultTeam("Team mới")];
     render();
   };
 
-  const focusTeam = (name) => {
-    document.querySelectorAll('.chip-button').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.name === name);
-    });
+  // so sánh % chi phí: chênh lệch theo tỉ lệ % so với target
+  const comparePercent = (actual, target) => {
+    actual = Number(actual) || 0;
+    target = Number(target) || 0;
+    if (!target) return { txt: "--", cls: "" };
 
-    let t = teams.find(team => team.name.toLowerCase() === name.toLowerCase());
-    if (!t) {
-      t = createDefaultTeam(name);
-      teams = [...teams, t];
-    }
-    render();
-
-    requestAnimationFrame(() => {
-      const el = document.querySelector(`.card[data-team-id="${t.id}"]`);
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
+    const diffPct = ((actual - target) / target) * 100;
+    const sign = diffPct >= 0 ? "+" : "";
+    const txt  = `${sign}${diffPct.toFixed(1)}%`;
+    const cls  = diffPct <= 0 ? "positive" : "negative"; // xanh nếu ≤ target, đỏ nếu vượt
+    return { txt, cls };
   };
 
-  // =========================
-  // 8) RENDER TEAMS
-  // =========================
+  // ===== Render teams =====
   const renderTeams = () => {
-    const container = document.getElementById('teamsContainer');
-    container.innerHTML = '';
+    const container = document.getElementById("teamsContainer");
+    container.innerHTML = "";
 
     teams.forEach((team, index) => {
       const metrics = computeTeamMetrics(team);
-      const card = document.createElement('div');
+      const card = document.createElement("div");
       card.className = `card team-${index % 4}`;
       card.dataset.teamId = team.id;
 
       const breakEvenText = metrics.breakEven
         ? `${formatCurrency(metrics.breakEven)}`
-        : 'Không xác định';
+        : "Không xác định";
 
-      const fixedActual  = Number(team.fixedCost) || 0;
-      const fixedTarget  = Number(team.targetFixedCost) || 0;
-      let fixedDiffTxt = '--', fixedDiffClass = '';
+      // So sánh target vs thực tế
+      const fixedActual = Number(team.fixedCost) || 0;
+      const fixedTarget = Number(team.targetFixedCost) || 0;
+      let fixedDiffTxt = "--", fixedDiffClass = "";
       if (fixedTarget > 0) {
         const diffPct = ((fixedActual - fixedTarget) / fixedTarget) * 100;
-        const sign = diffPct >= 0 ? '+' : '';
-        fixedDiffTxt = `${sign}${diffPct.toFixed(1)}%`;
-        fixedDiffClass = diffPct <= 0 ? 'positive' : 'negative';
+        const sign = diffPct >= 0 ? "+" : "";
+        fixedDiffTxt   = `${sign}${diffPct.toFixed(1)}%`;
+        fixedDiffClass = diffPct <= 0 ? "positive" : "negative";
       }
 
       const cogsCmp  = comparePercent(team.cogs,    team.targetCogs);
@@ -691,7 +709,7 @@
           </div>
           <div>
             <button class="small" onclick="toggleCollapse('${team.id}')">
-              ${team.collapsed ? 'Xem chi tiết' : 'Ẩn chi tiết'}
+              ${team.collapsed ? "Xem chi tiết" : "Ẩn chi tiết"}
             </button>
             <button class="small danger" onclick="deleteTeam('${team.id}')">
               Xóa
@@ -700,15 +718,15 @@
         </div>
       `;
 
-      let bodyHtml = '';
+      let bodyHtml = "";
       if (!team.collapsed) {
-        const profitClassM1 = metrics.m1.netProfit >= 0 ? 'positive' : 'negative';
-        const profitClassM2 = metrics.m2.netProfit >= 0 ? 'positive' : 'negative';
-        const profitClassM3 = metrics.m3.netProfit >= 0 ? 'positive' : 'negative';
+        const profitClassM1 = metrics.m1.netProfit >= 0 ? "positive" : "negative";
+        const profitClassM2 = metrics.m2.netProfit >= 0 ? "positive" : "negative";
+        const profitClassM3 = metrics.m3.netProfit >= 0 ? "positive" : "negative";
 
-        const paClassM1 = metrics.m1.profitAfterBonus >= 0 ? 'positive' : 'negative';
-        const paClassM2 = metrics.m2.profitAfterBonus >= 0 ? 'positive' : 'negative';
-        const paClassM3 = metrics.m3.profitAfterBonus >= 0 ? 'positive' : 'negative';
+        const paClassM1 = metrics.m1.profitAfterBonus >= 0 ? "positive" : "negative";
+        const paClassM2 = metrics.m2.profitAfterBonus >= 0 ? "positive" : "negative";
+        const paClassM3 = metrics.m3.profitAfterBonus >= 0 ? "positive" : "negative";
 
         bodyHtml = `
           <div class="grid">
@@ -1001,17 +1019,15 @@
     });
   };
 
-  // =========================
-  // 9) RENDER SUMMARY
-  // =========================
+  // ===== Render summary =====
   const renderSummary = () => {
-    const container = document.getElementById('summaryContainer');
+    const container = document.getElementById("summaryContainer");
     if (!teams.length) {
       container.innerHTML = "<p class='muted'>Chưa có team nào.</p>";
       return;
     }
 
-    let rowsHtml = '';
+    let rowsHtml = "";
 
     let totalRevenue = 0;
     let totalCostBeforeBonus = 0;
@@ -1025,7 +1041,7 @@
     let totalBonus   = 0;
 
     teams.forEach(team => {
-      const m = computeTeamMetrics(team).m3; // Mốc 3 – thực tế
+      const m = computeTeamMetrics(team).m3; // dùng Mốc 3 – thực tế
       const costBeforeBonus = m.variableCost + m.fixedCost;
 
       totalRevenue         += m.revenue;
@@ -1039,8 +1055,8 @@
       totalMedia           += m.bonusMedia;
       totalBonus           += m.totalBonus;
 
-      const grossCls  = m.grossProfit      >= 0 ? 'positive' : 'negative';
-      const profitCls = m.profitAfterBonus >= 0 ? 'positive' : 'negative';
+      const grossCls  = m.grossProfit      >= 0 ? "positive" : "negative";
+      const profitCls = m.profitAfterBonus >= 0 ? "positive" : "negative";
 
       rowsHtml += `
         <tr>
@@ -1059,8 +1075,8 @@
       `;
     });
 
-    const totalGrossCls  = totalGross  >= 0 ? 'positive' : 'negative';
-    const totalProfitCls = totalProfit >= 0 ? 'positive' : 'negative';
+    const totalGrossCls  = totalGross  >= 0 ? "positive" : "negative";
+    const totalProfitCls = totalProfit >= 0 ? "positive" : "negative";
 
     const tableHtml = `
       <table>
@@ -1107,92 +1123,13 @@
     container.innerHTML = tableHtml;
   };
 
-  // =========================
-  // 10) GOOGLE SHEET SYNC
-  // =========================
-  const saveToServer = async () => {
-    if (!API_URL || API_URL.includes('PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE')) {
-      alert('Chưa cấu hình API_URL trong code.');
-      return;
-    }
-
-    try {
-      const payload = { id: SCENARIO_ID, teams };
-
-      // Không set headers để tránh preflight CORS
-      const res = await fetch(API_URL, {
-        method: 'POST',
-        body: JSON.stringify(payload),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok || !data.ok) {
-        throw new Error(data.error || 'Lỗi không xác định');
-      }
-
-      alert(`Đã lưu lên Google Sheet (scenario: ${SCENARIO_ID}).`);
-    } catch (err) {
-      console.error(err);
-      alert('Không lưu được lên Google Sheet: ' + err.message);
-    }
-  };
-
-  const loadFromServer = async () => {
-    if (!API_URL || API_URL.includes('PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE')) {
-      alert('Chưa cấu hình API_URL trong code.');
-      return;
-    }
-
-    try {
-      const res = await fetch(`${API_URL}?id=${encodeURIComponent(SCENARIO_ID)}`);
-      const data = await res.json();
-
-      if (!res.ok || !data.ok) {
-        throw new Error(data.error || 'Lỗi không xác định');
-      }
-
-      const incoming = Array.isArray(data.teams) ? data.teams : [];
-      if (!incoming.length) {
-        alert('Chưa có dữ liệu trên Google Sheet cho scenario này.');
-        return;
-      }
-
-      teams = incoming.map(t =>
-        Object.assign({}, createDefaultTeam(t.name || 'Team'), t)
-      );
-
-      render();
-      alert(`Đã tải cấu hình từ Google Sheet (scenario: ${SCENARIO_ID}).`);
-    } catch (err) {
-      console.error(err);
-      alert('Không tải được dữ liệu từ Google Sheet: ' + err.message);
-    }
-  };
-
-  // =========================
-  // 11) INIT
-  // =========================
-  const init = () => {
-    const storedState = loadState();
-    if (storedState && storedState.length) {
-      teams = storedState.map(t => ({
-        ...createDefaultTeam(t.name || 'Team'),
-        ...t,
-      }));
-    } else {
-      teams = createInitialTeamsFromCodeDefaults();
-    }
-    render();
-  };
-
   const render = () => {
     renderTeams();
     renderSummary();
     saveState();
   };
 
-  init();
+  render();
 </script>
 </body>
 </html>
