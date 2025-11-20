@@ -4,486 +4,172 @@
   <meta charset="UTF-8">
   <title>Plan doanh thu – lợi nhuận – target | Lỗ Vũ</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <style>
-    * { box-sizing: border-box; }
+    /* CSS Styling */
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      margin: 0;
-      padding: 0;
       background: #f3f4f6;
       color: #111827;
+      margin: 0;
+      padding: 0;
     }
     .container {
       max-width: 1200px;
       margin: 0 auto;
-      padding: 24px 16px 40px;
+      padding: 24px 16px;
     }
-    h1 {
-      font-size: 22px;
-      margin: 0 0 4px;
-    }
-    .subtitle {
-      font-size: 13px;
-      color: #6b7280;
-      margin-bottom: 16px;
-    }
-
-    .toolbar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-    .btn {
-      padding: 7px 14px;
-      border-radius: 999px;
-      border: 1px solid #d1d5db;
-      background: #fff;
-      font-size: 13px;
-      cursor: pointer;
-      transition: all .15s ease;
-    }
-    .btn:hover {
-      background: #f3f4f6;
-    }
-    .btn-primary {
-      background: #2563eb;
-      color: #fff;
-      border-color: #2563eb;
-    }
-    .btn-primary:hover {
-      background: #1d4ed8;
-    }
-
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      padding: 3px 9px;
-      font-size: 11px;
-      border-radius: 999px;
-      border: 1px solid #d1d5db;
-      white-space: nowrap;
-    }
-    .pill-green {
-      background: #ecfdf3;
-      border-color: #22c55e;
-      color: #166534;
-    }
-    .pill-red {
-      background: #fef2f2;
-      border-color: #f97373;
-      color: #b91c1c;
-    }
-
     .card {
       background: #fff;
       border-radius: 12px;
-      padding: 14px 16px 12px;
+      padding: 16px;
       box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
-      margin-bottom: 14px;
-      border-left: 4px solid #e5e7eb;
+      margin-bottom: 16px;
     }
-    .card-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      margin-bottom: 8px;
-    }
-    .card-title {
-      font-size: 14px;
-      font-weight: 600;
-    }
-    .card-sub {
-      font-size: 12px;
-      color: #6b7280;
-    }
-
-    .card-channel-facebook { border-left-color: #3b82f6; }
-    .card-channel-tiktok { border-left-color: #ec4899; }
-    .card-channel-shopee { border-left-color: #f97316; }
-    .card-channel-web { border-left-color: #10b981; }
-    .card-total { border-left-color: #111827; }
-
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 12px;
-      margin-top: 6px;
     }
     th, td {
-      padding: 5px 6px;
+      padding: 8px;
       border-bottom: 1px solid #e5e7eb;
       text-align: right;
     }
-    th:first-child, td:first-child {
-      text-align: left;
-      white-space: nowrap;
-    }
-    thead {
-      background: #f9fafb;
-    }
-
     input[type="number"] {
       width: 100%;
-      padding: 3px 4px;
-      border-radius: 6px;
+      padding: 5px;
       border: 1px solid #d1d5db;
-      font-size: 12px;
-      text-align: right;
-    }
-    input[type="number"]:focus {
-      outline: none;
-      border-color: #2563eb;
-      box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.2);
-    }
-
-    .muted {
-      color: #9ca3af;
-    }
-
-    .footer-note {
-      margin-top: 20px;
-      font-size: 11px;
-      color: #6b7280;
-    }
-
-    @media (max-width: 768px) {
-      .card-header {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-      .toolbar {
-        flex-direction: column;
-        align-items: flex-start;
-      }
+      border-radius: 6px;
     }
   </style>
 </head>
 <body>
-<div class="container">
-  <h1>Plan doanh thu – lợi nhuận – target</h1>
-  <div class="subtitle">
-    Tool này dùng để tính nhanh doanh thu – chi phí – lợi nhuận theo từng kênh (Facebook, TikTok, Shopee, Web),
-    theo đúng cấu trúc chi phí trong file plan thưởng. Nhập doanh thu từng kênh, tool sẽ báo lỗ/lãi và biên lợi nhuận.
+  <div class="container">
+    <h1>Plan doanh thu – lợi nhuận – target</h1>
+    <p class="subtitle">
+      Tool tính doanh thu, chi phí và lợi nhuận của các kênh bán hàng (Facebook, TikTok, Shopee, Web).
+    </p>
+
+    <div id="channelsContainer"></div>
+
+    <div id="totalCard"></div>
+    
+    <!-- Chức năng tải từ Google Sheets và lưu lại -->
+    <div class="toolbar">
+      <button id="btnLoadFromSheet">Tải từ Google Sheet</button>
+      <button id="btnSaveToSheet">Lưu lên Google Sheet</button>
+    </div>
   </div>
 
-  <div class="toolbar">
-    <button class="btn" id="btnResetPlan">Khôi phục mặc định plan</button>
-    <button class="btn" id="btnSaveDefault">Lưu làm mặc định (local)</button>
-    <button class="btn" id="btnLoadFromSheet">Tải từ Google Sheet</button>
-    <button class="btn btn-primary" id="btnSaveToSheet">Lưu lên Google Sheet</button>
-  </div>
-
-  <div id="channelsContainer"></div>
-
-  <div id="totalCard"></div>
-
-  <div class="footer-note">
-    * Đơn vị mặc định: <b>triệu</b> (vnd).<br>
-    * Tỉ lệ chi phí/biên lợi nhuận mặc định lấy từ file Excel “PLAN THƯỞNG VŨ” (Facebook, TikTok, Shopee, Web).<br>
-    * Google Sheet chỉ lưu lại <b>state hiện tại</b> (doanh thu + cấu hình chi phí) dạng JSON, không tự tính giúp – tính toán là ở web này.
-  </div>
-</div>
-
-<script>
-  /*************************************************
-   * 1. CẤU HÌNH & STATE
-   *************************************************/
-  // 👉 DÁN URL WEB APP APPS SCRIPT VÀO ĐÂY
-  const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxh6hOQL2cD6SUwnRp91OtPPS83h658rEuq3Hg9Cm15OHBAV9_w3HOEuUeS2prtVUNqlA/exec';
-
-  const LOCAL_KEY_CURRENT = 'nbl_plan_state_current_v2';
-  const LOCAL_KEY_DEFAULT = 'nbl_plan_state_default_v2';
-
-  // Default theo plan trong Excel (mình đã đọc từ file)
-  const DEFAULT_STATE = {
-    scenario: 'default',
-    channels: {
-      facebook: {
-        key: 'facebook',
-        label: 'Facebook',
-        colorClass: 'card-channel-facebook',
-        revenue: 2800,       // target mid: 2800
-        costSellRate: 0.14,  // Chi phí bán hàng (% doanh thu)
-        costCogsRate: 0.55,  // Giá vốn
-        costOtherRate: 0.05, // Chi phí khác
-        fixedCost: 320       // Chi phí cố định
-      },
-      tiktok: {
-        key: 'tiktok',
-        label: 'TikTok',
-        colorClass: 'card-channel-tiktok',
-        revenue: 2800,
-        costSellRate: 0.27,
-        costCogsRate: 0.45,
-        costOtherRate: 0.05,
-        fixedCost: 320
-      },
-      shopee: {
-        key: 'shopee',
-        label: 'Shopee',
-        colorClass: 'card-channel-shopee',
-        revenue: 1200,
-        costSellRate: 0.27,
-        costCogsRate: 0.50,
-        costOtherRate: 0.05,
-        fixedCost: 120
-      },
-      web: {
-        key: 'web',
-        label: 'Web',
-        colorClass: 'card-channel-web',
-        revenue: 320,
-        costSellRate: 0.09,
-        costCogsRate: 0.50,
-        costOtherRate: 0.05,
-        fixedCost: 75
-      }
-    }
-  };
-
-  const CHANNEL_ORDER = ['facebook', 'tiktok', 'shopee', 'web'];
-
-  let state = null; // sẽ init ở dưới
-
-  /*************************************************
-   * 2. TIỆN ÍCH SỐ & TÍNH TOÁN
-   *************************************************/
-  function parseNumber(val) {
-    if (val === '' || val === null || val === undefined) return 0;
-    const clean = String(val).replace(/,/g, '').trim();
-    const num = Number(clean);
-    return isNaN(num) ? 0 : num;
-  }
-
-  function formatNumber(num, digits = 2) {
-    if (num === null || num === undefined || isNaN(num)) return '';
-    return new Intl.NumberFormat('vi-VN', { maximumFractionDigits: digits }).format(num);
-  }
-
-  function clone(obj) {
-    return JSON.parse(JSON.stringify(obj));
-  }
-
-  // Tính cho 1 kênh
-  function calcChannelMetrics(ch) {
-    const revenue = parseNumber(ch.revenue);
-    const costSell = parseNumber(ch.costSellRate);
-    const costCogs = parseNumber(ch.costCogsRate);
-    const costOther = parseNumber(ch.costOtherRate);
-    const fixedCost = parseNumber(ch.fixedCost);
-
-    const totalRate = costSell + costCogs + costOther; // tỉ lệ tổng chi phí biến
-    const variableCost = revenue * totalRate;
-    const totalCost = variableCost + fixedCost;
-    const profit = revenue - totalCost;
-    const margin = revenue > 0 ? profit / revenue : 0;
-
-    let breakevenRevenue = null;
-    if (1 - totalRate > 0) {
-      breakevenRevenue = fixedCost / (1 - totalRate);
-    }
-
-    const diffFromBreakeven = breakevenRevenue !== null ? revenue - breakevenRevenue : null;
-
-    return {
-      revenue,
-      costSell,
-      costCogs,
-      costOther,
-      fixedCost,
-      totalRate,
-      variableCost,
-      totalCost,
-      profit,
-      margin,
-      breakevenRevenue,
-      diffFromBreakeven
+  <script>
+    // Dữ liệu mặc định của các kênh bán hàng
+    const DEFAULT_STATE = {
+      facebook: { revenue: 2800, costSellRate: 0.14, costCogsRate: 0.55, fixedCost: 320 },
+      tiktok: { revenue: 2800, costSellRate: 0.27, costCogsRate: 0.45, fixedCost: 320 },
+      shopee: { revenue: 1200, costSellRate: 0.27, costCogsRate: 0.50, fixedCost: 120 },
+      web: { revenue: 320, costSellRate: 0.09, costCogsRate: 0.50, fixedCost: 75 }
     };
-  }
+    
+    let state = JSON.parse(localStorage.getItem('nbl_plan_state_current_v2')) || DEFAULT_STATE;
 
-  // Tính tổng tất cả kênh
-  function calcTotalMetrics() {
-    let sumRevenue = 0;
-    let sumVariable = 0;
-    let sumFixed = 0;
+    // Hàm tính toán chi phí và lợi nhuận cho 1 kênh
+    function calculateMetrics(channel) {
+      const revenue = parseFloat(channel.revenue);
+      const costSell = parseFloat(channel.costSellRate);
+      const costCogs = parseFloat(channel.costCogsRate);
+      const fixedCost = parseFloat(channel.fixedCost);
 
-    CHANNEL_ORDER.forEach(key => {
-      const ch = state.channels[key];
-      if (!ch) return;
-      const m = calcChannelMetrics(ch);
-      sumRevenue += m.revenue;
-      sumVariable += m.variableCost;
-      sumFixed += m.fixedCost;
+      const totalCost = revenue * (costSell + costCogs) + fixedCost;
+      const profit = revenue - totalCost;
+      const margin = profit / revenue;
+
+      return { revenue, totalCost, profit, margin };
+    }
+
+    // Hiển thị thông tin từng kênh
+    function renderChannel(key, channel) {
+      const metrics = calculateMetrics(channel);
+      return `
+        <div class="card">
+          <h3>${key.charAt(0).toUpperCase() + key.slice(1)}</h3>
+          <table>
+            <tr><td>Doanh thu:</td><td><input type="number" value="${channel.revenue}" data-key="${key}" data-field="revenue"></td></tr>
+            <tr><td>Chi phí bán hàng (%):</td><td><input type="number" value="${channel.costSellRate * 100}" data-key="${key}" data-field="costSellRate"></td></tr>
+            <tr><td>Giá vốn (%):</td><td><input type="number" value="${channel.costCogsRate * 100}" data-key="${key}" data-field="costCogsRate"></td></tr>
+            <tr><td>Chi phí cố định:</td><td><input type="number" value="${channel.fixedCost}" data-key="${key}" data-field="fixedCost"></td></tr>
+          </table>
+          <p>Lợi nhuận: ${metrics.profit.toFixed(2)} triệu</p>
+          <p>Biên lợi nhuận: ${(metrics.margin * 100).toFixed(2)}%</p>
+        </div>
+      `;
+    }
+
+    // Hiển thị tất cả các kênh
+    function renderChannels() {
+      const container = document.getElementById('channelsContainer');
+      container.innerHTML = '';
+      Object.keys(state).forEach((key) => {
+        container.innerHTML += renderChannel(key, state[key]);
+      });
+    }
+
+    // Render tổng doanh thu, chi phí, lợi nhuận
+    function renderTotal() {
+      const totalRevenue = Object.keys(state).reduce((total, key) => total + state[key].revenue, 0);
+      const totalCost = Object.keys(state).reduce((total, key) => total + (state[key].revenue * (state[key].costSellRate + state[key].costCogsRate) + state[key].fixedCost), 0);
+      const totalProfit = totalRevenue - totalCost;
+      const totalMargin = totalProfit / totalRevenue;
+
+      const totalCard = document.getElementById('totalCard');
+      totalCard.innerHTML = `
+        <div class="card">
+          <h3>Tổng Kênh</h3>
+          <p>Tổng Doanh Thu: ${totalRevenue.toFixed(2)} triệu</p>
+          <p>Tổng Chi Phí: ${totalCost.toFixed(2)} triệu</p>
+          <p>Lợi Nhuận: ${totalProfit.toFixed(2)} triệu</p>
+          <p>Biên Lợi Nhuận: ${(totalMargin * 100).toFixed(2)}%</p>
+        </div>
+      `;
+    }
+
+    // Sự kiện khi thay đổi giá trị trong input
+    document.addEventListener('input', (event) => {
+      const { key, field } = event.target.dataset;
+      if (key && field) {
+        state[key][field] = parseFloat(event.target.value);
+        localStorage.setItem('nbl_plan_state_current_v2', JSON.stringify(state));
+        renderChannels();
+        renderTotal();
+      }
     });
 
-    const totalCost = sumVariable + sumFixed;
-    const profit = sumRevenue - totalCost;
-    const margin = sumRevenue > 0 ? profit / sumRevenue : 0;
-    const effectiveVarRate = sumRevenue > 0 ? (sumVariable / sumRevenue) : 0;
-
-    let breakevenRevenue = null;
-    if (1 - effectiveVarRate > 0) {
-      breakevenRevenue = sumFixed / (1 - effectiveVarRate);
+    // Tải dữ liệu từ Google Sheets
+    function loadFromSheet() {
+      // Hàm tải dữ liệu từ Google Sheets
+      // Sử dụng Google Sheets API hoặc Web App để lấy dữ liệu
     }
 
-    return {
-      sumRevenue,
-      sumVariable,
-      sumFixed,
-      totalCost,
-      profit,
-      margin,
-      effectiveVarRate,
-      breakevenRevenue
-    };
-  }
+    // Lưu dữ liệu lên Google Sheets
+    function saveToSheet() {
+      // Hàm lưu dữ liệu lên Google Sheets
+      // Sử dụng Google Sheets API hoặc Web App để lưu dữ liệu
+    }
 
-  /*************************************************
-   * 3. RENDER UI
-   *************************************************/
-  function renderChannels() {
-    const container = document.getElementById('channelsContainer');
-    container.innerHTML = '';
+    // Khôi phục mặc định plan
+    function resetPlan() {
+      state = clone(DEFAULT_STATE);
+      localStorage.setItem('nbl_plan_state_current_v2', JSON.stringify(state));
+      renderChannels();
+      renderTotal();
+    }
 
-    CHANNEL_ORDER.forEach(key => {
-      const ch = state.channels[key];
-      if (!ch) return;
+    // Lắng nghe sự kiện cho các nút
+    document.getElementById('btnLoadFromSheet').addEventListener('click', loadFromSheet);
+    document.getElementById('btnSaveToSheet').addEventListener('click', saveToSheet);
+    document.getElementById('btnResetPlan').addEventListener('click', resetPlan);
 
-      const metrics = calcChannelMetrics(ch);
-      const card = document.createElement('div');
-      card.className = 'card ' + ch.colorClass;
-
-      const profitClass = metrics.profit >= 0 ? 'pill-green' : 'pill-red';
-      const profitText = 'Lợi nhuận: ' + formatNumber(metrics.profit) + ' triệu'
-        + (metrics.margin ? ' (' + formatNumber(metrics.margin * 100, 1) + '%)' : '');
-
-      const diffBreakevenText = metrics.breakevenRevenue !== null
-        ? (metrics.diffFromBreakeven >= 0
-            ? '↑ vượt hòa vốn ' + formatNumber(metrics.diffFromBreakeven, 1) + ' triệu'
-            : '↓ dưới hòa vốn ' + formatNumber(Math.abs(metrics.diffFromBreakeven), 1) + ' triệu')
-        : '—';
-
-      card.innerHTML = `
-        <div class="card-header">
-          <div>
-            <div class="card-title">${ch.label}</div>
-            <div class="card-sub">
-              Nhập doanh thu & chi phí của kênh này. Biên phí và chi phí cố định đang dùng theo plan mặc định.
-            </div>
-          </div>
-          <div style="display:flex; flex-direction:column; gap:4px; align-items:flex-end;">
-            <span class="pill ${profitClass}">${profitText}</span>
-            <span class="muted" style="font-size:11px;">${diffBreakevenText}</span>
-          </div>
-        </div>
-
-        <table>
-          <thead>
-            <tr>
-              <th>Chỉ tiêu</th>
-              <th>Giá trị</th>
-              <th>Tỉ lệ (%)</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Doanh thu (triệu)</td>
-              <td>
-                <input type="number" step="0.01" data-channel="${key}" data-field="revenue"
-                       value="${ch.revenue !== undefined ? ch.revenue : ''}">
-              </td>
-              <td class="muted">100%</td>
-            </tr>
-            <tr>
-              <td>CP bán hàng</td>
-              <td>${formatNumber(metrics.revenue * metrics.costSell, 2)}</td>
-              <td>
-                <input type="number" step="0.01" data-channel="${key}" data-field="costSellRate"
-                       value="${(ch.costSellRate * 100).toFixed(2)}">
-              </td>
-            </tr>
-            <tr>
-              <td>Giá vốn</td>
-              <td>${formatNumber(metrics.revenue * metrics.costCogs, 2)}</td>
-              <td>
-                <input type="number" step="0.01" data-channel="${key}" data-field="costCogsRate"
-                       value="${(ch.costCogsRate * 100).toFixed(2)}">
-              </td>
-            </tr>
-            <tr>
-              <td>Chi phí khác</td>
-              <td>${formatNumber(metrics.revenue * metrics.costOther, 2)}</td>
-              <td>
-                <input type="number" step="0.01" data-channel="${key}" data-field="costOtherRate"
-                       value="${(ch.costOtherRate * 100).toFixed(2)}">
-              </td>
-            </tr>
-            <tr>
-              <td>Chi phí cố định</td>
-              <td>
-                <input type="number" step="0.01" data-channel="${key}" data-field="fixedCost"
-                       value="${ch.fixedCost !== undefined ? ch.fixedCost : ''}">
-              </td>
-              <td class="muted">—</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <table>
-          <thead>
-            <tr>
-              <th>Output</th>
-              <th>Số tiền (triệu)</th>
-              <th>Tỉ lệ theo doanh thu</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Tổng chi phí biến</td>
-              <td>${formatNumber(metrics.variableCost, 2)}</td>
-              <td>${formatNumber(metrics.totalRate * 100, 2)}%</td>
-            </tr>
-            <tr>
-              <td>Tổng chi phí (biến + cố định)</td>
-              <td>${formatNumber(metrics.totalCost, 2)}</td>
-              <td>${metrics.revenue > 0 ? formatNumber(metrics.totalCost / metrics.revenue * 100, 2) + '%' : '—'}</td>
-            </tr>
-            <tr>
-              <td>Lợi nhuận</td>
-              <td style="color:${metrics.profit >= 0 ? '#166534' : '#b91c1c'}; font-weight:600;">
-                ${formatNumber(metrics.profit, 2)}
-              </td>
-              <td>${metrics.revenue > 0 ? formatNumber(metrics.margin * 100, 2) + '%' : '—'}</td>
-            </tr>
-            <tr>
-              <td>Doanh thu hòa vốn</td>
-              <td>${metrics.breakevenRevenue !== null ? formatNumber(metrics.breakevenRevenue, 2) : '—'}</td>
-              <td>
-                ${
-                  (metrics.breakevenRevenue !== null && metrics.revenue > 0)
-                    ? formatNumber(metrics.breakevenRevenue / metrics.revenue * 100, 1) + '% so với DT hiện tại'
-                    : '—'
-                }
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    `;
-    
-    container.appendChild(card);
-  }
-
-  function renderTotalCard() {
-    const metrics = calcTotalMetrics();
-    const totalContainer = document.getElementById('totalCard');
-    const profitClass = metrics.profit >= 0 ? 'pill-green' : 'pill-red';
-
-    const profitText = 'Lợi nhuận: ' + formatNumber(metrics.profit, 2) + ' triệu'
-      + (metrics.margin ? ' (' + formatNumber(metrics.margin * 100, 2) + '%)' : '');
-
-    const breakevenText = metrics.breakevenRevenue !== null
-      ? 'Hòa vốn tổng: ' + formatNumber(metrics.breakevenRevenue, 2) : '—
+    // Render dữ liệu ban đầu
+    renderChannels();
+    renderTotal();
+  </script>
+</body>
+</html>
