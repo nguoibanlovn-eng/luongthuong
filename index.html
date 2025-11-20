@@ -1,1116 +1,704 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <title>Plan doanh thu – lợi nhuận – thưởng theo team | Lỗ Vũ</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <title>Doanh thu – Lợi nhuận – Target | thuong.nguoibanlo.vn</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <style>
-    :root {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color-scheme: light dark;
+    * {
+      box-sizing: border-box;
     }
     body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       margin: 0;
-      padding: 16px;
+      padding: 0;
+      background: #f7f7f9;
+      color: #222;
+    }
+    .container {
       max-width: 1100px;
-      margin-inline: auto;
-      box-sizing: border-box;
-      line-height: 1.5;
-      font-size: 14px;
+      margin: 0 auto;
+      padding: 24px 16px 40px;
     }
-    h1 { font-size: 22px; margin-bottom: 6px; }
-    h2 { margin-top: 20px; font-size: 18px; }
-    p  { margin: 2px 0 6px; }
-    .muted { opacity: 0.7; font-size: 12px; }
+    h1 {
+      font-size: 22px;
+      margin: 0 0 4px;
+    }
+    .subtitle {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 16px;
+    }
 
-    .toolbar {
+    .chip-group {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-      margin: 6px 0 10px;
       flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
     }
-
-    button {
-      cursor: pointer;
-      border-radius: 999px;
-      border: 1px solid rgba(128,128,128,0.5);
+    .chip {
       padding: 6px 12px;
-      background: transparent;
-      font-size: 12px;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      white-space: nowrap;
-    }
-    button.primary { background: #2563eb; border-color: #2563eb; color: #fff; }
-    button.danger  { border-color: #dc2626; color: #dc2626; }
-    button.small   { padding: 4px 8px; font-size: 11px; }
-
-    .chip-button {
-      padding: 4px 10px;
       border-radius: 999px;
-      font-size: 12px;
-      background: rgba(128,128,128,0.06);
+      border: 1px solid #ddd;
+      background: #fff;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all .15s ease;
     }
-    .chip-button.active {
+    .chip.active {
       background: #111827;
-      color: #f9fafb;
+      color: #fff;
       border-color: #111827;
     }
 
-    input[type="text"], input[type="number"] {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 4px 6px;
-      border-radius: 8px;
-      border: 1px solid rgba(128,128,128,0.5);
-      font-size: 13px;
-      background: transparent;
-      height: 32px;
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
     }
-    input:focus {
-      outline: 2px solid #2563eb55;
+    .btn {
+      padding: 7px 14px;
+      border-radius: 999px;
+      border: 1px solid #ddd;
+      background: #fff;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all .15s ease;
+    }
+    .btn:hover {
+      background: #f1f1f5;
+    }
+    .btn-primary {
+      background: #2563eb;
+      color: #fff;
       border-color: #2563eb;
     }
-
-    .team-name {
-      max-width: 170px;
-      font-weight: 600;
-      font-size: 13px;
+    .btn-primary:hover {
+      background: #1d4ed8;
+    }
+    .btn-danger {
+      border-color: #f97373;
+      color: #b91c1c;
+      background: #fff0f0;
     }
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(12, minmax(0, 1fr));
-      gap: 8px;
-      margin-top: 6px;
-    }
-    .col-2  { grid-column: span 2; }
-    .col-3  { grid-column: span 3; }
-    .col-4  { grid-column: span 4; }
-    .col-6  { grid-column: span 6; }
-    .col-12 { grid-column: span 12; }
-
-    @media (max-width: 768px) {
-      .col-2, .col-3, .col-4, .col-6 { grid-column: span 12; }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px dashed #999;
+      font-size: 12px;
+      color: #555;
+      margin-top: 4px;
     }
 
     .card {
-      border-radius: 14px;
-      border: 1px solid rgba(148,163,184,0.8);
-      padding: 10px;
-      margin-bottom: 14px;
-      background: rgba(255,255,255,0.02);
+      background: #fff;
+      border-radius: 12px;
+      padding: 16px 16px 12px;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+      margin-bottom: 16px;
     }
-    .card.team-0 { border-left: 4px solid #3b82f6; background: rgba(59,130,246,0.02); }
-    .card.team-1 { border-left: 4px solid #22c55e; background: rgba(34,197,94,0.02); }
-    .card.team-2 { border-left: 4px solid #f97316; background: rgba(249,115,22,0.02); }
-    .card.team-3 { border-left: 4px solid #a855f7; background: rgba(168,85,247,0.02); }
-
     .card-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 8px;
-      margin-bottom: 6px;
-      flex-wrap: wrap;
+      margin-bottom: 8px;
     }
-    .card-header-left {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .badge {
-      font-size: 11px;
-      padding: 2px 6px;
-      border-radius: 999px;
-      border: 1px solid rgba(148,163,184,0.9);
-      background: rgba(148,163,184,0.15);
+    .card-title {
+      font-size: 14px;
       font-weight: 600;
     }
-
-    .pill-input {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 11px;
-      padding: 4px 10px;
-      border-radius: 999px;
-      border: 1px dashed rgba(148,163,184,0.9);
-      background: rgba(249,250,251,0.9);
+    .card-sub {
+      font-size: 12px;
+      color: #666;
     }
-    .pill-input span  { opacity: 0.7; }
-    .pill-input strong{ font-variant-numeric: tabular-nums; }
+
+    .team-row-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .team-name-input {
+      border: none;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 0;
+      background: transparent;
+      outline: none;
+    }
+
+    .team-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 12px;
+      color: #666;
+    }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 4px;
+      margin-top: 8px;
       font-size: 12px;
-      table-layout: fixed;
+    }
+    thead {
+      background: #f9fafb;
     }
     th, td {
-      padding: 3px 6px;
-      border-bottom: 1px solid rgba(148,163,184,0.6);
+      padding: 6px 8px;
       text-align: right;
-      font-variant-numeric: tabular-nums;
-      vertical-align: middle;
+      border-bottom: 1px solid #eee;
     }
-    th:first-child,
-    td:first-child {
+    th:first-child, td:first-child {
       text-align: left;
     }
-    th { font-weight: 600; background: rgba(148,163,184,0.25); }
-    tbody tr:nth-child(even) { background: rgba(148,163,184,0.08); }
-    tfoot td { font-weight: 600; background: rgba(37,99,235,0.06); }
-    .row-total  { background: rgba(59,130,246,0.08) !important; }
-    .row-profit { background: rgba(16,185,129,0.08) !important; }
 
-    .muted-percent {
-      display: inline-block;
-      margin-left: 4px;
-      font-size: 10px;
-      opacity: 0.7;
-    }
-
-    .positive { color: #16a34a; }
-    .negative { color: #dc2626; }
-
-    .table-input {
-      height: 22px;
-      padding: 1px 4px;
-      font-size: 12px;
-      text-align: right;
+    input[type="number"] {
+      width: 100%;
+      padding: 4px 6px;
       border-radius: 6px;
-      background: transparent;
-    }
-
-    .section-divider {
-      margin: 14px 0 8px;
-      border-top: 1px dashed rgba(148,163,184,0.9);
-    }
-
-    .mini-compare {
-      margin-top: 2px;
-      font-size: 11px;
-      table-layout: auto;
-    }
-    .mini-compare th,
-    .mini-compare td {
-      padding: 1px 4px;
-    }
-    .mini-compare .table-input {
-      height: 20px;
-      font-size: 11px;
-      padding: 1px 4px;
-      max-width: 110px;
-    }
-
-    .bonus-input {
-      width: 70px !important;
-      max-width: 100%;
-      height: 22px !important;
+      border: 1px solid #ddd;
       font-size: 12px;
       text-align: right;
-      padding: 2px 4px;
     }
-    .bonus-field {
+    input[type="number"]:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.2);
+    }
+
+    .pill {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      border: 1px solid #ddd;
     }
-    .bonus-label {
-      font-size: 13px;
-      font-weight: 500;
+    .pill-green {
+      color: #166534;
+      border-color: #22c55e;
+      background: #ecfdf3;
+    }
+    .pill-red {
+      color: #b91c1c;
+      border-color: #f97373;
+      background: #fef2f2;
     }
 
-    .blog-promo {
-      margin-top: 20px;
-      padding: 12px 14px;
-      border-radius: 14px;
-      border: 1px solid rgba(37,99,235,0.4);
-      background: linear-gradient(90deg, rgba(37,99,235,0.08), rgba(59,130,246,0.02));
+    .footer-note {
+      margin-top: 24px;
+      font-size: 11px;
+      color: #777;
     }
-    .blog-promo-title {
-      font-size: 13px;
-      font-weight: 600;
-      margin-bottom: 6px;
-    }
-    .blog-promo-link {
-      display: inline-block;
-      margin-bottom: 4px;
-      font-weight: 600;
-      text-decoration: none;
-      padding: 4px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(37,99,235,0.7);
-    }
-    .blog-promo-link:hover {
-      background: rgba(37,99,235,0.12);
-    }
-    .blog-promo-sub {
-      font-size: 12px;
-      opacity: 0.8;
+
+    @media (max-width: 768px) {
+      .toolbar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>Plan doanh thu – lợi nhuận – thưởng theo team</h1>
-  <p class="muted">
-    Công cụ nội bộ giúp Lỗ Vũ &amp; team set target, tính hòa vốn, chia thưởng theo từng team
-    (Sale, RD, CSKH, KT+HCNS, Media). Đơn vị doanh thu &amp; chi phí có thể dùng theo triệu cho dễ nhìn.
-  </p>
+<div class="container">
+  <h1>Doanh thu – lợi nhuận – target</h1>
+  <div class="subtitle">
+    Bảng này giúp Lỗ Vũ & team set target, tính hòa vốn & theo dõi doanh thu – chi phí theo từng kênh.
+  </div>
 
-  <div class="section-divider"></div>
-
-  <!-- CẤU HÌNH TEAM -->
-  <h2>Cấu hình team <span class="muted">Áp dụng trong phiên làm việc này</span></h2>
-  <div class="toolbar">
-    <div>
-      <span class="muted">Chọn team nhanh:</span>
-      <button class="chip-button" data-name="TikTok"   onclick="focusTeam('TikTok')">TikTok</button>
-      <button class="chip-button" data-name="Shopee"   onclick="focusTeam('Shopee')">Shopee</button>
-      <button class="chip-button" data-name="Website"  onclick="focusTeam('Website')">Website</button>
-      <button class="chip-button" data-name="Facebook" onclick="focusTeam('Facebook')">Facebook</button>
-      <button class="chip-button" data-name="B2B"      onclick="focusTeam('B2B')">B2B</button>
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Chọn team / kênh áp dụng cho phiên làm việc này</div>
+        <div class="card-sub">Dữ liệu sẽ được lưu lại trên trình duyệt (localStorage). Nút “Lưu làm mặc định” sẽ ghi nhớ cấu hình hiện tại cho lần sau.</div>
+      </div>
+      <div class="badge" id="overallMarginBadge">
+        Tổng biên phí: <span id="overallMarginText">&nbsp;–</span>
+      </div>
     </div>
-    <div style="display:flex; gap:6px; flex-wrap:wrap;">
-      <button class="small" onclick="resetToDefaults()">Cập nhật lại chỉ số</button>
-      <button class="small" onclick="saveDefaultsFromCurrent()">Lưu làm mặc định</button>
-      <button class="small" onclick="loadFromServer()">Tải từ Google Sheet</button>
-      <button class="small" onclick="saveToServer()">Lưu lên Google Sheet</button>
-      <button class="primary" onclick="addTeam()">+ Thêm team</button>
+
+    <div class="chip-group" id="teamChipGroup">
+      <!-- chips sẽ render bằng JS -->
+    </div>
+
+    <div class="toolbar">
+      <button class="btn" id="btnRecalc">Cập nhật lại chỉ số</button>
+      <button class="btn" id="btnSaveDefault">Lưu làm mặc định</button>
+      <button class="btn" id="btnLoadFromSheet">Tải từ Google Sheet</button>
+      <button class="btn" id="btnSaveToSheet">Lưu lên Google Sheet</button>
+      <button class="btn btn-primary" id="btnAddTeam">+ Thêm team</button>
     </div>
   </div>
-  <p class="muted">
-    • Thay đổi được lưu lại trên trình duyệt của anh (localStorage).<br />
-    • “Lưu làm mặc định” sẽ ghi nhớ cấu hình hiện tại để lần reset sau dùng lại.
-  </p>
 
-  <div id="teamsContainer"></div>
-
-  <div class="section-divider"></div>
-
-  <!-- TỔNG QUAN DOANH THU -->
-  <h2>Tổng quan doanh thu &amp; thưởng các team</h2>
-  <p class="muted">
-    Mỗi team dùng 3 mốc doanh thu: <b>Mốc 1</b>, <b>Mốc 2</b>, <b>Mốc 3 (thực tế)</b>. Mốc 3 dùng để
-    tính tổng doanh thu &amp; tổng thưởng toàn doanh nghiệp.
-  </p>
-
-  <h2 style="margin-top: 18px;">Tổng quan tất cả team (Mốc 3 – thực tế)</h2>
-  <div id="summaryContainer"></div>
-
-  <!-- PROMO -->
-  <div class="blog-promo">
-    <div class="blog-promo-title">Đọc thêm các bài viết &amp; case thực chiến tại trang chủ:</div>
-    <a href="https://nguoibanlo.vn" target="_blank" rel="noreferrer" class="blog-promo-link">
-      nguoibanlo.vn
-    </a>
-    <div class="blog-promo-sub">
-      Chia sẻ về TMĐT, xây kênh, chia thưởng, tối ưu P&amp;L cho SME Việt – phong cách Lỗ Vũ.
-    </div>
+  <div id="teamContainer">
+    <!-- team cards sẽ render bằng JS -->
   </div>
+
+  <div class="footer-note">
+    * Đơn vị số liệu mặc định là <b>triệu</b>. Anh em có thể đổi cách nhập nếu muốn.<br>
+    * Tool đang ở phiên bản demo, công thức có thể đơn giản hơn thực tế. Cứ dùng trước, có gì cần chỉnh thêm anh báo lại.
+  </div>
+</div>
 
 <script>
-  // ===== API Google Apps Script =====
-  // Nếu anh deploy Apps Script URL khác thì thay chuỗi này.
-  const API_URL = 'https://script.google.com/macros/s/AKfycbyMu73TU-Crvn2oYkQ5R1F1I9hihPOjL8qHU0kgeRI1e9f43uRx3QkXPB8h1roCkGgE1w/exec';
-  const SCENARIO_ID = 'default';
+  /*************************************************
+   * 1. CẤU HÌNH CƠ BẢN
+   *************************************************/
+  // DÁN URL WEB APP APPS SCRIPT VÀO ĐÂY
+  const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyMu73TU-Crvn2oYkQ5R1F1I9hihPOjL8qHU0kgeRI1e9f43uRx3QkXPB8h1roCkGgE1w/exec';
 
-  // ===== Storage keys =====
-  const STORAGE_KEY_STATE    = 'thuong_tool_state_v1';
-  const STORAGE_KEY_DEFAULTS = 'thuong_tool_defaults_v1';
+  const LOCAL_KEY_CURRENT = 'nbl_tool_config_current_v1';
+  const LOCAL_KEY_DEFAULT = 'nbl_tool_config_default_v1';
 
-  // ===== LocalStorage helpers =====
-  const loadJSON = (key) => {
-    try {
-      const raw = localStorage.getItem(key);
-      if (!raw) return null;
-      return JSON.parse(raw);
-    } catch (e) {
-      console.warn('Không đọc được', key, e);
-      return null;
-    }
+  // seed mặc định
+  const DEFAULT_TEAMS = [
+    { name: 'TikTok', key: 'tiktok' },
+    { name: 'Shopee', key: 'shopee' },
+    { name: 'Website', key: 'website' },
+    { name: 'Facebook', key: 'facebook' },
+    { name: 'B2B', key: 'b2b' }
+  ];
+
+  let state = {
+    scenario: 'default',
+    teams: []
   };
 
-  const saveJSON = (key, value) => {
-    try {
-      localStorage.setItem(key, JSON.stringify(value));
-    } catch (e) {
-      console.warn('Không lưu được', key, e);
-    }
-  };
-
-  // ===== Format helpers =====
-  const formatCurrency = (n) => {
-    if (isNaN(n)) return '-';
-    return Number(n).toLocaleString('vi-VN', { maximumFractionDigits: 0 });
-  };
-
-  const formatPercent = (n) => {
-    if (isNaN(n)) return '-';
-    return Number(n).toLocaleString('vi-VN', { maximumFractionDigits: 1 }) + ' %';
-  };
-
-  const formatMoneyInput = (n) => {
-    if (n === null || n === undefined || n === '' || isNaN(n)) return '';
-    return Number(n).toLocaleString('vi-VN');
-  };
-
-  const parseMoneyInput = (str) => {
-    if (str === null || str === undefined) return 0;
-    const cleaned = String(str).replace(/[^\d-]/g, '');
-    const num = Number(cleaned);
+  /*************************************************
+   * 2. HÀM TIỆN ÍCH
+   *************************************************/
+  function parseNumber(value) {
+    if (value === '' || value === null || value === undefined) return 0;
+    const clean = String(value).replace(/,/g, '').trim();
+    const num = Number(clean);
     return isNaN(num) ? 0 : num;
-  };
-
-  const cellValPct = (val, revenue) => {
-    if (isNaN(val)) return '-';
-    const base = formatCurrency(val);
-    if (!revenue || isNaN(revenue) || revenue === 0) return base;
-    const pct = (val / revenue) * 100;
-    return `${base}<span class="muted-percent">(${pct.toFixed(1)}%)</span>`;
-  };
-
-  // ===== Default config per channel =====
-  const DEFAULT_TEAMS = {
-    Facebook: {
-      fixedCost: 320,
-      cogs: 60, selling: 15, other: 5,
-      bonusSale: 27, bonusRD: 4, bonusCSKH: 1, bonusKT: 1.2, bonusMedia: 1,
-      revenue1: 1250, revenue2: 2309, revenue3: 2800,
-    },
-    TikTok: {
-      fixedCost: 320,
-      cogs: 51, selling: 30, other: 5,
-      bonusSale: 27, bonusRD: 4, bonusCSKH: 1, bonusKT: 1.2, bonusMedia: 1,
-      revenue1: 1800, revenue2: 1862, revenue3: 2800,
-    },
-    Shopee: {
-      fixedCost: 120,
-      cogs: 53, selling: 30, other: 5,
-      bonusSale: 7, bonusRD: 4, bonusCSKH: 1, bonusKT: 1.2, bonusMedia: 1,
-      revenue1: 800, revenue2: 1030, revenue3: 1200,
-    },
-    Website: {
-      fixedCost: 75,
-      cogs: 60, selling: 15, other: 5,
-      bonusSale: 25, bonusRD: 4, bonusCSKH: 1, bonusKT: 1.2, bonusMedia: 1,
-      revenue1: 245, revenue2: 245, revenue3: 320,
-    },
-    B2B: {
-      fixedCost: 75,
-      cogs: 60, selling: 15, other: 5,
-      bonusSale: 20, // Sale B2B ăn 20% LNR
-      bonusRD: 4, bonusCSKH: 1, bonusKT: 1.2, bonusMedia: 1,
-      revenue1: 245, revenue2: 245, revenue3: 320,
-    },
-  };
-
-  // ===== Team factory =====
-  const createDefaultTeam = (name) => {
-    const baseName = name || 'Team mới';
-    const d = DEFAULT_TEAMS[baseName] || {};
-    const fixedCost = d.fixedCost ?? 100;
-    const cogs      = d.cogs ?? 60;
-    const selling   = d.selling ?? 10;
-    const other     = d.other ?? 5;
-
-    return {
-      id: Date.now().toString() + Math.random().toString(16).slice(2),
-      name: baseName,
-      fixedCost, cogs, selling, other,
-      bonusSale:  d.bonusSale  ?? 10,
-      bonusRD:    d.bonusRD    ?? 4,
-      bonusCSKH:  d.bonusCSKH  ?? 1,
-      bonusKT:    d.bonusKT    ?? 1.2,
-      bonusMedia: d.bonusMedia ?? 1,
-      revenue1: d.revenue1 ?? 1000,
-      revenue2: d.revenue2 ?? 1500,
-      revenue3: d.revenue3 ?? 2000,
-      targetFixedCost: d.fixedCost ?? fixedCost,
-      targetCogs:      d.cogs      ?? cogs,
-      targetSelling:   d.selling   ?? selling,
-      targetOther:     d.other     ?? other,
-      collapsed: false,
-    };
-  };
-
-  const createInitialTeamsFromCodeDefaults = () => ([
-    createDefaultTeam('TikTok'),
-    createDefaultTeam('Shopee'),
-    createDefaultTeam('Website'),
-    createDefaultTeam('Facebook'),
-    createDefaultTeam('B2B'),
-  ]);
-
-  // ===== State init =====
-  let teams;
-  const storedState = loadJSON(STORAGE_KEY_STATE);
-  if (storedState && storedState.length) {
-    teams = storedState.map(t => ({
-      ...createDefaultTeam(t.name || 'Team'),
-      ...t,
-    }));
-  } else {
-    teams = createInitialTeamsFromCodeDefaults();
   }
 
-  const saveState   = () => saveJSON(STORAGE_KEY_STATE, teams);
-  const loadDefaults = () => loadJSON(STORAGE_KEY_DEFAULTS);
+  function formatNumber(num) {
+    if (num === null || num === undefined || isNaN(num)) return '';
+    return new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 2 }).format(num);
+  }
 
-  const saveDefaultsFromCurrent = () => {
-    saveJSON(STORAGE_KEY_DEFAULTS, teams);
-    alert('Đã lưu cấu hình hiện tại làm mặc định.');
-  };
+  function calcTeamMetrics(team) {
+    const margin = parseNumber(team.margin);
+    const target = parseNumber(team.targetRevenue);
+    const actual = parseNumber(team.actualRevenue);
 
-  const resetToDefaults = () => {
-    const storedDefaults = loadDefaults();
-    if (storedDefaults && storedDefaults.length) {
-      teams = storedDefaults.map(t => ({
-        ...createDefaultTeam(t.name || 'Team'),
-        ...t,
-      }));
-    } else {
-      teams = createInitialTeamsFromCodeDefaults();
-    }
-    render();
-  };
+    const targetProfit = target * margin / 100;
+    const actualProfit = actual * margin / 100;
+    const diffRevenue = actual - target;
+    const diffProfit = actualProfit - targetProfit;
+    const diffPercent = target > 0 ? (actual / target - 1) * 100 : 0;
 
-  // ===== Apps Script sync =====
-  const saveToServer = async () => {
-    if (!API_URL) {
-      alert('Chưa cấu hình API_URL.');
-      return;
-    }
+    return {
+      targetProfit,
+      actualProfit,
+      diffRevenue,
+      diffProfit,
+      diffPercent
+    };
+  }
 
-    try {
-      const payload = { id: SCENARIO_ID, teams };
-      const res = await fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+  function calcOverallMargin() {
+    if (!state.teams.length) return null;
+    let sumRevenue = 0;
+    let sumProfit = 0;
+    state.teams.forEach(t => {
+      const margin = parseNumber(t.margin);
+      const actual = parseNumber(t.actualRevenue);
+      sumRevenue += actual;
+      sumProfit += actual * margin / 100;
+    });
+    if (sumRevenue === 0) return null;
+    return sumProfit * 100 / sumRevenue;
+  }
+
+  /*************************************************
+   * 3. RENDER UI
+   *************************************************/
+  function renderTeamChips() {
+    const wrap = document.getElementById('teamChipGroup');
+    wrap.innerHTML = '';
+    state.teams.forEach((t, idx) => {
+      const chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = 'chip' + (idx === 0 ? ' active' : '');
+      chip.textContent = t.name || ('Team ' + (idx + 1));
+      chip.dataset.index = idx;
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('#teamChipGroup .chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        // scroll tới card tương ứng
+        const card = document.querySelector('.team-card[data-index="' + idx + '"]');
+        if (card) {
+          card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
       });
+      wrap.appendChild(chip);
+    });
+  }
 
-      let data;
-      try {
-        data = await res.json();
-      } catch (e) {
-        throw new Error('Phản hồi không phải JSON: ' + e.message);
-      }
+  function renderTeams() {
+    const container = document.getElementById('teamContainer');
+    container.innerHTML = '';
 
-      if (!res.ok || !data.ok) {
-        throw new Error(data && data.error ? data.error : 'Lỗi không xác định từ server');
-      }
+    state.teams.forEach((team, index) => {
+      const card = document.createElement('div');
+      card.className = 'card team-card';
+      card.dataset.index = index;
 
-      alert(`Đã gửi dữ liệu lên Google Sheet (scenario: ${SCENARIO_ID}). Mở sheet sẽ thấy dòng "${SCENARIO_ID}" được cập nhật.`);
-    } catch (err) {
-      console.error('saveToServer error:', err);
-      alert('Không lưu được lên Google Sheet: ' + err.message);
+      const metrics = calcTeamMetrics(team);
+
+      card.innerHTML = `
+        <div class="team-row-header">
+          <div>
+            <input class="team-name-input" value="${team.name || ('Team ' + (index + 1))}" data-field="name" data-index="${index}">
+            <div class="team-meta">
+              <span>Kênh: ${team.key || ('team_' + (index + 1))}</span>
+              <span>| Biên phí: <span id="margin-label-${index}">${formatNumber(team.margin) || 0}</span>%</span>
+            </div>
+          </div>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <span class="pill ${metrics.diffProfit >= 0 ? 'pill-green' : 'pill-red'}">
+              Lợi nhuận: ${formatNumber(metrics.actualProfit)} (chênh ${formatNumber(metrics.diffProfit)})
+            </span>
+            <button class="btn btn-danger" data-action="remove-team" data-index="${index}">Xóa</button>
+          </div>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th></th>
+              <th>Target</th>
+              <th>Thực tế</th>
+              <th>Chênh lệch</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Doanh thu (triệu)</td>
+              <td>
+                <input type="number" step="0.01"
+                       data-field="targetRevenue"
+                       data-index="${index}"
+                       value="${team.targetRevenue !== undefined ? team.targetRevenue : ''}">
+              </td>
+              <td>
+                <input type="number" step="0.01"
+                       data-field="actualRevenue"
+                       data-index="${index}"
+                       value="${team.actualRevenue !== undefined ? team.actualRevenue : ''}">
+              </td>
+              <td>
+                <span id="diff-revenue-${index}">
+                  ${formatNumber(metrics.diffRevenue)}
+                  (${formatNumber(metrics.diffPercent)}%)
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td>Biên phí gộp (%)</td>
+              <td colspan="2">
+                <input type="number" step="0.1"
+                       data-field="margin"
+                       data-index="${index}"
+                       value="${team.margin !== undefined ? team.margin : ''}">
+              </td>
+              <td>
+                <span id="profit-summary-${index}">
+                  LN target: ${formatNumber(metrics.targetProfit)} | LN thực: ${formatNumber(metrics.actualProfit)}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      `;
+
+      container.appendChild(card);
+    });
+
+    attachTeamEventHandlers();
+    updateOverallMarginBadge();
+  }
+
+  function updateOverallMarginBadge() {
+    const badgeText = document.getElementById('overallMarginText');
+    const margin = calcOverallMargin();
+    if (margin === null) {
+      badgeText.textContent = '–';
+    } else {
+      badgeText.textContent = formatNumber(margin) + ' %';
     }
-  };
+  }
 
-  const loadFromServer = async () => {
-    if (!API_URL) {
-      alert('Chưa cấu hình API_URL.');
+  function attachTeamEventHandlers() {
+    // inputs
+    document.querySelectorAll('input[data-field]').forEach(input => {
+      input.addEventListener('input', () => {
+        const field = input.dataset.field;
+        const idx = Number(input.dataset.index);
+        const val = input.value;
+        const team = state.teams[idx];
+        if (!team) return;
+
+        if (field === 'name') {
+          team.name = val;
+        } else if (field === 'margin') {
+          team.margin = parseNumber(val);
+          const label = document.getElementById('margin-label-' + idx);
+          if (label) label.textContent = formatNumber(team.margin || 0);
+        } else if (field === 'targetRevenue') {
+          team.targetRevenue = parseNumber(val);
+        } else if (field === 'actualRevenue') {
+          team.actualRevenue = parseNumber(val);
+        }
+
+        recalcTeamRow(idx);
+        saveCurrentToLocal();
+      });
+    });
+
+    // rename team input
+    document.querySelectorAll('.team-name-input').forEach(input => {
+      input.addEventListener('input', () => {
+        const idx = Number(input.dataset.index);
+        const team = state.teams[idx];
+        if (!team) return;
+        team.name = input.value;
+        const chip = document.querySelector(`#teamChipGroup .chip[data-index="${idx}"]`);
+        if (chip) chip.textContent = team.name || ('Team ' + (idx + 1));
+        saveCurrentToLocal();
+      });
+    });
+
+    // remove buttons
+    document.querySelectorAll('[data-action="remove-team"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = Number(btn.dataset.index);
+        if (!confirm('Xóa team này?')) return;
+        state.teams.splice(idx, 1);
+        saveCurrentToLocal();
+        renderTeamChips();
+        renderTeams();
+      });
+    });
+  }
+
+  function recalcTeamRow(index) {
+    const team = state.teams[index];
+    if (!team) return;
+    const metrics = calcTeamMetrics(team);
+
+    const diffEl = document.getElementById('diff-revenue-' + index);
+    if (diffEl) {
+      diffEl.textContent = `${formatNumber(metrics.diffRevenue)} (${formatNumber(metrics.diffPercent)}%)`;
+    }
+    const pEl = document.getElementById('profit-summary-' + index);
+    if (pEl) {
+      pEl.textContent = `LN target: ${formatNumber(metrics.targetProfit)} | LN thực: ${formatNumber(metrics.actualProfit)}`;
+    }
+
+    const card = document.querySelector(`.team-card[data-index="${index}"] .pill`);
+    if (card) {
+      card.className = 'pill ' + (metrics.diffProfit >= 0 ? 'pill-green' : 'pill-red');
+      card.textContent = `Lợi nhuận: ${formatNumber(metrics.actualProfit)} (chênh ${formatNumber(metrics.diffProfit)})`;
+    }
+
+    updateOverallMarginBadge();
+  }
+
+  /*************************************************
+   * 4. LOCALSTORAGE
+   *************************************************/
+  function saveCurrentToLocal() {
+    const data = JSON.stringify(state);
+    localStorage.setItem(LOCAL_KEY_CURRENT, data);
+  }
+
+  function saveDefaultToLocal() {
+    const data = JSON.stringify(state);
+    localStorage.setItem(LOCAL_KEY_DEFAULT, data);
+    alert('Đã lưu cấu hình hiện tại làm mặc định.');
+  }
+
+  function loadFromLocal() {
+    const raw = localStorage.getItem(LOCAL_KEY_CURRENT);
+    if (!raw) return null;
+    try {
+      return JSON.parse(raw);
+    } catch (err) {
+      console.error('Parse local current error:', err);
+      return null;
+    }
+  }
+
+  function loadDefaultFromLocal() {
+    const raw = localStorage.getItem(LOCAL_KEY_DEFAULT);
+    if (!raw) return null;
+    try {
+      return JSON.parse(raw);
+    } catch (err) {
+      console.error('Parse local default error:', err);
+      return null;
+    }
+  }
+
+  /*************************************************
+   * 5. GOOGLE SHEET – LOAD & SAVE
+   *************************************************/
+  async function loadScenarioFromGoogleSheet(scenarioName = 'default') {
+    if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.indexOf('http') !== 0) {
+      alert('GOOGLE_SCRIPT_URL chưa được cấu hình đúng trong file index.html');
       return;
     }
-
     try {
-      const url = `${API_URL}?id=${encodeURIComponent(SCENARIO_ID)}`;
+      const url = GOOGLE_SCRIPT_URL +
+        '?action=get&scenario=' + encodeURIComponent(scenarioName);
+
       const res = await fetch(url, { method: 'GET' });
 
-      let dataText = await res.text();
-      let data;
-      try {
-        data = JSON.parse(dataText);
-      } catch (e) {
-        console.error('Raw response:', dataText);
-        throw new Error('Phản hồi không phải JSON hợp lệ.');
-      }
-
-      if (!res.ok || !data.ok) {
-        throw new Error(data && data.error ? data.error : 'Lỗi không xác định từ server');
-      }
-
-      const incoming = Array.isArray(data.teams) ? data.teams : [];
-      if (!incoming.length) {
-        alert('Chưa có dữ liệu trên Google Sheet cho scenario này.');
+      if (!res.ok) {
+        const text = await res.text();
+        alert('Không tải được từ Google Sheet: ' + res.status + ' - ' + text);
         return;
       }
 
-      teams = incoming.map(t =>
-        Object.assign(
-          {},
-          createDefaultTeam(t.name || 'Team'),
-          t
-        )
-      );
+      const data = await res.json();
+      if (!data.ok) {
+        alert('Không tải được từ Google Sheet: ' + (data.error || 'Unknown error'));
+        return;
+      }
 
-      render();
-      alert(`Đã tải cấu hình từ Google Sheet (scenario: ${SCENARIO_ID}).`);
+      if (data.data) {
+        // data.data chính là object state đã lưu
+        state = data.data;
+      } else {
+        // nếu chưa có gì trên sheet → giữ state hiện tại
+      }
+
+      renderTeamChips();
+      renderTeams();
+      saveCurrentToLocal();
+
+      alert('Đã tải cấu hình từ Google Sheet (scenario: ' + (data.scenario || 'default') + ').');
     } catch (err) {
-      console.error('loadFromServer error:', err);
-      alert('Không tải được dữ liệu từ Google Sheet: ' + err.message);
+      console.error('Load from sheet error:', err);
+      alert('Không tải được từ Google Sheet: ' + err.message);
     }
-  };
+  }
 
-  // ===== Core calc =====
-  const computeTeamMetrics = (team) => {
-    const varPct =
-      (Number(team.cogs)    || 0) +
-      (Number(team.selling) || 0) +
-      (Number(team.other)   || 0);
+  async function saveScenarioToGoogleSheet(scenarioName = 'default') {
+    if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.indexOf('http') !== 0) {
+      alert('GOOGLE_SCRIPT_URL chưa được cấu hình đúng trong file index.html');
+      return;
+    }
+    try {
+      const body = new URLSearchParams();
+      body.append('action', 'save');
+      body.append('scenario', scenarioName);
+      body.append('payload', JSON.stringify(state));
 
-    const calcForRevenue = (r) => {
-      const revenue = Number(r) || 0;
-      const variableCost = revenue * (varPct / 100);
-      const grossProfit  = revenue - variableCost;
-      const fixedCost    = Number(team.fixedCost) || 0;
-      const netProfit    = grossProfit - fixedCost;
-      const safeProfit   = Math.max(0, netProfit);
+      const res = await fetch(GOOGLE_SCRIPT_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+        },
+        body
+      });
 
-      const bonusSale   = safeProfit * ((Number(team.bonusSale)   || 0) / 100);
-      const bonusRD     = safeProfit * ((Number(team.bonusRD)     || 0) / 100);
-      const bonusCSKH   = safeProfit * ((Number(team.bonusCSKH)   || 0) / 100);
-      const bonusKT     = safeProfit * ((Number(team.bonusKT)     || 0) / 100);
-      const bonusMedia  = safeProfit * ((Number(team.bonusMedia)  || 0) / 100);
+      if (!res.ok) {
+        const text = await res.text();
+        alert('Không lưu được lên Google Sheet: ' + res.status + ' - ' + text);
+        return;
+      }
 
-      const totalBonus = bonusSale + bonusRD + bonusCSKH + bonusKT + bonusMedia;
-      const profitAfterBonus = netProfit - totalBonus;
+      const data = await res.json();
+      if (!data.ok) {
+        alert('Không lưu được lên Google Sheet: ' + (data.error || 'Unknown error'));
+        return;
+      }
 
-      return {
-        revenue,
-        variableCost,
-        grossProfit,
-        fixedCost,
-        netProfit,
-        bonusSale,
-        bonusRD,
-        bonusCSKH,
-        bonusKT,
-        bonusMedia,
-        totalBonus,
-        profitAfterBonus,
+      alert('Đã lưu cấu hình lên Google Sheet (scenario: ' + (data.scenario || 'default') + ').');
+    } catch (err) {
+      console.error('Save to sheet error:', err);
+      alert('Không lưu được lên Google Sheet: ' + err.message);
+    }
+  }
+
+  /*************************************************
+   * 6. KHỞI TẠO & SỰ KIỆN
+   *************************************************/
+  function initDefaultStateIfNeeded() {
+    const fromLocal = loadFromLocal();
+    if (fromLocal && fromLocal.teams && Array.isArray(fromLocal.teams) && fromLocal.teams.length) {
+      state = fromLocal;
+      return;
+    }
+
+    const fromDefault = loadDefaultFromLocal();
+    if (fromDefault && fromDefault.teams && Array.isArray(fromDefault.teams) && fromDefault.teams.length) {
+      state = fromDefault;
+      return;
+    }
+
+    // nếu chưa có gì → seed mặc định
+    state.teams = DEFAULT_TEAMS.map(t => ({
+      name: t.name,
+      key: t.key,
+      margin: 20,
+      targetRevenue: 0,
+      actualRevenue: 0
+    }));
+  }
+
+  function initButtons() {
+    document.getElementById('btnRecalc').addEventListener('click', () => {
+      state.teams.forEach((_, idx) => recalcTeamRow(idx));
+      saveCurrentToLocal();
+      alert('Đã cập nhật lại chỉ số.');
+    });
+
+    document.getElementById('btnSaveDefault').addEventListener('click', () => {
+      saveDefaultToLocal();
+    });
+
+    document.getElementById('btnAddTeam').addEventListener('click', () => {
+      const newTeam = {
+        name: 'Team mới ' + (state.teams.length + 1),
+        key: 'team_' + (state.teams.length + 1),
+        margin: 20,
+        targetRevenue: 0,
+        actualRevenue: 0
       };
-    };
-
-    let breakEven = null;
-    const fixedCostOuter = Number(team.fixedCost) || 0;
-    if (varPct < 100 && fixedCostOuter > 0) {
-      breakEven = fixedCostOuter / (1 - varPct / 100);
-    }
-
-    return {
-      varPct,
-      breakEven,
-      m1: calcForRevenue(team.revenue1),
-      m2: calcForRevenue(team.revenue2),
-      m3: calcForRevenue(team.revenue3),
-    };
-  };
-
-  // ===== Handlers =====
-  const handleInput = (teamId, field, value) => {
-    teams = teams.map(t => t.id === teamId ? { ...t, [field]: value } : t);
-    render();
-  };
-
-  const handleMoney = (teamId, field, raw) => {
-    const num = parseMoneyInput(raw);
-    handleInput(teamId, field, num);
-  };
-
-  const toggleCollapse = (teamId) => {
-    teams = teams.map(t => t.id === teamId ? { ...t, collapsed: !t.collapsed } : t);
-    render();
-  };
-
-  const deleteTeam = (teamId) => {
-    if (teams.length === 1) {
-      alert('Cần ít nhất 1 team.');
-      return;
-    }
-    teams = teams.filter(t => t.id !== teamId);
-    render();
-  };
-
-  const addTeam = () => {
-    teams = [...teams, createDefaultTeam('Team mới')];
-    render();
-  };
-
-  const comparePercent = (actual, target) => {
-    actual = Number(actual) || 0;
-    target = Number(target) || 0;
-    if (!target) return { txt: '--', cls: '' };
-
-    const diffPct = ((actual - target) / target) * 100;
-    const sign = diffPct >= 0 ? '+' : '';
-    const txt  = `${sign}${diffPct.toFixed(1)}%`;
-    const cls  = diffPct <= 0 ? 'positive' : 'negative'; // xanh nếu ≤ target
-    return { txt, cls };
-  };
-
-  const focusTeam = (name) => {
-    document.querySelectorAll('.chip-button').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.name === name);
+      state.teams.push(newTeam);
+      saveCurrentToLocal();
+      renderTeamChips();
+      renderTeams();
     });
 
-    let t = teams.find(team => team.name.toLowerCase() === name.toLowerCase());
-    if (!t) {
-      t = createDefaultTeam(name);
-      teams = [...teams, t];
-    }
-    render();
-
-    requestAnimationFrame(() => {
-      const el = document.querySelector(`.card[data-team-id="${t.id}"]`);
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
-  };
-
-  // ===== RENDER TEAMS =====
-  const renderTeams = () => {
-    const container = document.getElementById('teamsContainer');
-    container.innerHTML = '';
-
-    teams.forEach((team, index) => {
-      const metrics = computeTeamMetrics(team);
-      const card = document.createElement('div');
-      card.className = `card team-${index % 4}`;
-      card.dataset.teamId = team.id;
-
-      const breakEvenText = metrics.breakEven
-        ? `${formatCurrency(metrics.breakEven)}`
-        : 'Không xác định';
-
-      // so sánh target vs thực tế
-      const fixedActual = Number(team.fixedCost) || 0;
-      const fixedTarget = Number(team.targetFixedCost) || 0;
-      let fixedDiffTxt = '--', fixedDiffClass = '';
-      if (fixedTarget > 0) {
-        const diffPct = ((fixedActual - fixedTarget) / fixedTarget) * 100;
-        const sign = diffPct >= 0 ? '+' : '';
-        fixedDiffTxt   = `${sign}${diffPct.toFixed(1)}%`;
-        fixedDiffClass = diffPct <= 0 ? 'positive' : 'negative';
-      }
-
-      const cogsCmp  = comparePercent(team.cogs,    team.targetCogs);
-      const sellCmp  = comparePercent(team.selling, team.targetSelling);
-      const otherCmp = comparePercent(team.other,   team.targetOther);
-
-      const headerHtml = `
-        <div class="card-header">
-          <div class="card-header-left">
-            <span class="badge">Team ${index + 1}</span>
-            <input
-              type="text"
-              class="team-name"
-              value="${team.name}"
-              onchange="handleInput('${team.id}','name',this.value)"
-            />
-            <span class="pill-input">
-              <span>Tổng biến phí:</span>
-              <strong>${formatPercent(metrics.varPct)}</strong>
-            </span>
-            <span class="pill-input">
-              <span>Điểm hòa vốn:</span>
-              <strong>${breakEvenText}</strong>
-            </span>
-          </div>
-          <div>
-            <button class="small" onclick="toggleCollapse('${team.id}')">
-              ${team.collapsed ? 'Xem chi tiết' : 'Ẩn chi tiết'}
-            </button>
-            <button class="small danger" onclick="deleteTeam('${team.id}')">
-              Xóa
-            </button>
-          </div>
-        </div>
-      `;
-
-      let bodyHtml = '';
-      if (!team.collapsed) {
-        const profitClassM1 = metrics.m1.netProfit >= 0 ? 'positive' : 'negative';
-        const profitClassM2 = metrics.m2.netProfit >= 0 ? 'positive' : 'negative';
-        const profitClassM3 = metrics.m3.netProfit >= 0 ? 'positive' : 'negative';
-
-        const paClassM1 = metrics.m1.profitAfterBonus >= 0 ? 'positive' : 'negative';
-        const paClassM2 = metrics.m2.profitAfterBonus >= 0 ? 'positive' : 'negative';
-        const paClassM3 = metrics.m3.profitAfterBonus >= 0 ? 'positive' : 'negative';
-
-        bodyHtml = `
-          <div class="grid">
-            <div class="col-12">
-              <table class="mini-compare">
-                <thead>
-                  <tr>
-                    <th>Chỉ tiêu</th>
-                    <th>Target</th>
-                    <th>Thực tế</th>
-                    <th>Chênh lệch</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Chi phí cố định / kỳ</td>
-                    <td>
-                      <input
-                        type="text"
-                        class="table-input"
-                        value="${formatMoneyInput(team.targetFixedCost)}"
-                        onchange="handleMoney('${team.id}','targetFixedCost',this.value)"
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        class="table-input"
-                        value="${formatMoneyInput(team.fixedCost)}"
-                        onchange="handleMoney('${team.id}','fixedCost',this.value)"
-                      />
-                    </td>
-                    <td class="${fixedDiffClass}">${fixedDiffTxt}</td>
-                  </tr>
-                  <tr>
-                    <td>Giá vốn (COGS)</td>
-                    <td>
-                      <input
-                        type="number"
-                        class="table-input"
-                        value="${team.targetCogs}"
-                        onchange="handleInput('${team.id}','targetCogs',this.value)"
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="number"
-                        class="table-input"
-                        value="${team.cogs}"
-                        onchange="handleInput('${team.id}','cogs',this.value)"
-                      />
-                    </td>
-                    <td class="${cogsCmp.cls}">${cogsCmp.txt}</td>
-                  </tr>
-                  <tr>
-                    <td>Chi phí bán hàng</td>
-                    <td>
-                      <input
-                        type="number"
-                        class="table-input"
-                        value="${team.targetSelling}"
-                        onchange="handleInput('${team.id}','targetSelling',this.value)"
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="number"
-                        class="table-input"
-                        value="${team.selling}"
-                        onchange="handleInput('${team.id}','selling',this.value)"
-                      />
-                    </td>
-                    <td class="${sellCmp.cls}">${sellCmp.txt}</td>
-                  </tr>
-                  <tr>
-                    <td>Chi phí khác (biến phí)</td>
-                    <td>
-                      <input
-                        type="number"
-                        class="table-input"
-                        value="${team.targetOther}"
-                        onchange="handleInput('${team.id}','targetOther',this.value)"
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="number"
-                        class="table-input"
-                        value="${team.other}"
-                        onchange="handleInput('${team.id}','other',this.value)"
-                      />
-                    </td>
-                    <td class="${otherCmp.cls}">${otherCmp.txt}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <div class="col-12 muted">
-              = Giá vốn + Chi phí bán hàng + Chi phí khác → <b>Tổng biến phí: ${formatPercent(metrics.varPct)}</b>
-            </div>
-
-            <div class="col-12" style="margin-top:6px;">
-              <p><strong>% thưởng trên LỢI NHUẬN (chỉ tính khi lợi nhuận &gt; 0)</strong></p>
-            </div>
-            <div class="col-2">
-              <div class="bonus-field">
-                <span class="bonus-label">Sale</span>
-                <input type="number" class="bonus-input"
-                  value="${team.bonusSale}"
-                  onchange="handleInput('${team.id}','bonusSale',this.value)" />
-              </div>
-            </div>
-            <div class="col-2">
-              <div class="bonus-field">
-                <span class="bonus-label">RD</span>
-                <input type="number" class="bonus-input"
-                  value="${team.bonusRD}"
-                  onchange="handleInput('${team.id}','bonusRD',this.value)" />
-              </div>
-            </div>
-            <div class="col-2">
-              <div class="bonus-field">
-                <span class="bonus-label">CSKH</span>
-                <input type="number" class="bonus-input"
-                  value="${team.bonusCSKH}"
-                  onchange="handleInput('${team.id}','bonusCSKH',this.value)" />
-              </div>
-            </div>
-            <div class="col-2">
-              <div class="bonus-field">
-                <span class="bonus-label">KT + HCNS</span>
-                <input type="number" class="bonus-input"
-                  value="${team.bonusKT}"
-                  onchange="handleInput('${team.id}','bonusKT',this.value)" />
-              </div>
-            </div>
-            <div class="col-2">
-              <div class="bonus-field">
-                <span class="bonus-label">Media</span>
-                <input type="number" class="bonus-input"
-                  value="${team.bonusMedia}"
-                  onchange="handleInput('${team.id}','bonusMedia',this.value)" />
-              </div>
-            </div>
-            <div class="col-12 muted">
-              Tổng % thưởng = Sale + RD + CSKH + KT + Media. Thưởng tính trên LNR &gt; 0 của từng mốc.
-            </div>
-          </div>
-
-          <table>
-            <thead>
-              <tr>
-                <th>Chỉ tiêu</th>
-                <th>Mốc 1</th>
-                <th>Mốc 2</th>
-                <th>Mốc 3</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Doanh thu</td>
-                <td>
-                  <input type="text" class="table-input"
-                    value="${formatMoneyInput(team.revenue1)}"
-                    onchange="handleMoney('${team.id}','revenue1',this.value)" />
-                </td>
-                <td>
-                  <input type="text" class="table-input"
-                    value="${formatMoneyInput(team.revenue2)}"
-                    onchange="handleMoney('${team.id}','revenue2',this.value)" />
-                </td>
-                <td>
-                  <input type="text" class="table-input"
-                    value="${formatMoneyInput(team.revenue3)}"
-                    onchange="handleMoney('${team.id}','revenue3',this.value)" />
-                </td>
-              </tr>
-              <tr>
-                <td>Biến phí</td>
-                <td>${cellValPct(metrics.m1.variableCost, metrics.m1.revenue)}</td>
-                <td>${cellValPct(metrics.m2.variableCost, metrics.m2.revenue)}</td>
-                <td>${cellValPct(metrics.m3.variableCost, metrics.m3.revenue)}</td>
-              </tr>
-              <tr>
-                <td>Lợi nhuận gộp (sau biến phí)</td>
-                <td>${cellValPct(metrics.m1.grossProfit, metrics.m1.revenue)}</td>
-                <td>${cellValPct(metrics.m2.grossProfit, metrics.m2.revenue)}</td>
-                <td>${cellValPct(metrics.m3.grossProfit, metrics.m3.revenue)}</td>
-              </tr>
-              <tr>
-                <td>Chi phí cố định</td>
-                <td>${cellValPct(metrics.m1.fixedCost, metrics.m1.revenue)}</td>
-                <td>${cellValPct(metrics.m2.fixedCost, metrics.m2.revenue)}</td>
-                <td>${cellValPct(metrics.m3.fixedCost, metrics.m3.revenue)}</td>
-              </tr>
-              <tr>
-                <td>Lợi nhuận trước thưởng</td>
-                <td class="${profitClassM1}">${cellValPct(metrics.m1.netProfit, metrics.m1.revenue)}</td>
-                <td class="${profitClassM2}">${cellValPct(metrics.m2.netProfit, metrics.m2.revenue)}</td>
-                <td class="${profitClassM3}">${cellValPct(metrics.m3.netProfit, metrics.m3.revenue)}</td>
-              </tr>
-              <tr>
-                <td>Thưởng Sale</td>
-                <td>${cellValPct(metrics.m1.bonusSale, metrics.m1.revenue)}</td>
-                <td>${cellValPct(metrics.m2.bonusSale, metrics.m2.revenue)}</td>
-                <td>${cellValPct(metrics.m3.bonusSale, metrics.m3.revenue)}</td>
-              </tr>
-              <tr>
-                <td>Thưởng RD</td>
-                <td>${cellValPct(metrics.m1.bonusRD, metrics.m1.revenue)}</td>
-                <td>${cellValPct(metrics.m2.bonusRD, metrics.m2.revenue)}</td>
-                <td>${cellValPct(metrics.m3.bonusRD, metrics.m3.revenue)}</td>
-              </tr>
-              <tr>
-                <td>Thưởng CSKH</td>
-                <td>${cellValPct(metrics.m1.bonusCSKH, metrics.m1.revenue)}</td>
-                <td>${cellValPct(metrics.m2.bonusCSKH, metrics.m2.revenue)}</td>
-                <td>${cellValPct(metrics.m3.bonusCSKH, metrics.m3.revenue)}</td>
-              </tr>
-              <tr>
-                <td>Thưởng KT + HCNS</td>
-                <td>${cellValPct(metrics.m1.bonusKT, metrics.m1.revenue)}</td>
-                <td>${cellValPct(metrics.m2.bonusKT, metrics.m2.revenue)}</td>
-                <td>${cellValPct(metrics.m3.bonusKT, metrics.m3.revenue)}</td>
-              </tr>
-              <tr>
-                <td>Thưởng Media</td>
-                <td>${cellValPct(metrics.m1.bonusMedia, metrics.m1.revenue)}</td>
-                <td>${cellValPct(metrics.m2.bonusMedia, metrics.m2.revenue)}</td>
-                <td>${cellValPct(metrics.m3.bonusMedia, metrics.m3.revenue)}</td>
-              </tr>
-              <tr class="row-total">
-                <td><strong>Tổng thưởng</strong></td>
-                <td>${cellValPct(metrics.m1.totalBonus, metrics.m1.revenue)}</td>
-                <td>${cellValPct(metrics.m2.totalBonus, metrics.m2.revenue)}</td>
-                <td>${cellValPct(metrics.m3.totalBonus, metrics.m3.revenue)}</td>
-              </tr>
-              <tr class="row-profit">
-                <td><strong>Lợi nhuận sau thưởng</strong></td>
-                <td class="${paClassM1}">${cellValPct(metrics.m1.profitAfterBonus, metrics.m1.revenue)}</td>
-                <td class="${paClassM2}">${cellValPct(metrics.m2.profitAfterBonus, metrics.m2.revenue)}</td>
-                <td class="${paClassM3}">${cellValPct(metrics.m3.profitAfterBonus, metrics.m3.revenue)}</td>
-              </tr>
-            </tbody>
-          </table>
-        `;
-      }
-
-      card.innerHTML = headerHtml + bodyHtml;
-      container.appendChild(card);
-    });
-  };
-
-  // ===== RENDER SUMMARY =====
-  const renderSummary = () => {
-    const container = document.getElementById('summaryContainer');
-    if (!teams.length) {
-      container.innerHTML = "<p class='muted'>Chưa có team nào.</p>";
-      return;
-    }
-
-    let rowsHtml = '';
-
-    let totalRevenue = 0;
-    let totalCostBeforeBonus = 0;
-    let totalGross   = 0;
-    let totalProfit  = 0;
-    let totalSale    = 0;
-    let totalRD      = 0;
-    let totalCSKH    = 0;
-    let totalKT      = 0;
-    let totalMedia   = 0;
-    let totalBonus   = 0;
-
-    teams.forEach(team => {
-      const m = computeTeamMetrics(team).m3; // Mốc 3
-
-      const costBeforeBonus = m.variableCost + m.fixedCost;
-
-      totalRevenue         += m.revenue;
-      totalCostBeforeBonus += costBeforeBonus;
-      totalGross           += m.grossProfit;
-      totalProfit          += m.profitAfterBonus;
-      totalSale            += m.bonusSale;
-      totalRD              += m.bonusRD;
-      totalCSKH            += m.bonusCSKH;
-      totalKT              += m.bonusKT;
-      totalMedia           += m.bonusMedia;
-      totalBonus           += m.totalBonus;
-
-      const grossCls  = m.grossProfit      >= 0 ? 'positive' : 'negative';
-      const profitCls = m.profitAfterBonus >= 0 ? 'positive' : 'negative';
-
-      rowsHtml += `
-        <tr>
-          <td>${team.name}</td>
-          <td>${formatCurrency(m.revenue)}</td>
-          <td>${cellValPct(costBeforeBonus, m.revenue)}</td>
-          <td class="${grossCls}">${cellValPct(m.grossProfit, m.revenue)}</td>
-          <td class="${profitCls}">${cellValPct(m.profitAfterBonus, m.revenue)}</td>
-          <td>${cellValPct(m.bonusSale, m.revenue)}</td>
-          <td>${cellValPct(m.bonusRD, m.revenue)}</td>
-          <td>${cellValPct(m.bonusCSKH, m.revenue)}</td>
-          <td>${cellValPct(m.bonusKT, m.revenue)}</td>
-          <td>${cellValPct(m.bonusMedia, m.revenue)}</td>
-          <td>${cellValPct(m.totalBonus, m.revenue)}</td>
-        </tr>
-      `;
+    document.getElementById('btnLoadFromSheet').addEventListener('click', () => {
+      loadScenarioFromGoogleSheet('default');
     });
 
-    const totalGrossCls  = totalGross  >= 0 ? 'positive' : 'negative';
-    const totalProfitCls = totalProfit >= 0 ? 'positive' : 'negative';
+    document.getElementById('btnSaveToSheet').addEventListener('click', () => {
+      saveScenarioToGoogleSheet('default');
+    });
+  }
 
-    const tableHtml = `
-      <table>
-        <thead>
-          <tr>
-            <th>Team</th>
-            <th>Doanh thu Mốc 3</th>
-            <th>Chi phí (trước thưởng)</th>
-            <th>Lợi nhuận gộp</th>
-            <th>Lợi nhuận sau thưởng</th>
-            <th>Thưởng Sale</th>
-            <th>Thưởng RD</th>
-            <th>Thưởng CSKH</th>
-            <th>Thưởng KT+HCNS</th>
-            <th>Thưởng Media</th>
-            <th>Tổng thưởng</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${rowsHtml}
-        </tbody>
-        <tfoot>
-          <tr>
-            <td><strong>Tổng doanh nghiệp</strong></td>
-            <td>${formatCurrency(totalRevenue)}</td>
-            <td>${cellValPct(totalCostBeforeBonus, totalRevenue)}</td>
-            <td class="${totalGrossCls}">
-              ${cellValPct(totalGross, totalRevenue)}
-            </td>
-            <td class="${totalProfitCls}">
-              ${cellValPct(totalProfit, totalRevenue)}
-            </td>
-            <td>${cellValPct(totalSale, totalRevenue)}</td>
-            <td>${cellValPct(totalRD, totalRevenue)}</td>
-            <td>${cellValPct(totalCSKH, totalRevenue)}</td>
-            <td>${cellValPct(totalKT, totalRevenue)}</td>
-            <td>${cellValPct(totalMedia, totalRevenue)}</td>
-            <td>${cellValPct(totalBonus, totalRevenue)}</td>
-          </tr>
-        </tfoot>
-      </table>
-    `;
-
-    container.innerHTML = tableHtml;
-  };
-
-  // ===== MASTER RENDER =====
-  const render = () => {
+  document.addEventListener('DOMContentLoaded', () => {
+    initDefaultStateIfNeeded();
+    renderTeamChips();
     renderTeams();
-    renderSummary();
-    saveState();
-  };
-
-  // Khởi tạo
-  render();
+    initButtons();
+  });
 </script>
+
 </body>
 </html>
