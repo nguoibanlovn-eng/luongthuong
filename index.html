@@ -103,18 +103,16 @@
       border: 1px solid #e5e7eb;
       color: #4b5563;
     }
-    .card.tiktok::before {
-      background: radial-gradient(circle at top left, #06b6d4, transparent 55%);
-    }
-    .card.tiktok .card-title { color: #0f766e; }
-    .card.shopee::before {
-      background: radial-gradient(circle at top left, #fb923c, transparent 55%);
-    }
-    .card.shopee .card-title { color: #c2410c; }
-    .card.facebook::before {
-      background: radial-gradient(circle at top left, #60a5fa, transparent 55%);
-    }
-    .card.facebook .card-title { color: #1d4ed8; }
+    .card.tiktok::before      { background: radial-gradient(circle at top left, #06b6d4, transparent 55%); }
+    .card.tiktok .card-title  { color: #0f766e; }
+    .card.shopee::before      { background: radial-gradient(circle at top left, #fb923c, transparent 55%); }
+    .card.shopee .card-title  { color: #c2410c; }
+    .card.facebook::before    { background: radial-gradient(circle at top left, #60a5fa, transparent 55%); }
+    .card.facebook .card-title{ color: #1d4ed8; }
+    .card.web::before         { background: radial-gradient(circle at top left, #22c55e, transparent 55%); }
+    .card.web .card-title     { color: #15803d; }
+    .card.offline::before     { background: radial-gradient(circle at top left, #a855f7, transparent 55%); }
+    .card.offline .card-title { color: #7c3aed; }
 
     .chip {
       font-size: 10px;
@@ -140,14 +138,8 @@
       align-items: center;
       margin-bottom: 6px;
     }
-    .section-title {
-      font-size: 13px;
-      font-weight: 600;
-    }
-    .section-sub {
-      font-size: 11px;
-      color: #6b7280;
-    }
+    .section-title { font-size: 13px; font-weight: 600; }
+    .section-sub   { font-size: 11px; color: #6b7280; }
 
     .grid {
       display: grid;
@@ -158,7 +150,7 @@
     .field {
       display: flex;
       flex-direction: column;
-      gap: 2px;
+      gap: 4px;
     }
     .field label {
       font-size: 11px;
@@ -197,16 +189,10 @@
       font-weight: 500;
       color: #111827;
     }
-    .value.highlight {
-      font-size: 13px;
-      font-weight: 600;
-    }
-    .value.positive {
-      color: #16a34a;
-    }
-    .value.negative {
-      color: #dc2626;
-    }
+    .value.highlight { font-size: 13px; font-weight: 600; }
+    .value.positive  { color: #16a34a; }
+    .value.negative  { color: #dc2626; }
+
     .section-footer {
       display: flex;
       justify-content: space-between;
@@ -232,18 +218,10 @@
       align-items: center;
       gap: 4px;
     }
-    .pill span.label {
-      color: #6b7280;
-    }
-    .pill span.amount {
-      color: #111827;
-      font-weight: 500;
-    }
-    .pill span.rate {
-      color: #9ca3af;
-    }
+    .pill span.label  { color: #6b7280; }
+    .pill span.amount { color: #111827; font-weight: 500; }
+    .pill span.rate   { color: #9ca3af; }
 
-    /* Summary */
     .summary-card {
       background: #ffffff;
       border-radius: 18px;
@@ -251,11 +229,8 @@
       box-shadow: 0 12px 30px rgba(15,23,42,0.12);
       border: 1px solid #e5e7eb;
     }
-    .summary-title {
-      font-size: 15px;
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
+    .summary-title { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+
     table {
       width: 100%;
       border-collapse: collapse;
@@ -266,9 +241,7 @@
       text-align: right;
       border-bottom: 1px solid #e5e7eb;
     }
-    th:first-child, td:first-child {
-      text-align: left;
-    }
+    th:first-child, td:first-child { text-align: left; }
     th {
       background: #f9fafb;
       font-weight: 600;
@@ -279,6 +252,7 @@
       font-weight: 600;
       background: #f9fafb;
     }
+    .team-offline td:first-child { font-weight: 600; }
 
     @media (max-width: 768px) {
       body { padding: 16px; }
@@ -288,14 +262,16 @@
 </head>
 <body>
   <h1>Phần mềm tính thưởng theo kênh bán hàng</h1>
-  <div class="subtitle">Mỗi kênh một bảng: 1) Hòa vốn  2) Doanh thu & chia thưởng  +  bảng tổng doanh thu & tổng thưởng.</div>
+  <div class="subtitle">
+    Mỗi kênh: 1) Hòa vốn  2) Doanh thu & chia thưởng. Dưới cùng là bảng tổng doanh thu & tổng thưởng.
+  </div>
 
   <div class="top-actions">
     <button class="btn" onclick="calculateAllChannels()">Tính tất cả kênh & cập nhật bảng tổng</button>
   </div>
 
   <div class="cards">
-    <!-- TikTok -->
+    <!-- TEMPLATE CARD: TikTok -->
     <div class="card channel-card tiktok" data-channel="TikTok">
       <div class="card-header">
         <div class="card-title">
@@ -305,7 +281,7 @@
         <button class="btn-ghost btn" onclick="calculateChannel(this)">Tính kênh TikTok</button>
       </div>
 
-      <!-- Hòa vốn -->
+      <!-- 1. Hòa vốn -->
       <div class="section">
         <div class="section-header">
           <div>
@@ -321,15 +297,6 @@
               <input type="number" class="js-fixed" value="32000000">
               <span class="unit">VND</span>
             </div>
-          </div>
-          <div class="field">
-            <label>CP bán hàng (phí sàn, ship, voucher...)</label>
-            <div class="field-row">
-              <input type="number" class="js-cpbh" value="27" step="0.1">
-              <span class="unit">% doanh thu</span>
-            </div>
-          </div>
-          <div class="field">
             <label>Giá vốn hàng bán</label>
             <div class="field-row">
               <input type="number" class="js-cogs" value="45" step="0.1">
@@ -337,6 +304,11 @@
             </div>
           </div>
           <div class="field">
+            <label>CP bán hàng (phí sàn, ship, voucher...)</label>
+            <div class="field-row">
+              <input type="number" class="js-cpbh" value="27" step="0.1">
+              <span class="unit">% doanh thu</span>
+            </div>
             <label>Chi phí khác</label>
             <div class="field-row">
               <input type="number" class="js-cpk" value="5" step="0.1">
@@ -360,7 +332,7 @@
         </div>
       </div>
 
-      <!-- Doanh thu & chia thưởng -->
+      <!-- 2. Doanh thu & chia thưởng -->
       <div class="section">
         <div class="section-header">
           <div>
@@ -369,22 +341,20 @@
           </div>
           <span class="chip">Thưởng</span>
         </div>
+
         <div class="grid">
+          <!-- Cột trái: doanh thu & lợi nhuận -->
           <div class="field">
             <label>Doanh thu thực tế tháng</label>
             <div class="field-row">
               <input type="number" class="js-rev" value="300000000">
               <span class="unit">VND</span>
             </div>
-          </div>
-          <div class="field">
             <label>Lợi nhuận sau chi phí</label>
             <div class="field-row">
               <span class="value highlight js-profit">–</span>
               <span class="unit">VND</span>
             </div>
-          </div>
-          <div class="field">
             <label>Tỉ suất lợi nhuận</label>
             <div class="field-row">
               <span class="value js-margin">–</span>
@@ -392,7 +362,7 @@
             </div>
           </div>
 
-          <!-- Tỉ lệ thưởng -->
+          <!-- Cột phải: % thưởng trên lợi nhuận -->
           <div class="field">
             <label>% thưởng trên lợi nhuận</label>
             <div class="field-row">
@@ -405,9 +375,6 @@
               <input type="number" class="js-rate-rd" value="4" step="0.1" style="max-width:70px;">
               <span class="unit">%</span>
             </div>
-          </div>
-          <div class="field">
-            <label>&nbsp;</label>
             <div class="field-row">
               <span class="unit">CSKH</span>
               <input type="number" class="js-rate-cskh" value="1" step="0.1" style="max-width:70px;">
@@ -423,12 +390,15 @@
               <input type="number" class="js-rate-media" value="1" step="0.1" style="max-width:70px;">
               <span class="unit">%</span>
             </div>
-          </div>
-          <div class="field">
-            <label>Website & Offline (mỗi team)</label>
             <div class="field-row">
-              <input type="number" class="js-rate-weboff" value="1" step="0.1" style="max-width:70px;">
-              <span class="unit">% trên lợi nhuận</span>
+              <span class="unit">Website</span>
+              <input type="number" class="js-rate-web" value="1" step="0.1" style="max-width:70px;">
+              <span class="unit">%</span>
+            </div>
+            <div class="field-row">
+              <span class="unit">Offline</span>
+              <input type="number" class="js-rate-off" value="1" step="0.1" style="max-width:70px;">
+              <span class="unit">%</span>
             </div>
           </div>
         </div>
@@ -492,6 +462,7 @@
         <button class="btn-ghost btn" onclick="calculateChannel(this)">Tính kênh Shopee</button>
       </div>
 
+      <!-- Hòa vốn -->
       <div class="section">
         <div class="section-header">
           <div>
@@ -507,6 +478,11 @@
               <input type="number" class="js-fixed" value="32000000">
               <span class="unit">VND</span>
             </div>
+            <label>Giá vốn hàng bán</label>
+            <div class="field-row">
+              <input type="number" class="js-cogs" value="55" step="0.1">
+              <span class="unit">% doanh thu</span>
+            </div>
           </div>
           <div class="field">
             <label>CP bán hàng</label>
@@ -514,15 +490,6 @@
               <input type="number" class="js-cpbh" value="18" step="0.1">
               <span class="unit">% doanh thu</span>
             </div>
-          </div>
-          <div class="field">
-            <label>Giá vốn</label>
-            <div class="field-row">
-              <input type="number" class="js-cogs" value="55" step="0.1">
-              <span class="unit">% doanh thu</span>
-            </div>
-          </div>
-          <div class="field">
             <label>Chi phí khác</label>
             <div class="field-row">
               <input type="number" class="js-cpk" value="5" step="0.1">
@@ -546,6 +513,7 @@
         </div>
       </div>
 
+      <!-- Doanh thu & thưởng -->
       <div class="section">
         <div class="section-header">
           <div>
@@ -554,6 +522,7 @@
           </div>
           <span class="chip">Thưởng</span>
         </div>
+
         <div class="grid">
           <div class="field">
             <label>Doanh thu thực tế tháng</label>
@@ -561,21 +530,18 @@
               <input type="number" class="js-rev" value="300000000">
               <span class="unit">VND</span>
             </div>
-          </div>
-          <div class="field">
             <label>Lợi nhuận sau chi phí</label>
             <div class="field-row">
               <span class="value highlight js-profit">–</span>
               <span class="unit">VND</span>
             </div>
-          </div>
-          <div class="field">
             <label>Tỉ suất lợi nhuận</label>
             <div class="field-row">
               <span class="value js-margin">–</span>
               <span class="unit">% trên doanh thu</span>
             </div>
           </div>
+
           <div class="field">
             <label>% thưởng trên lợi nhuận</label>
             <div class="field-row">
@@ -588,9 +554,6 @@
               <input type="number" class="js-rate-rd" value="4" step="0.1" style="max-width:70px;">
               <span class="unit">%</span>
             </div>
-          </div>
-          <div class="field">
-            <label>&nbsp;</label>
             <div class="field-row">
               <span class="unit">CSKH</span>
               <input type="number" class="js-rate-cskh" value="1" step="0.1" style="max-width:70px;">
@@ -606,12 +569,15 @@
               <input type="number" class="js-rate-media" value="1" step="0.1" style="max-width:70px;">
               <span class="unit">%</span>
             </div>
-          </div>
-          <div class="field">
-            <label>Website & Offline (mỗi team)</label>
             <div class="field-row">
-              <input type="number" class="js-rate-weboff" value="1" step="0.1" style="max-width:70px;">
-              <span class="unit">% trên lợi nhuận</span>
+              <span class="unit">Website</span>
+              <input type="number" class="js-rate-web" value="1" step="0.1" style="max-width:70px;">
+              <span class="unit">%</span>
+            </div>
+            <div class="field-row">
+              <span class="unit">Offline</span>
+              <input type="number" class="js-rate-off" value="1" step="0.1" style="max-width:70px;">
+              <span class="unit">%</span>
             </div>
           </div>
         </div>
@@ -622,45 +588,14 @@
         </div>
 
         <div class="pill-row">
-          <div class="pill">
-            <span class="label">Sale</span>
-            <span class="amount js-bonus-sale">–</span>
-            <span class="rate js-bonus-sale-rate"></span>
-          </div>
-          <div class="pill">
-            <span class="label">RD</span>
-            <span class="amount js-bonus-rd">–</span>
-            <span class="rate js-bonus-rd-rate"></span>
-          </div>
-          <div class="pill">
-            <span class="label">CSKH</span>
-            <span class="amount js-bonus-cskh">–</span>
-            <span class="rate js-bonus-cskh-rate"></span>
-          </div>
-          <div class="pill">
-            <span class="label">KT+HCNS</span>
-            <span class="amount js-bonus-kt">–</span>
-            <span class="rate js-bonus-kt-rate"></span>
-          </div>
-          <div class="pill">
-            <span class="label">Media</span>
-            <span class="amount js-bonus-media">–</span>
-            <span class="rate js-bonus-media-rate"></span>
-          </div>
-          <div class="pill">
-            <span class="label">Website</span>
-            <span class="amount js-bonus-web">–</span>
-            <span class="rate js-bonus-web-rate"></span>
-          </div>
-          <div class="pill">
-            <span class="label">Offline</span>
-            <span class="amount js-bonus-off">–</span>
-            <span class="rate js-bonus-off-rate"></span>
-          </div>
-          <div class="pill">
-            <span class="label">Tổng thưởng</span>
-            <span class="amount js-bonus-total">–</span>
-          </div>
+          <div class="pill"><span class="label">Sale</span><span class="amount js-bonus-sale">–</span><span class="rate js-bonus-sale-rate"></span></div>
+          <div class="pill"><span class="label">RD</span><span class="amount js-bonus-rd">–</span><span class="rate js-bonus-rd-rate"></span></div>
+          <div class="pill"><span class="label">CSKH</span><span class="amount js-bonus-cskh">–</span><span class="rate js-bonus-cskh-rate"></span></div>
+          <div class="pill"><span class="label">KT+HCNS</span><span class="amount js-bonus-kt">–</span><span class="rate js-bonus-kt-rate"></span></div>
+          <div class="pill"><span class="label">Media</span><span class="amount js-bonus-media">–</span><span class="rate js-bonus-media-rate"></span></div>
+          <div class="pill"><span class="label">Website</span><span class="amount js-bonus-web">–</span><span class="rate js-bonus-web-rate"></span></div>
+          <div class="pill"><span class="label">Offline</span><span class="amount js-bonus-off">–</span><span class="rate js-bonus-off-rate"></span></div>
+          <div class="pill"><span class="label">Tổng thưởng</span><span class="amount js-bonus-total">–</span></div>
         </div>
       </div>
     </div>
@@ -675,6 +610,7 @@
         <button class="btn-ghost btn" onclick="calculateChannel(this)">Tính kênh Facebook</button>
       </div>
 
+      <!-- Hòa vốn -->
       <div class="section">
         <div class="section-header">
           <div>
@@ -690,6 +626,11 @@
               <input type="number" class="js-fixed" value="32000000">
               <span class="unit">VND</span>
             </div>
+            <label>Giá vốn hàng bán</label>
+            <div class="field-row">
+              <input type="number" class="js-cogs" value="55" step="0.1">
+              <span class="unit">% doanh thu</span>
+            </div>
           </div>
           <div class="field">
             <label>CP bán hàng</label>
@@ -697,15 +638,6 @@
               <input type="number" class="js-cpbh" value="14" step="0.1">
               <span class="unit">% doanh thu</span>
             </div>
-          </div>
-          <div class="field">
-            <label>Giá vốn</label>
-            <div class="field-row">
-              <input type="number" class="js-cogs" value="55" step="0.1">
-              <span class="unit">% doanh thu</span>
-            </div>
-          </div>
-          <div class="field">
             <label>Chi phí khác</label>
             <div class="field-row">
               <input type="number" class="js-cpk" value="5" step="0.1">
@@ -729,6 +661,7 @@
         </div>
       </div>
 
+      <!-- Doanh thu & thưởng -->
       <div class="section">
         <div class="section-header">
           <div>
@@ -737,6 +670,7 @@
           </div>
           <span class="chip">Thưởng</span>
         </div>
+
         <div class="grid">
           <div class="field">
             <label>Doanh thu thực tế tháng</label>
@@ -744,21 +678,18 @@
               <input type="number" class="js-rev" value="300000000">
               <span class="unit">VND</span>
             </div>
-          </div>
-          <div class="field">
             <label>Lợi nhuận sau chi phí</label>
             <div class="field-row">
               <span class="value highlight js-profit">–</span>
               <span class="unit">VND</span>
             </div>
-          </div>
-          <div class="field">
             <label>Tỉ suất lợi nhuận</label>
             <div class="field-row">
               <span class="value js-margin">–</span>
               <span class="unit">% trên doanh thu</span>
             </div>
           </div>
+
           <div class="field">
             <label>% thưởng trên lợi nhuận</label>
             <div class="field-row">
@@ -771,9 +702,6 @@
               <input type="number" class="js-rate-rd" value="4" step="0.1" style="max-width:70px;">
               <span class="unit">%</span>
             </div>
-          </div>
-          <div class="field">
-            <label>&nbsp;</label>
             <div class="field-row">
               <span class="unit">CSKH</span>
               <input type="number" class="js-rate-cskh" value="1" step="0.1" style="max-width:70px;">
@@ -787,14 +715,17 @@
             <div class="field-row">
               <span class="unit">Media</span>
               <input type="number" class="js-rate-media" value="1" step="0.1" style="max-width:70px;">
-              <span class="unit">% </span>
+              <span class="unit">%</span>
             </div>
-          </div>
-          <div class="field">
-            <label>Website & Offline (mỗi team)</label>
             <div class="field-row">
-              <input type="number" class="js-rate-weboff" value="1" step="0.1" style="max-width:70px;">
-              <span class="unit">% trên lợi nhuận</span>
+              <span class="unit">Website</span>
+              <input type="number" class="js-rate-web" value="1" step="0.1" style="max-width:70px;">
+              <span class="unit">%</span>
+            </div>
+            <div class="field-row">
+              <span class="unit">Offline</span>
+              <input type="number" class="js-rate-off" value="1" step="0.1" style="max-width:70px;">
+              <span class="unit">%</span>
             </div>
           </div>
         </div>
@@ -805,81 +736,301 @@
         </div>
 
         <div class="pill-row">
-          <div class="pill">
-            <span class="label">Sale</span>
-            <span class="amount js-bonus-sale">–</span>
-            <span class="rate js-bonus-sale-rate"></span>
+          <div class="pill"><span class="label">Sale</span><span class="amount js-bonus-sale">–</span><span class="rate js-bonus-sale-rate"></span></div>
+          <div class="pill"><span class="label">RD</span><span class="amount js-bonus-rd">–</span><span class="rate js-bonus-rd-rate"></span></div>
+          <div class="pill"><span class="label">CSKH</span><span class="amount js-bonus-cskh">–</span><span class="rate js-bonus-cskh-rate"></span></div>
+          <div class="pill"><span class="label">KT+HCNS</span><span class="amount js-bonus-kt">–</span><span class="rate js-bonus-kt-rate"></span></div>
+          <div class="pill"><span class="label">Media</span><span class="amount js-bonus-media">–</span><span class="rate js-bonus-media-rate"></span></div>
+          <div class="pill"><span class="label">Website</span><span class="amount js-bonus-web">–</span><span class="rate js-bonus-web-rate"></span></div>
+          <div class="pill"><span class="label">Offline</span><span class="amount js-bonus-off">–</span><span class="rate js-bonus-off-rate"></span></div>
+          <div class="pill"><span class="label">Tổng thưởng</span><span class="amount js-bonus-total">–</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Website -->
+    <div class="card channel-card web" data-channel="Website">
+      <div class="card-header">
+        <div class="card-title">
+          Website
+          <span class="badge">Kênh web</span>
+        </div>
+        <button class="btn-ghost btn" onclick="calculateChannel(this)">Tính kênh Website</button>
+      </div>
+
+      <!-- Hòa vốn -->
+      <div class="section">
+        <div class="section-header">
+          <div>
+            <div class="section-title">1. Điểm hòa vốn</div>
+            <div class="section-sub">Từ chi phí cố định & các biến phí theo % doanh thu</div>
           </div>
-          <div class="pill">
-            <span class="label">RD</span>
-            <span class="amount js-bonus-rd">–</span>
-            <span class="rate js-bonus-rd-rate"></span>
+          <span class="chip">Hòa vốn</span>
+        </div>
+        <div class="grid">
+          <div class="field">
+            <label>Chi phí cố định / tháng</label>
+            <div class="field-row">
+              <input type="number" class="js-fixed" value="20000000">
+              <span class="unit">VND</span>
+            </div>
+            <label>Giá vốn hàng bán</label>
+            <div class="field-row">
+              <input type="number" class="js-cogs" value="50" step="0.1">
+              <span class="unit">% doanh thu</span>
+            </div>
           </div>
-          <div class="pill">
-            <span class="label">CSKH</span>
-            <span class="amount js-bonus-cskh">–</span>
-            <span class="rate js-bonus-cskh-rate"></span>
+          <div class="field">
+            <label>CP bán hàng</label>
+            <div class="field-row">
+              <input type="number" class="js-cpbh" value="15" step="0.1">
+              <span class="unit">% doanh thu</span>
+            </div>
+            <label>Chi phí khác</label>
+            <div class="field-row">
+              <input type="number" class="js-cpk" value="5" step="0.1">
+              <span class="unit">% doanh thu</span>
+            </div>
           </div>
-          <div class="pill">
-            <span class="label">KT+HCNS</span>
-            <span class="amount js-bonus-kt">–</span>
-            <span class="rate js-bonus-kt-rate"></span>
+          <div class="field">
+            <label>Tổng biến phí</label>
+            <div class="field-row">
+              <span class="value js-varRate">–</span>
+              <span class="unit">% doanh thu</span>
+            </div>
           </div>
-          <div class="pill">
-            <span class="label">Media</span>
-            <span class="amount js-bonus-media">–</span>
-            <span class="rate js-bonus-media-rate"></span>
+          <div class="field">
+            <label>Doanh thu hòa vốn ước tính</label>
+            <div class="field-row">
+              <span class="value highlight js-breakeven">–</span>
+              <span class="unit">VND / tháng</span>
+            </div>
           </div>
-          <div class="pill">
-            <span class="label">Website</span>
-            <span class="amount js-bonus-web">–</span>
-            <span class="rate js-bonus-web-rate"></span>
+        </div>
+      </div>
+
+      <!-- Doanh thu & thưởng -->
+      <div class="section">
+        <div class="section-header">
+          <div>
+            <div class="section-title">2. Doanh thu & chia thưởng</div>
+            <div class="section-sub">Lợi nhuận sau chi phí & thưởng theo % lợi nhuận</div>
           </div>
-          <div class="pill">
-            <span class="label">Offline</span>
-            <span class="amount js-bonus-off">–</span>
-            <span class="rate js-bonus-off-rate"></span>
+          <span class="chip">Thưởng</span>
+        </div>
+
+        <div class="grid">
+          <div class="field">
+            <label>Doanh thu thực tế tháng</label>
+            <div class="field-row">
+              <input type="number" class="js-rev" value="200000000">
+              <span class="unit">VND</span>
+            </div>
+            <label>Lợi nhuận sau chi phí</label>
+            <div class="field-row">
+              <span class="value highlight js-profit">–</span>
+              <span class="unit">VND</span>
+            </div>
+            <label>Tỉ suất lợi nhuận</label>
+            <div class="field-row">
+              <span class="value js-margin">–</span>
+              <span class="unit">% trên doanh thu</span>
+            </div>
           </div>
-          <div class="pill">
-            <span class="label">Tổng thưởng</span>
-            <span class="amount js-bonus-total">–</span>
+
+          <div class="field">
+            <label>% thưởng trên lợi nhuận</label>
+            <div class="field-row"><span class="unit">Sale</span>   <input type="number" class="js-rate-sale"  value="27" step="0.1" style="max-width:70px;"><span class="unit">%</span></div>
+            <div class="field-row"><span class="unit">RD</span>     <input type="number" class="js-rate-rd"    value="4"  step="0.1" style="max-width:70px;"><span class="unit">%</span></div>
+            <div class="field-row"><span class="unit">CSKH</span>   <input type="number" class="js-rate-cskh"  value="1"  step="0.1" style="max-width:70px;"><span class="unit">%</span></div>
+            <div class="field-row"><span class="unit">KT + HCNS</span><input type="number" class="js-rate-kt" value="1.2"step="0.1" style="max-width:70px;"><span class="unit">%</span></div>
+            <div class="field-row"><span class="unit">Media</span>  <input type="number" class="js-rate-media" value="1"  step="0.1" style="max-width:70px;"><span class="unit">%</span></div>
+            <div class="field-row"><span class="unit">Website</span><input type="number" class="js-rate-web"   value="1"  step="0.1" style="max-width:70px;"><span class="unit">%</span></div>
+            <div class="field-row"><span class="unit">Offline</span><input type="number" class="js-rate-off"   value="1"  step="0.1" style="max-width:70px;"><span class="unit">%</span></div>
           </div>
+        </div>
+
+        <div class="section-footer">
+          <div>Thưởng chi tiết theo bộ phận</div>
+          <button class="btn-ghost btn" onclick="calculateChannel(this)">Cập nhật thưởng</button>
+        </div>
+
+        <div class="pill-row">
+          <div class="pill"><span class="label">Sale</span><span class="amount js-bonus-sale">–</span><span class="rate js-bonus-sale-rate"></span></div>
+          <div class="pill"><span class="label">RD</span><span class="amount js-bonus-rd">–</span><span class="rate js-bonus-rd-rate"></span></div>
+          <div class="pill"><span class="label">CSKH</span><span class="amount js-bonus-cskh">–</span><span class="rate js-bonus-cskh-rate"></span></div>
+          <div class="pill"><span class="label">KT+HCNS</span><span class="amount js-bonus-kt">–</span><span class="rate js-bonus-kt-rate"></span></div>
+          <div class="pill"><span class="label">Media</span><span class="amount js-bonus-media">–</span><span class="rate js-bonus-media-rate"></span></div>
+          <div class="pill"><span class="label">Website</span><span class="amount js-bonus-web">–</span><span class="rate js-bonus-web-rate"></span></div>
+          <div class="pill"><span class="label">Offline</span><span class="amount js-bonus-off">–</span><span class="rate js-bonus-off-rate"></span></div>
+          <div class="pill"><span class="label">Tổng thưởng</span><span class="amount js-bonus-total">–</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Offline -->
+    <div class="card channel-card offline" data-channel="Offline">
+      <div class="card-header">
+        <div class="card-title">
+          Offline
+          <span class="badge">Cửa hàng / sự kiện</span>
+        </div>
+        <button class="btn-ghost btn" onclick="calculateChannel(this)">Tính kênh Offline</button>
+      </div>
+
+      <!-- Hòa vốn -->
+      <div class="section">
+        <div class="section-header">
+          <div>
+            <div class="section-title">1. Điểm hòa vốn</div>
+            <div class="section-sub">Từ chi phí cố định & các biến phí theo % doanh thu</div>
+          </div>
+          <span class="chip">Hòa vốn</span>
+        </div>
+        <div class="grid">
+          <div class="field">
+            <label>Chi phí cố định / tháng</label>
+            <div class="field-row">
+              <input type="number" class="js-fixed" value="25000000">
+              <span class="unit">VND</span>
+            </div>
+            <label>Giá vốn hàng bán</label>
+            <div class="field-row">
+              <input type="number" class="js-cogs" value="50" step="0.1">
+              <span class="unit">% doanh thu</span>
+            </div>
+          </div>
+          <div class="field">
+            <label>CP bán hàng</label>
+            <div class="field-row">
+              <input type="number" class="js-cpbh" value="20" step="0.1">
+              <span class="unit">% doanh thu</span>
+            </div>
+            <label>Chi phí khác</label>
+            <div class="field-row">
+              <input type="number" class="js-cpk" value="5" step="0.1">
+              <span class="unit">% doanh thu</span>
+            </div>
+          </div>
+          <div class="field">
+            <label>Tổng biến phí</label>
+            <div class="field-row">
+              <span class="value js-varRate">–</span>
+              <span class="unit">% doanh thu</span>
+            </div>
+          </div>
+          <div class="field">
+            <label>Doanh thu hòa vốn ước tính</label>
+            <div class="field-row">
+              <span class="value highlight js-breakeven">–</span>
+              <span class="unit">VND / tháng</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Doanh thu & thưởng -->
+      <div class="section">
+        <div class="section-header">
+          <div>
+            <div class="section-title">2. Doanh thu & chia thưởng</div>
+            <div class="section-sub">Lợi nhuận sau chi phí & thưởng theo % lợi nhuận</div>
+          </div>
+          <span class="chip">Thưởng</span>
+        </div>
+
+        <div class="grid">
+          <div class="field">
+            <label>Doanh thu thực tế tháng</label>
+            <div class="field-row">
+              <input type="number" class="js-rev" value="150000000">
+              <span class="unit">VND</span>
+            </div>
+            <label>Lợi nhuận sau chi phí</label>
+            <div class="field-row">
+              <span class="value highlight js-profit">–</span>
+              <span class="unit">VND</span>
+            </div>
+            <label>Tỉ suất lợi nhuận</label>
+            <div class="field-row">
+              <span class="value js-margin">–</span>
+              <span class="unit">% trên doanh thu</span>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>% thưởng trên lợi nhuận</label>
+            <div class="field-row"><span class="unit">Sale</span>   <input type="number" class="js-rate-sale"  value="27" step="0.1" style="max-width:70px;"><span class="unit">%</span></div>
+            <div class="field-row"><span class="unit">RD</span>     <input type="number" class="js-rate-rd"    value="4"  step="0.1" style="max-width:70px;"><span class="unit">%</span></div>
+            <div class="field-row"><span class="unit">CSKH</span>   <input type="number" class="js-rate-cskh"  value="1"  step="0.1" style="max-width:70px;"><span class="unit">%</span></div>
+            <div class="field-row"><span class="unit">KT + HCNS</span><input type="number" class="js-rate-kt" value="1.2"step="0.1" style="max-width:70px;"><span class="unit">%</span></div>
+            <div class="field-row"><span class="unit">Media</span>  <input type="number" class="js-rate-media" value="1"  step="0.1" style="max-width:70px;"><span class="unit">%</span></div>
+            <div class="field-row"><span class="unit">Website</span><input type="number" class="js-rate-web"   value="1"  step="0.1" style="max-width:70px;"><span class="unit">%</span></div>
+            <div class="field-row"><span class="unit">Offline</span><input type="number" class="js-rate-off"   value="1"  step="0.1" style="max-width:70px;"><span class="unit">%</span></div>
+          </div>
+        </div>
+
+        <div class="section-footer">
+          <div>Thưởng chi tiết theo bộ phận</div>
+          <button class="btn-ghost btn" onclick="calculateChannel(this)">Cập nhật thưởng</button>
+        </div>
+
+        <div class="pill-row">
+          <div class="pill"><span class="label">Sale</span><span class="amount js-bonus-sale">–</span><span class="rate js-bonus-sale-rate"></span></div>
+          <div class="pill"><span class="label">RD</span><span class="amount js-bonus-rd">–</span><span class="rate js-bonus-rd-rate"></span></div>
+          <div class="pill"><span class="label">CSKH</span><span class="amount js-bonus-cskh">–</span><span class="rate js-bonus-cskh-rate"></span></div>
+          <div class="pill"><span class="label">KT+HCNS</span><span class="amount js-bonus-kt">–</span><span class="rate js-bonus-kt-rate"></span></div>
+          <div class="pill"><span class="label">Media</span><span class="amount js-bonus-media">–</span><span class="rate js-bonus-media-rate"></span></div>
+          <div class="pill"><span class="label">Website</span><span class="amount js-bonus-web">–</span><span class="rate js-bonus-web-rate"></span></div>
+          <div class="pill"><span class="label">Offline</span><span class="amount js-bonus-off">–</span><span class="rate js-bonus-off-rate"></span></div>
+          <div class="pill"><span class="label">Tổng thưởng</span><span class="amount js-bonus-total">–</span></div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Summary -->
+  <!-- CARD TỔNG -->
   <div class="summary-card">
-    <div class="summary-title">Bảng tổng doanh thu & tổng thưởng</div>
-    <table>
-      <thead>
-        <tr>
-          <th>Kênh</th>
-          <th>Doanh thu</th>
-          <th>Lợi nhuận</th>
-          <th>Tổng thưởng</th>
-        </tr>
-      </thead>
-      <tbody id="summary-body">
-        <!-- auto fill -->
-      </tbody>
-    </table>
+    <!-- Section 1: tổng theo kênh -->
+    <div class="section" style="margin-bottom:10px;">
+      <div class="section-header">
+        <div>
+          <div class="summary-title">Bảng tổng doanh thu & tổng thưởng</div>
+          <div class="section-sub">Tổng hợp nhanh hiệu quả theo từng kênh</div>
+        </div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Kênh</th>
+            <th>Doanh thu</th>
+            <th>Lợi nhuận</th>
+            <th>Tỉ suất LN</th>
+            <th>Tổng thưởng</th>
+          </tr>
+        </thead>
+        <tbody id="summary-body"></tbody>
+      </table>
+    </div>
 
-    <div style="height:10px;"></div>
-
-    <div class="summary-title">Tổng thưởng theo bộ phận (mọi kênh)</div>
-    <table>
-      <thead>
-        <tr>
-          <th>Bộ phận</th>
-          <th>Tổng thưởng</th>
-        </tr>
-      </thead>
-      <tbody id="summary-team-body">
-        <!-- auto fill -->
-      </tbody>
-    </table>
+    <!-- Section 2: tổng theo bộ phận -->
+    <div class="section">
+      <div class="section-header">
+        <div>
+          <div class="summary-title">Tổng thưởng theo bộ phận (mọi kênh)</div>
+          <div class="section-sub">Cộng gộp thưởng từ tất cả nền tảng</div>
+        </div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Bộ phận</th>
+            <th>Tổng thưởng</th>
+          </tr>
+        </thead>
+        <tbody id="summary-team-body"></tbody>
+      </table>
+    </div>
   </div>
 
   <script>
@@ -887,32 +1038,34 @@
       if (!isFinite(v)) return '–';
       return Math.round(v).toLocaleString('vi-VN');
     }
+    function fmtPercent(v) {
+      if (!isFinite(v)) return '–';
+      return (v * 100).toFixed(2) + '%';
+    }
     function fmtPercentDisplay(num) {
-      return ` (${num.toFixed(1)}%)`;
+      return num > 0 ? ` (${num.toFixed(1)}%)` : '';
     }
 
     function calculateChannel(btn) {
       const card = btn.closest('.channel-card');
       if (!card) return;
 
-      // Hòa vốn
+      // Phần hòa vốn
       const fixed = Number(card.querySelector('.js-fixed')?.value || 0);
-      const cpbh = (Number(card.querySelector('.js-cpbh')?.value || 0) ) / 100;
-      const cogs = (Number(card.querySelector('.js-cogs')?.value || 0) ) / 100;
-      const cpk  = (Number(card.querySelector('.js-cpk')?.value  || 0) ) / 100;
+      const cpbh  = (Number(card.querySelector('.js-cpbh')?.value || 0)) / 100;
+      const cogs  = (Number(card.querySelector('.js-cogs')?.value || 0)) / 100;
+      const cpk   = (Number(card.querySelector('.js-cpk') ?.value || 0)) / 100;
 
       const varRate = cpbh + cogs + cpk;
-      const varRateEl = card.querySelector('.js-varRate');
+      const varRateEl   = card.querySelector('.js-varRate');
       const breakevenEl = card.querySelector('.js-breakeven');
 
-      if (varRateEl) varRateEl.textContent = (varRate * 100).toFixed(2) + '%';
+      if (varRateEl)   varRateEl.textContent   = fmtPercent(varRate);
       let breakeven = 0;
-      if (1 - varRate > 0) {
-        breakeven = fixed / (1 - varRate);
-      }
+      if (1 - varRate > 0) breakeven = fixed / (1 - varRate);
       if (breakevenEl) breakevenEl.textContent = fmtMoney(breakeven);
 
-      // Doanh thu & lợi nhuận
+      // Phần doanh thu & lợi nhuận
       const rev = Number(card.querySelector('.js-rev')?.value || 0);
       const profitEl = card.querySelector('.js-profit');
       const marginEl = card.querySelector('.js-margin');
@@ -925,32 +1078,34 @@
         profitEl.classList.toggle('positive', profit > 0);
         profitEl.classList.toggle('negative', profit < 0);
       }
-      if (marginEl) marginEl.textContent = (margin * 100).toFixed(2) + '%';
+      if (marginEl) marginEl.textContent = fmtPercent(margin);
 
-      const baseProfit = Math.max(profit, 0); // không thưởng nếu lỗ
+      const baseProfit = Math.max(profit, 0); // lỗ thì không thưởng
 
-      // Tỉ lệ thưởng
-      const rateSale   = (Number(card.querySelector('.js-rate-sale')?.value   || 0)) / 100;
-      const rateRD     = (Number(card.querySelector('.js-rate-rd')?.value     || 0)) / 100;
-      const rateCSKH   = (Number(card.querySelector('.js-rate-cskh')?.value   || 0)) / 100;
-      const rateKT     = (Number(card.querySelector('.js-rate-kt')?.value     || 0)) / 100;
-      const rateMedia  = (Number(card.querySelector('.js-rate-media')?.value  || 0)) / 100;
-      const rateWebOff = (Number(card.querySelector('.js-rate-weboff')?.value || 0)) / 100;
+      // % thưởng
+      const rateSale  = (Number(card.querySelector('.js-rate-sale') ?.value || 0)) / 100;
+      const rateRD    = (Number(card.querySelector('.js-rate-rd')   ?.value || 0)) / 100;
+      const rateCSKH  = (Number(card.querySelector('.js-rate-cskh') ?.value || 0)) / 100;
+      const rateKT    = (Number(card.querySelector('.js-rate-kt')   ?.value || 0)) / 100;
+      const rateMedia = (Number(card.querySelector('.js-rate-media')?.value || 0)) / 100;
+      const rateWeb   = (Number(card.querySelector('.js-rate-web')  ?.value || 0)) / 100;
+      const rateOff   = (Number(card.querySelector('.js-rate-off')  ?.value || 0)) / 100;
 
-      const bonusSale   = baseProfit * rateSale;
-      const bonusRD     = baseProfit * rateRD;
-      const bonusCSKH   = baseProfit * rateCSKH;
-      const bonusKT     = baseProfit * rateKT;
-      const bonusMedia  = baseProfit * rateMedia;
-      const bonusWeb    = baseProfit * rateWebOff; // mỗi team
-      const bonusOff    = baseProfit * rateWebOff; // mỗi team
-      const bonusTotal  = bonusSale + bonusRD + bonusCSKH + bonusKT + bonusMedia + bonusWeb + bonusOff;
+      const bonusSale  = baseProfit * rateSale;
+      const bonusRD    = baseProfit * rateRD;
+      const bonusCSKH  = baseProfit * rateCSKH;
+      const bonusKT    = baseProfit * rateKT;
+      const bonusMedia = baseProfit * rateMedia;
+      const bonusWeb   = baseProfit * rateWeb;
+      const bonusOff   = baseProfit * rateOff;
 
-      function setBonus(selectorAmount, selectorRate, bonus, rateValue) {
-        const a = card.querySelector(selectorAmount);
-        const r = card.querySelector(selectorRate);
+      const bonusTotal = bonusSale + bonusRD + bonusCSKH + bonusKT + bonusMedia + bonusWeb + bonusOff;
+
+      function setBonus(amountSel, rateSel, bonus, rate) {
+        const a = card.querySelector(amountSel);
+        const r = card.querySelector(rateSel);
         if (a) a.textContent = fmtMoney(bonus);
-        if (r) r.textContent = rateValue > 0 ? fmtPercentDisplay(rateValue * 100) : '';
+        if (r) r.textContent = fmtPercentDisplay(rate * 100);
       }
 
       setBonus('.js-bonus-sale',   '.js-bonus-sale-rate',   bonusSale,  rateSale);
@@ -958,30 +1113,31 @@
       setBonus('.js-bonus-cskh',   '.js-bonus-cskh-rate',   bonusCSKH,  rateCSKH);
       setBonus('.js-bonus-kt',     '.js-bonus-kt-rate',     bonusKT,    rateKT);
       setBonus('.js-bonus-media',  '.js-bonus-media-rate',  bonusMedia, rateMedia);
-      setBonus('.js-bonus-web',    '.js-bonus-web-rate',    bonusWeb,   rateWebOff);
-      setBonus('.js-bonus-off',    '.js-bonus-off-rate',    bonusOff,   rateWebOff);
+      setBonus('.js-bonus-web',    '.js-bonus-web-rate',    bonusWeb,   rateWeb);
+      setBonus('.js-bonus-off',    '.js-bonus-off-rate',    bonusOff,   rateOff);
 
       const totalEl = card.querySelector('.js-bonus-total');
       if (totalEl) totalEl.textContent = fmtMoney(bonusTotal);
 
-      // lưu cho bảng tổng
-      card.dataset.rev         = rev;
-      card.dataset.profit      = profit;
-      card.dataset.bonusTotal  = bonusTotal;
-      card.dataset.bonusSale   = bonusSale;
-      card.dataset.bonusRd     = bonusRD;
-      card.dataset.bonusCskh   = bonusCSKH;
-      card.dataset.bonusKt     = bonusKT;
-      card.dataset.bonusMedia  = bonusMedia;
-      card.dataset.bonusWeb    = bonusWeb;
-      card.dataset.bonusOff    = bonusOff;
+      // Lưu data cho bảng tổng
+      card.dataset.rev        = rev;
+      card.dataset.profit     = profit;
+      card.dataset.margin     = margin;
+      card.dataset.bonusTotal = bonusTotal;
+      card.dataset.bonusSale  = bonusSale;
+      card.dataset.bonusRd    = bonusRD;
+      card.dataset.bonusCskh  = bonusCSKH;
+      card.dataset.bonusKt    = bonusKT;
+      card.dataset.bonusMedia = bonusMedia;
+      card.dataset.bonusWeb   = bonusWeb;
+      card.dataset.bonusOff   = bonusOff;
 
-      updateSummary(); // cập nhật bảng tổng mỗi lần tính kênh
+      updateSummary();
     }
 
     function calculateAllChannels() {
       document.querySelectorAll('.channel-card').forEach(card => {
-        const btn = card.querySelector('button');
+        const btn = card.querySelector('.btn-ghost');
         if (btn) calculateChannel(btn);
       });
     }
@@ -989,11 +1145,11 @@
     function updateSummary() {
       const cards = document.querySelectorAll('.channel-card');
       const tbody = document.getElementById('summary-body');
-      const teamBody = document.getElementById('summary-team-body');
-      if (!tbody || !teamBody) return;
+      const tTeam = document.getElementById('summary-team-body');
+      if (!tbody || !tTeam) return;
 
       tbody.innerHTML = '';
-      teamBody.innerHTML = '';
+      tTeam.innerHTML = '';
 
       let totalRev = 0, totalProfit = 0, totalBonus = 0;
       let sumSale = 0, sumRD = 0, sumCSKH = 0, sumKT = 0, sumMedia = 0, sumWeb = 0, sumOff = 0;
@@ -1002,7 +1158,10 @@
         const name   = card.dataset.channel || 'Kênh';
         const rev    = Number(card.dataset.rev        || 0);
         const profit = Number(card.dataset.profit     || 0);
+        const margin = Number(card.dataset.margin     || 0);
         const bonus  = Number(card.dataset.bonusTotal || 0);
+
+        if (rev === 0 && profit === 0 && bonus === 0) return;
 
         totalRev    += rev;
         totalProfit += profit;
@@ -1021,24 +1180,28 @@
           <td>${name}</td>
           <td>${fmtMoney(rev)}</td>
           <td>${fmtMoney(profit)}</td>
+          <td>${fmtPercent(margin)}</td>
           <td>${fmtMoney(bonus)}</td>
         `;
         tbody.appendChild(tr);
       });
 
       const trTotal = document.createElement('tr');
+      const totalMargin = totalRev > 0 ? totalProfit / totalRev : 0;
       trTotal.innerHTML = `
         <td>Tổng</td>
         <td>${fmtMoney(totalRev)}</td>
         <td>${fmtMoney(totalProfit)}</td>
+        <td>${fmtPercent(totalMargin)}</td>
         <td>${fmtMoney(totalBonus)}</td>
       `;
       tbody.appendChild(trTotal);
 
-      function addTeamRow(name, value) {
+      function addTeamRow(name, value, extraClass = '') {
         const tr = document.createElement('tr');
+        if (extraClass) tr.className = extraClass;
         tr.innerHTML = `<td>${name}</td><td>${fmtMoney(value)}</td>`;
-        teamBody.appendChild(tr);
+        tTeam.appendChild(tr);
       }
 
       addTeamRow('Sale',        sumSale);
@@ -1047,10 +1210,9 @@
       addTeamRow('KT + HCNS',   sumKT);
       addTeamRow('Media',       sumMedia);
       addTeamRow('Website',     sumWeb);
-      addTeamRow('Offline',     sumOff);
+      addTeamRow('Offline',     sumOff, 'team-offline');
     }
 
-    // tính sẵn khi mở trang
     window.addEventListener('DOMContentLoaded', calculateAllChannels);
   </script>
 </body>
