@@ -2,22 +2,20 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Doanh thu – Lợi nhuận – Target | thuong.nguoibanlo.vn</title>
+  <title>Plan doanh thu – lợi nhuận – target | Lỗ Vũ</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       margin: 0;
       padding: 0;
-      background: #f7f7f9;
-      color: #222;
+      background: #f3f4f6;
+      color: #111827;
     }
     .container {
-      max-width: 1100px;
+      max-width: 1200px;
       margin: 0 auto;
       padding: 24px 16px 40px;
     }
@@ -27,29 +25,8 @@
     }
     .subtitle {
       font-size: 13px;
-      color: #666;
+      color: #6b7280;
       margin-bottom: 16px;
-    }
-
-    .chip-group {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 12px;
-    }
-    .chip {
-      padding: 6px 12px;
-      border-radius: 999px;
-      border: 1px solid #ddd;
-      background: #fff;
-      font-size: 13px;
-      cursor: pointer;
-      transition: all .15s ease;
-    }
-    .chip.active {
-      background: #111827;
-      color: #fff;
-      border-color: #111827;
     }
 
     .toolbar {
@@ -61,14 +38,14 @@
     .btn {
       padding: 7px 14px;
       border-radius: 999px;
-      border: 1px solid #ddd;
+      border: 1px solid #d1d5db;
       background: #fff;
       font-size: 13px;
       cursor: pointer;
       transition: all .15s ease;
     }
     .btn:hover {
-      background: #f1f1f5;
+      background: #f3f4f6;
     }
     .btn-primary {
       background: #2563eb;
@@ -78,34 +55,40 @@
     .btn-primary:hover {
       background: #1d4ed8;
     }
-    .btn-danger {
-      border-color: #f97373;
-      color: #b91c1c;
-      background: #fff0f0;
-    }
 
-    .badge {
+    .pill {
       display: inline-flex;
       align-items: center;
-      padding: 4px 10px;
+      padding: 3px 9px;
+      font-size: 11px;
       border-radius: 999px;
-      border: 1px dashed #999;
-      font-size: 12px;
-      color: #555;
-      margin-top: 4px;
+      border: 1px solid #d1d5db;
+      white-space: nowrap;
+    }
+    .pill-green {
+      background: #ecfdf3;
+      border-color: #22c55e;
+      color: #166534;
+    }
+    .pill-red {
+      background: #fef2f2;
+      border-color: #f97373;
+      color: #b91c1c;
     }
 
     .card {
       background: #fff;
       border-radius: 12px;
-      padding: 16px 16px 12px;
+      padding: 14px 16px 12px;
       box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
-      margin-bottom: 16px;
+      margin-bottom: 14px;
+      border-left: 4px solid #e5e7eb;
     }
     .card-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 8px;
       margin-bottom: 8px;
     }
     .card-title {
@@ -114,55 +97,39 @@
     }
     .card-sub {
       font-size: 12px;
-      color: #666;
+      color: #6b7280;
     }
 
-    .team-row-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-    }
-    .team-name-input {
-      border: none;
-      font-weight: 600;
-      font-size: 14px;
-      padding: 0;
-      background: transparent;
-      outline: none;
-    }
-
-    .team-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      font-size: 12px;
-      color: #666;
-    }
+    .card-channel-facebook { border-left-color: #3b82f6; }
+    .card-channel-tiktok { border-left-color: #ec4899; }
+    .card-channel-shopee { border-left-color: #f97316; }
+    .card-channel-web { border-left-color: #10b981; }
+    .card-total { border-left-color: #111827; }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 8px;
       font-size: 12px;
+      margin-top: 6px;
+    }
+    th, td {
+      padding: 5px 6px;
+      border-bottom: 1px solid #e5e7eb;
+      text-align: right;
+    }
+    th:first-child, td:first-child {
+      text-align: left;
+      white-space: nowrap;
     }
     thead {
       background: #f9fafb;
     }
-    th, td {
-      padding: 6px 8px;
-      text-align: right;
-      border-bottom: 1px solid #eee;
-    }
-    th:first-child, td:first-child {
-      text-align: left;
-    }
 
     input[type="number"] {
       width: 100%;
-      padding: 4px 6px;
+      padding: 3px 4px;
       border-radius: 6px;
-      border: 1px solid #ddd;
+      border: 1px solid #d1d5db;
       font-size: 12px;
       text-align: right;
     }
@@ -172,32 +139,21 @@
       box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.2);
     }
 
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      padding: 2px 8px;
-      border-radius: 999px;
-      font-size: 11px;
-      border: 1px solid #ddd;
-    }
-    .pill-green {
-      color: #166534;
-      border-color: #22c55e;
-      background: #ecfdf3;
-    }
-    .pill-red {
-      color: #b91c1c;
-      border-color: #f97373;
-      background: #fef2f2;
+    .muted {
+      color: #9ca3af;
     }
 
     .footer-note {
-      margin-top: 24px;
+      margin-top: 20px;
       font-size: 11px;
-      color: #777;
+      color: #6b7280;
     }
 
     @media (max-width: 768px) {
+      .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
       .toolbar {
         flex-direction: column;
         align-items: flex-start;
@@ -207,214 +163,311 @@
 </head>
 <body>
 <div class="container">
-  <h1>Doanh thu – lợi nhuận – target</h1>
+  <h1>Plan doanh thu – lợi nhuận – target</h1>
   <div class="subtitle">
-    Bảng này giúp Lỗ Vũ & team set target, tính hòa vốn & theo dõi doanh thu – chi phí theo từng kênh.
+    Tool này dùng để tính nhanh doanh thu – chi phí – lợi nhuận theo từng kênh (Facebook, TikTok, Shopee, Web),
+    theo đúng cấu trúc chi phí trong file plan thưởng. Nhập doanh thu từng kênh, tool sẽ báo lỗ/lãi và biên lợi nhuận.
   </div>
 
-  <div class="card">
-    <div class="card-header">
-      <div>
-        <div class="card-title">Chọn team / kênh áp dụng cho phiên làm việc này</div>
-        <div class="card-sub">Dữ liệu sẽ được lưu lại trên trình duyệt (localStorage). Nút “Lưu làm mặc định” sẽ ghi nhớ cấu hình hiện tại cho lần sau.</div>
-      </div>
-      <div class="badge" id="overallMarginBadge">
-        Tổng biên phí: <span id="overallMarginText">&nbsp;–</span>
-      </div>
-    </div>
-
-    <div class="chip-group" id="teamChipGroup">
-      <!-- chips sẽ render bằng JS -->
-    </div>
-
-    <div class="toolbar">
-      <button class="btn" id="btnRecalc">Cập nhật lại chỉ số</button>
-      <button class="btn" id="btnSaveDefault">Lưu làm mặc định</button>
-      <button class="btn" id="btnLoadFromSheet">Tải từ Google Sheet</button>
-      <button class="btn" id="btnSaveToSheet">Lưu lên Google Sheet</button>
-      <button class="btn btn-primary" id="btnAddTeam">+ Thêm team</button>
-    </div>
+  <div class="toolbar">
+    <button class="btn" id="btnResetPlan">Khôi phục mặc định plan</button>
+    <button class="btn" id="btnSaveDefault">Lưu làm mặc định (local)</button>
+    <button class="btn" id="btnLoadFromSheet">Tải từ Google Sheet</button>
+    <button class="btn btn-primary" id="btnSaveToSheet">Lưu lên Google Sheet</button>
   </div>
 
-  <div id="teamContainer">
-    <!-- team cards sẽ render bằng JS -->
-  </div>
+  <div id="channelsContainer"></div>
+
+  <div id="totalCard"></div>
 
   <div class="footer-note">
-    * Đơn vị số liệu mặc định là <b>triệu</b>. Anh em có thể đổi cách nhập nếu muốn.<br>
-    * Tool đang ở phiên bản demo, công thức có thể đơn giản hơn thực tế. Cứ dùng trước, có gì cần chỉnh thêm anh báo lại.
+    * Đơn vị mặc định: <b>triệu</b> (vnd).<br>
+    * Tỉ lệ chi phí/biên lợi nhuận mặc định lấy từ file Excel “PLAN THƯỞNG VŨ” (Facebook, TikTok, Shopee, Web).<br>
+    * Google Sheet chỉ lưu lại <b>state hiện tại</b> (doanh thu + cấu hình chi phí) dạng JSON, không tự tính giúp – tính toán là ở web này.
   </div>
 </div>
 
 <script>
   /*************************************************
-   * 1. CẤU HÌNH CƠ BẢN
+   * 1. CẤU HÌNH & STATE
    *************************************************/
-  // DÁN URL WEB APP APPS SCRIPT VÀO ĐÂY
-  const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxh6hOQL2cD6SUwnRp91OtPPS83h658rEuq3Hg9Cm15OHBAV9_w3HOEuUeS2prtVUNqlA/exec';
+  // 👉 DÁN URL WEB APP APPS SCRIPT VÀO ĐÂY
+  // Ví dụ: 'https://script.google.com/macros/s/AKfycbxh6hOQL2cD6SUwnRp91OtPPS83h658rEuq3Hg9Cm15OHBAV9_w3HOEuUeS2prtVUNqlA/exec'
+  const GOOGLE_SCRIPT_URL = 'PASTE_YOUR_WEB_APP_URL_HERE';
 
-  const LOCAL_KEY_CURRENT = 'nbl_tool_config_current_v1';
-  const LOCAL_KEY_DEFAULT = 'nbl_tool_config_default_v1';
+  const LOCAL_KEY_CURRENT = 'nbl_plan_state_current_v2';
+  const LOCAL_KEY_DEFAULT = 'nbl_plan_state_default_v2';
 
-  // seed mặc định
-  const DEFAULT_TEAMS = [
-    { name: 'TikTok', key: 'tiktok' },
-    { name: 'Shopee', key: 'shopee' },
-    { name: 'Website', key: 'website' },
-    { name: 'Facebook', key: 'facebook' },
-    { name: 'B2B', key: 'b2b' }
-  ];
-
-  let state = {
+  // Default theo plan trong Excel (mình đã đọc từ file)
+  const DEFAULT_STATE = {
     scenario: 'default',
-    teams: []
+    channels: {
+      facebook: {
+        key: 'facebook',
+        label: 'Facebook',
+        colorClass: 'card-channel-facebook',
+        revenue: 2800,       // target mid: 2800
+        costSellRate: 0.14,  // Chi phí bán hàng (% doanh thu)
+        costCogsRate: 0.55,  // Giá vốn
+        costOtherRate: 0.05, // Chi phí khác
+        fixedCost: 320       // Chi phí cố định
+      },
+      tiktok: {
+        key: 'tiktok',
+        label: 'TikTok',
+        colorClass: 'card-channel-tiktok',
+        revenue: 2800,
+        costSellRate: 0.27,
+        costCogsRate: 0.45,
+        costOtherRate: 0.05,
+        fixedCost: 320
+      },
+      shopee: {
+        key: 'shopee',
+        label: 'Shopee',
+        colorClass: 'card-channel-shopee',
+        revenue: 1200,
+        costSellRate: 0.27,
+        costCogsRate: 0.50,
+        costOtherRate: 0.05,
+        fixedCost: 120
+      },
+      web: {
+        key: 'web',
+        label: 'Web',
+        colorClass: 'card-channel-web',
+        revenue: 320,
+        costSellRate: 0.09,
+        costCogsRate: 0.50,
+        costOtherRate: 0.05,
+        fixedCost: 75
+      }
+    }
   };
 
+  const CHANNEL_ORDER = ['facebook', 'tiktok', 'shopee', 'web'];
+
+  let state = null; // sẽ init ở dưới
+
   /*************************************************
-   * 2. HÀM TIỆN ÍCH
+   * 2. TIỆN ÍCH SỐ & TÍNH TOÁN
    *************************************************/
-  function parseNumber(value) {
-    if (value === '' || value === null || value === undefined) return 0;
-    const clean = String(value).replace(/,/g, '').trim();
+  function parseNumber(val) {
+    if (val === '' || val === null || val === undefined) return 0;
+    const clean = String(val).replace(/,/g, '').trim();
     const num = Number(clean);
     return isNaN(num) ? 0 : num;
   }
 
-  function formatNumber(num) {
+  function formatNumber(num, digits = 2) {
     if (num === null || num === undefined || isNaN(num)) return '';
-    return new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 2 }).format(num);
+    return new Intl.NumberFormat('vi-VN', { maximumFractionDigits: digits }).format(num);
   }
 
-  function calcTeamMetrics(team) {
-    const margin = parseNumber(team.margin);
-    const target = parseNumber(team.targetRevenue);
-    const actual = parseNumber(team.actualRevenue);
+  function clone(obj) {
+    return JSON.parse(JSON.stringify(obj));
+  }
 
-    const targetProfit = target * margin / 100;
-    const actualProfit = actual * margin / 100;
-    const diffRevenue = actual - target;
-    const diffProfit = actualProfit - targetProfit;
-    const diffPercent = target > 0 ? (actual / target - 1) * 100 : 0;
+  // Tính cho 1 kênh
+  function calcChannelMetrics(ch) {
+    const revenue = parseNumber(ch.revenue);
+    const costSell = parseNumber(ch.costSellRate);
+    const costCogs = parseNumber(ch.costCogsRate);
+    const costOther = parseNumber(ch.costOtherRate);
+    const fixedCost = parseNumber(ch.fixedCost);
+
+    const totalRate = costSell + costCogs + costOther; // tỉ lệ tổng chi phí biến
+    const variableCost = revenue * totalRate;
+    const totalCost = variableCost + fixedCost;
+    const profit = revenue - totalCost;
+    const margin = revenue > 0 ? profit / revenue : 0;
+
+    let breakevenRevenue = null;
+    if (1 - totalRate > 0) {
+      breakevenRevenue = fixedCost / (1 - totalRate);
+    }
+
+    const diffFromBreakeven = breakevenRevenue !== null ? revenue - breakevenRevenue : null;
 
     return {
-      targetProfit,
-      actualProfit,
-      diffRevenue,
-      diffProfit,
-      diffPercent
+      revenue,
+      costSell,
+      costCogs,
+      costOther,
+      fixedCost,
+      totalRate,
+      variableCost,
+      totalCost,
+      profit,
+      margin,
+      breakevenRevenue,
+      diffFromBreakeven
     };
   }
 
-  function calcOverallMargin() {
-    if (!state.teams.length) return null;
+  // Tính tổng tất cả kênh
+  function calcTotalMetrics() {
     let sumRevenue = 0;
-    let sumProfit = 0;
-    state.teams.forEach(t => {
-      const margin = parseNumber(t.margin);
-      const actual = parseNumber(t.actualRevenue);
-      sumRevenue += actual;
-      sumProfit += actual * margin / 100;
+    let sumVariable = 0;
+    let sumFixed = 0;
+
+    CHANNEL_ORDER.forEach(key => {
+      const ch = state.channels[key];
+      if (!ch) return;
+      const m = calcChannelMetrics(ch);
+      sumRevenue += m.revenue;
+      sumVariable += m.variableCost;
+      sumFixed += m.fixedCost;
     });
-    if (sumRevenue === 0) return null;
-    return sumProfit * 100 / sumRevenue;
+
+    const totalCost = sumVariable + sumFixed;
+    const profit = sumRevenue - totalCost;
+    const margin = sumRevenue > 0 ? profit / sumRevenue : 0;
+    const effectiveVarRate = sumRevenue > 0 ? (sumVariable / sumRevenue) : 0;
+
+    let breakevenRevenue = null;
+    if (1 - effectiveVarRate > 0) {
+      breakevenRevenue = sumFixed / (1 - effectiveVarRate);
+    }
+
+    return {
+      sumRevenue,
+      sumVariable,
+      sumFixed,
+      totalCost,
+      profit,
+      margin,
+      effectiveVarRate,
+      breakevenRevenue
+    };
   }
 
   /*************************************************
    * 3. RENDER UI
    *************************************************/
-  function renderTeamChips() {
-    const wrap = document.getElementById('teamChipGroup');
-    wrap.innerHTML = '';
-    state.teams.forEach((t, idx) => {
-      const chip = document.createElement('button');
-      chip.type = 'button';
-      chip.className = 'chip' + (idx === 0 ? ' active' : '');
-      chip.textContent = t.name || ('Team ' + (idx + 1));
-      chip.dataset.index = idx;
-      chip.addEventListener('click', () => {
-        document.querySelectorAll('#teamChipGroup .chip').forEach(c => c.classList.remove('active'));
-        chip.classList.add('active');
-        // scroll tới card tương ứng
-        const card = document.querySelector('.team-card[data-index="' + idx + '"]');
-        if (card) {
-          card.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      });
-      wrap.appendChild(chip);
-    });
-  }
-
-  function renderTeams() {
-    const container = document.getElementById('teamContainer');
+  function renderChannels() {
+    const container = document.getElementById('channelsContainer');
     container.innerHTML = '';
 
-    state.teams.forEach((team, index) => {
-      const card = document.createElement('div');
-      card.className = 'card team-card';
-      card.dataset.index = index;
+    CHANNEL_ORDER.forEach(key => {
+      const ch = state.channels[key];
+      if (!ch) return;
 
-      const metrics = calcTeamMetrics(team);
+      const metrics = calcChannelMetrics(ch);
+      const card = document.createElement('div');
+      card.className = 'card ' + ch.colorClass;
+
+      const profitClass = metrics.profit >= 0 ? 'pill-green' : 'pill-red';
+      const profitText = 'Lợi nhuận: ' + formatNumber(metrics.profit) + ' triệu'
+        + (metrics.margin ? ' (' + formatNumber(metrics.margin * 100, 1) + '%)' : '');
+
+      const diffBreakevenText = metrics.breakevenRevenue !== null
+        ? (metrics.diffFromBreakeven >= 0
+            ? '↑ vượt hòa vốn ' + formatNumber(metrics.diffFromBreakeven, 1) + ' triệu'
+            : '↓ dưới hòa vốn ' + formatNumber(Math.abs(metrics.diffFromBreakeven), 1) + ' triệu')
+        : '—';
 
       card.innerHTML = `
-        <div class="team-row-header">
+        <div class="card-header">
           <div>
-            <input class="team-name-input" value="${team.name || ('Team ' + (index + 1))}" data-field="name" data-index="${index}">
-            <div class="team-meta">
-              <span>Kênh: ${team.key || ('team_' + (index + 1))}</span>
-              <span>| Biên phí: <span id="margin-label-${index}">${formatNumber(team.margin) || 0}</span>%</span>
+            <div class="card-title">${ch.label}</div>
+            <div class="card-sub">
+              Nhập doanh thu & chi phí của kênh này. Biên phí và chi phí cố định đang dùng theo plan mặc định.
             </div>
           </div>
-          <div style="display:flex; gap:8px; align-items:center;">
-            <span class="pill ${metrics.diffProfit >= 0 ? 'pill-green' : 'pill-red'}">
-              Lợi nhuận: ${formatNumber(metrics.actualProfit)} (chênh ${formatNumber(metrics.diffProfit)})
-            </span>
-            <button class="btn btn-danger" data-action="remove-team" data-index="${index}">Xóa</button>
+          <div style="display:flex; flex-direction:column; gap:4px; align-items:flex-end;">
+            <span class="pill ${profitClass}">${profitText}</span>
+            <span class="muted" style="font-size:11px;">${diffBreakevenText}</span>
           </div>
         </div>
 
         <table>
           <thead>
             <tr>
-              <th></th>
-              <th>Target</th>
-              <th>Thực tế</th>
-              <th>Chênh lệch</th>
+              <th>Chỉ tiêu</th>
+              <th>Giá trị</th>
+              <th>Tỉ lệ (%)</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td>Doanh thu (triệu)</td>
               <td>
-                <input type="number" step="0.01"
-                       data-field="targetRevenue"
-                       data-index="${index}"
-                       value="${team.targetRevenue !== undefined ? team.targetRevenue : ''}">
+                <input type="number" step="0.01" data-channel="${key}" data-field="revenue"
+                       value="${ch.revenue !== undefined ? ch.revenue : ''}">
               </td>
+              <td class="muted">100%</td>
+            </tr>
+            <tr>
+              <td>CP bán hàng</td>
+              <td>${formatNumber(metrics.revenue * metrics.costSell, 2)}</td>
               <td>
-                <input type="number" step="0.01"
-                       data-field="actualRevenue"
-                       data-index="${index}"
-                       value="${team.actualRevenue !== undefined ? team.actualRevenue : ''}">
-              </td>
-              <td>
-                <span id="diff-revenue-${index}">
-                  ${formatNumber(metrics.diffRevenue)}
-                  (${formatNumber(metrics.diffPercent)}%)
-                </span>
+                <input type="number" step="0.01" data-channel="${key}" data-field="costSellRate"
+                       value="${(ch.costSellRate * 100).toFixed(2)}">
               </td>
             </tr>
             <tr>
-              <td>Biên phí gộp (%)</td>
-              <td colspan="2">
-                <input type="number" step="0.1"
-                       data-field="margin"
-                       data-index="${index}"
-                       value="${team.margin !== undefined ? team.margin : ''}">
-              </td>
+              <td>Giá vốn</td>
+              <td>${formatNumber(metrics.revenue * metrics.costCogs, 2)}</td>
               <td>
-                <span id="profit-summary-${index}">
-                  LN target: ${formatNumber(metrics.targetProfit)} | LN thực: ${formatNumber(metrics.actualProfit)}
-                </span>
+                <input type="number" step="0.01" data-channel="${key}" data-field="costCogsRate"
+                       value="${(ch.costCogsRate * 100).toFixed(2)}">
+              </td>
+            </tr>
+            <tr>
+              <td>Chi phí khác</td>
+              <td>${formatNumber(metrics.revenue * metrics.costOther, 2)}</td>
+              <td>
+                <input type="number" step="0.01" data-channel="${key}" data-field="costOtherRate"
+                       value="${(ch.costOtherRate * 100).toFixed(2)}">
+              </td>
+            </tr>
+            <tr>
+              <td>Chi phí cố định</td>
+              <td>
+                <input type="number" step="0.01" data-channel="${key}" data-field="fixedCost"
+                       value="${ch.fixedCost !== undefined ? ch.fixedCost : ''}">
+              </td>
+              <td class="muted">—</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Output</th>
+              <th>Số tiền (triệu)</th>
+              <th>Tỉ lệ theo doanh thu</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Tổng chi phí biến</td>
+              <td>${formatNumber(metrics.variableCost, 2)}</td>
+              <td>${formatNumber(metrics.totalRate * 100, 2)}%</td>
+            </tr>
+            <tr>
+              <td>Tổng chi phí (biến + cố định)</td>
+              <td>${formatNumber(metrics.totalCost, 2)}</td>
+              <td>${metrics.revenue > 0 ? formatNumber(metrics.totalCost / metrics.revenue * 100, 2) + '%' : '—'}</td>
+            </tr>
+            <tr>
+              <td>Lợi nhuận</td>
+              <td style="color:${metrics.profit >= 0 ? '#166534' : '#b91c1c'}; font-weight:600;">
+                ${formatNumber(metrics.profit, 2)}
+              </td>
+              <td>${metrics.revenue > 0 ? formatNumber(metrics.margin * 100, 2) + '%' : '—'}</td>
+            </tr>
+            <tr>
+              <td>Doanh thu hòa vốn</td>
+              <td>${metrics.breakevenRevenue !== null ? formatNumber(metrics.breakevenRevenue, 2) : '—'}</td>
+              <td>
+                ${
+                  (metrics.breakevenRevenue !== null && metrics.revenue > 0)
+                    ? formatNumber(metrics.breakevenRevenue / metrics.revenue * 100, 1) + '% so với DT hiện tại'
+                    : '—'
+                }
               </td>
             </tr>
           </tbody>
@@ -424,117 +477,128 @@
       container.appendChild(card);
     });
 
-    attachTeamEventHandlers();
-    updateOverallMarginBadge();
+    attachChannelInputListeners();
+    renderTotalCard();
   }
 
-  function updateOverallMarginBadge() {
-    const badgeText = document.getElementById('overallMarginText');
-    const margin = calcOverallMargin();
-    if (margin === null) {
-      badgeText.textContent = '–';
-    } else {
-      badgeText.textContent = formatNumber(margin) + ' %';
-    }
+  function renderTotalCard() {
+    const metrics = calcTotalMetrics();
+    const totalContainer = document.getElementById('totalCard');
+    const profitClass = metrics.profit >= 0 ? 'pill-green' : 'pill-red';
+
+    const profitText = 'Lợi nhuận: ' + formatNumber(metrics.profit, 2) + ' triệu'
+      + (metrics.margin ? ' (' + formatNumber(metrics.margin * 100, 2) + '%)' : '');
+
+    const breakevenText = metrics.breakevenRevenue !== null
+      ? 'Hòa vốn tổng: ' + formatNumber(metrics.breakevenRevenue, 2) + ' triệu'
+      : 'Hòa vốn tổng: —';
+
+    totalContainer.innerHTML = `
+      <div class="card card-total">
+        <div class="card-header">
+          <div>
+            <div class="card-title">TỔNG TOÀN BỘ KÊNH</div>
+            <div class="card-sub">
+              Tổng doanh thu, chi phí và lợi nhuận của tất cả kênh Facebook, TikTok, Shopee, Web.
+            </div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:4px; align-items:flex-end;">
+            <span class="pill ${profitClass}">${profitText}</span>
+            <span class="muted" style="font-size:11px;">${breakevenText}</span>
+          </div>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th></th>
+              <th>Số tiền (triệu)</th>
+              <th>Tỉ lệ theo doanh thu</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Doanh thu</td>
+              <td>${formatNumber(metrics.sumRevenue, 2)}</td>
+              <td>100%</td>
+            </tr>
+            <tr>
+              <td>Tổng chi phí biến</td>
+              <td>${formatNumber(metrics.sumVariable, 2)}</td>
+              <td>${metrics.sumRevenue > 0 ? formatNumber(metrics.effectiveVarRate * 100, 2) + '%' : '—'}</td>
+            </tr>
+            <tr>
+              <td>Tổng chi phí cố định</td>
+              <td>${formatNumber(metrics.sumFixed, 2)}</td>
+              <td class="muted">${metrics.sumRevenue > 0 ? formatNumber(metrics.sumFixed / metrics.sumRevenue * 100, 2) + '%' : '—'}</td>
+            </tr>
+            <tr>
+              <td>Tổng chi phí</td>
+              <td>${formatNumber(metrics.totalCost, 2)}</td>
+              <td>${metrics.sumRevenue > 0 ? formatNumber(metrics.totalCost / metrics.sumRevenue * 100, 2) + '%' : '—'}</td>
+            </tr>
+            <tr>
+              <td>Lợi nhuận</td>
+              <td style="color:${metrics.profit >= 0 ? '#166534' : '#b91c1c'}; font-weight:600;">
+                ${formatNumber(metrics.profit, 2)}
+              </td>
+              <td>${metrics.sumRevenue > 0 ? formatNumber(metrics.margin * 100, 2) + '%' : '—'}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    `;
   }
 
-  function attachTeamEventHandlers() {
-    // inputs
-    document.querySelectorAll('input[data-field]').forEach(input => {
+  function attachChannelInputListeners() {
+    document.querySelectorAll('input[data-channel][data-field]').forEach(input => {
       input.addEventListener('input', () => {
-        const field = input.dataset.field;
-        const idx = Number(input.dataset.index);
-        const val = input.value;
-        const team = state.teams[idx];
-        if (!team) return;
+        const channelKey = input.getAttribute('data-channel');
+        const field = input.getAttribute('data-field');
+        const ch = state.channels[channelKey];
+        if (!ch) return;
 
-        if (field === 'name') {
-          team.name = val;
-        } else if (field === 'margin') {
-          team.margin = parseNumber(val);
-          const label = document.getElementById('margin-label-' + idx);
-          if (label) label.textContent = formatNumber(team.margin || 0);
-        } else if (field === 'targetRevenue') {
-          team.targetRevenue = parseNumber(val);
-        } else if (field === 'actualRevenue') {
-          team.actualRevenue = parseNumber(val);
+        if (field === 'revenue' || field === 'fixedCost') {
+          ch[field] = parseNumber(input.value);
+        } else if (field === 'costSellRate' || field === 'costCogsRate' || field === 'costOtherRate') {
+          // user nhập % -> convert về dạng 0.xx
+          const percentVal = parseNumber(input.value);
+          ch[field] = percentVal / 100;
         }
 
-        recalcTeamRow(idx);
         saveCurrentToLocal();
+        renderChannels(); // render lại toàn bộ cho chắc
       });
     });
-
-    // rename team input
-    document.querySelectorAll('.team-name-input').forEach(input => {
-      input.addEventListener('input', () => {
-        const idx = Number(input.dataset.index);
-        const team = state.teams[idx];
-        if (!team) return;
-        team.name = input.value;
-        const chip = document.querySelector(`#teamChipGroup .chip[data-index="${idx}"]`);
-        if (chip) chip.textContent = team.name || ('Team ' + (idx + 1));
-        saveCurrentToLocal();
-      });
-    });
-
-    // remove buttons
-    document.querySelectorAll('[data-action="remove-team"]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const idx = Number(btn.dataset.index);
-        if (!confirm('Xóa team này?')) return;
-        state.teams.splice(idx, 1);
-        saveCurrentToLocal();
-        renderTeamChips();
-        renderTeams();
-      });
-    });
-  }
-
-  function recalcTeamRow(index) {
-    const team = state.teams[index];
-    if (!team) return;
-    const metrics = calcTeamMetrics(team);
-
-    const diffEl = document.getElementById('diff-revenue-' + index);
-    if (diffEl) {
-      diffEl.textContent = `${formatNumber(metrics.diffRevenue)} (${formatNumber(metrics.diffPercent)}%)`;
-    }
-    const pEl = document.getElementById('profit-summary-' + index);
-    if (pEl) {
-      pEl.textContent = `LN target: ${formatNumber(metrics.targetProfit)} | LN thực: ${formatNumber(metrics.actualProfit)}`;
-    }
-
-    const card = document.querySelector(`.team-card[data-index="${index}"] .pill`);
-    if (card) {
-      card.className = 'pill ' + (metrics.diffProfit >= 0 ? 'pill-green' : 'pill-red');
-      card.textContent = `Lợi nhuận: ${formatNumber(metrics.actualProfit)} (chênh ${formatNumber(metrics.diffProfit)})`;
-    }
-
-    updateOverallMarginBadge();
   }
 
   /*************************************************
    * 4. LOCALSTORAGE
    *************************************************/
   function saveCurrentToLocal() {
-    const data = JSON.stringify(state);
-    localStorage.setItem(LOCAL_KEY_CURRENT, data);
+    try {
+      localStorage.setItem(LOCAL_KEY_CURRENT, JSON.stringify(state));
+    } catch (e) {
+      console.warn('Không lưu được localStorage current:', e);
+    }
   }
 
   function saveDefaultToLocal() {
-    const data = JSON.stringify(state);
-    localStorage.setItem(LOCAL_KEY_DEFAULT, data);
-    alert('Đã lưu cấu hình hiện tại làm mặc định.');
+    try {
+      localStorage.setItem(LOCAL_KEY_DEFAULT, JSON.stringify(state));
+      alert('Đã lưu cấu hình hiện tại làm mặc định (local).');
+    } catch (e) {
+      console.warn('Không lưu được localStorage default:', e);
+    }
   }
 
-  function loadFromLocal() {
+  function loadCurrentFromLocal() {
     const raw = localStorage.getItem(LOCAL_KEY_CURRENT);
     if (!raw) return null;
     try {
       return JSON.parse(raw);
-    } catch (err) {
-      console.error('Parse local current error:', err);
+    } catch (e) {
+      console.error('Parse local current error:', e);
       return null;
     }
   }
@@ -544,18 +608,18 @@
     if (!raw) return null;
     try {
       return JSON.parse(raw);
-    } catch (err) {
-      console.error('Parse local default error:', err);
+    } catch (e) {
+      console.error('Parse local default error:', e);
       return null;
     }
   }
 
   /*************************************************
-   * 5. GOOGLE SHEET – LOAD & SAVE
+   * 5. GOOGLE SHEET – LOAD / SAVE
    *************************************************/
-  async function loadScenarioFromGoogleSheet(scenarioName = 'default') {
+  async function loadScenarioFromGoogleSheet(scenarioName) {
     if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.indexOf('http') !== 0) {
-      alert('GOOGLE_SCRIPT_URL chưa được cấu hình đúng trong file index.html');
+      alert('GOOGLE_SCRIPT_URL chưa được cấu hình đúng trong index.html');
       return;
     }
     try {
@@ -563,7 +627,6 @@
         '?action=get&scenario=' + encodeURIComponent(scenarioName);
 
       const res = await fetch(url, { method: 'GET' });
-
       if (!res.ok) {
         const text = await res.text();
         alert('Không tải được từ Google Sheet: ' + res.status + ' - ' + text);
@@ -576,27 +639,26 @@
         return;
       }
 
-      if (data.data) {
-        // data.data chính là object state đã lưu
+      if (data.data && data.data.channels) {
         state = data.data;
       } else {
-        // nếu chưa có gì trên sheet → giữ state hiện tại
+        // nếu sheet chưa có dữ liệu, dùng default
+        state = clone(DEFAULT_STATE);
       }
 
-      renderTeamChips();
-      renderTeams();
       saveCurrentToLocal();
+      renderChannels();
 
-      alert('Đã tải cấu hình từ Google Sheet (scenario: ' + (data.scenario || 'default') + ').');
+      alert('Đã tải cấu hình từ Google Sheet (scenario: ' + (data.scenario || scenarioName) + ').');
     } catch (err) {
       console.error('Load from sheet error:', err);
       alert('Không tải được từ Google Sheet: ' + err.message);
     }
   }
 
-  async function saveScenarioToGoogleSheet(scenarioName = 'default') {
+  async function saveScenarioToGoogleSheet(scenarioName) {
     if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.indexOf('http') !== 0) {
-      alert('GOOGLE_SCRIPT_URL chưa được cấu hình đúng trong file index.html');
+      alert('GOOGLE_SCRIPT_URL chưa được cấu hình đúng trong index.html');
       return;
     }
     try {
@@ -610,7 +672,7 @@
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
         },
-        body
+        body: body
       });
 
       if (!res.ok) {
@@ -625,7 +687,7 @@
         return;
       }
 
-      alert('Đã lưu cấu hình lên Google Sheet (scenario: ' + (data.scenario || 'default') + ').');
+      alert('Đã lưu cấu hình lên Google Sheet (scenario: ' + (data.scenario || scenarioName) + ').');
     } catch (err) {
       console.error('Save to sheet error:', err);
       alert('Không lưu được lên Google Sheet: ' + err.message);
@@ -633,54 +695,34 @@
   }
 
   /*************************************************
-   * 6. KHỞI TẠO & SỰ KIỆN
+   * 6. KHỞI TẠO & BUTTONS
    *************************************************/
-  function initDefaultStateIfNeeded() {
-    const fromLocal = loadFromLocal();
-    if (fromLocal && fromLocal.teams && Array.isArray(fromLocal.teams) && fromLocal.teams.length) {
-      state = fromLocal;
+  function initState() {
+    const fromCurrent = loadCurrentFromLocal();
+    if (fromCurrent && fromCurrent.channels) {
+      state = fromCurrent;
       return;
     }
 
     const fromDefault = loadDefaultFromLocal();
-    if (fromDefault && fromDefault.teams && Array.isArray(fromDefault.teams) && fromDefault.teams.length) {
+    if (fromDefault && fromDefault.channels) {
       state = fromDefault;
       return;
     }
 
-    // nếu chưa có gì → seed mặc định
-    state.teams = DEFAULT_TEAMS.map(t => ({
-      name: t.name,
-      key: t.key,
-      margin: 20,
-      targetRevenue: 0,
-      actualRevenue: 0
-    }));
+    state = clone(DEFAULT_STATE);
   }
 
   function initButtons() {
-    document.getElementById('btnRecalc').addEventListener('click', () => {
-      state.teams.forEach((_, idx) => recalcTeamRow(idx));
+    document.getElementById('btnResetPlan').addEventListener('click', () => {
+      if (!confirm('Khôi phục lại đúng plan mặc định theo Excel? Mọi chỉnh sửa chưa lưu sẽ mất.')) return;
+      state = clone(DEFAULT_STATE);
       saveCurrentToLocal();
-      alert('Đã cập nhật lại chỉ số.');
+      renderChannels();
     });
 
     document.getElementById('btnSaveDefault').addEventListener('click', () => {
       saveDefaultToLocal();
-    });
-
-    document.getElementById('btnAddTeam').addEventListener('click', () => {
-      const newTeam = {
-        name: 'Team mới ' + (state.teams.length + 1),
-        key: 'team_' + (state.teams.length + 1),
-        margin: 20,
-        targetRevenue: 0,
-        actualRevenue: 0
-      };
-      state.teams.push(newTeam);
-      saveCurrentToLocal();
-      renderTeamChips();
-      renderTeams();
     });
 
     document.getElementById('btnLoadFromSheet').addEventListener('click', () => {
@@ -693,9 +735,8 @@
   }
 
   document.addEventListener('DOMContentLoaded', () => {
-    initDefaultStateIfNeeded();
-    renderTeamChips();
-    renderTeams();
+    initState();
+    renderChannels();
     initButtons();
   });
 </script>
