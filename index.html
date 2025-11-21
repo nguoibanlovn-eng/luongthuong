@@ -28,12 +28,7 @@
       color: #6b7280;
       margin-bottom: 18px;
     }
-    .top-actions {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 18px;
-      gap: 10px;
-    }
+
     .btn {
       border: none;
       border-radius: 999px;
@@ -45,6 +40,7 @@
       background: #111827;
       color: #f9fafb;
       box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+      white-space: nowrap;
     }
     .btn:hover {
       transform: translateY(-1px);
@@ -87,6 +83,7 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 10px;
+      gap: 8px;
     }
     .card-title {
       font-size: 18px;
@@ -137,6 +134,7 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 6px;
+      gap: 8px;
     }
     .section-title { font-size: 13px; font-weight: 600; }
     .section-sub   { font-size: 11px; color: #6b7280; }
@@ -160,9 +158,8 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      /* không justify space-between để ô xếp gọn hơn */
     }
-    input[type="number"], input[type="text"] {
+    input[type="text"] {
       flex: 1;
       width: 100%;
       box-sizing: border-box;
@@ -174,7 +171,6 @@
       color: #111827;
       outline: none;
     }
-    input[type="number"]:focus,
     input[type="text"]:focus {
       border-color: #38bdf8;
       box-shadow: 0 0 0 1px rgba(56,189,248,0.5);
@@ -218,22 +214,33 @@
       width: 100%;
       border-collapse: collapse;
       font-size: 12px;
+      border-radius: 12px;
+      overflow: hidden;
     }
     th, td {
-      padding: 6px 6px;
+      padding: 6px 8px;
       text-align: right;
       border-bottom: 1px solid #e5e7eb;
     }
     th:first-child, td:first-child { text-align: left; }
     th {
-      background: #f9fafb;
+      background: #f3f4f6;
       font-weight: 600;
       color: #4b5563;
     }
-    tr:last-child td {
-      border-bottom: none;
-      font-weight: 600;
+    tbody tr:nth-child(odd) {
       background: #f9fafb;
+    }
+    tbody tr:hover {
+      background: #e5e7eb;
+    }
+    tbody tr.total-row {
+      background: #0f172a;
+      color: #f9fafb;
+      font-weight: 600;
+    }
+    tbody tr.total-row td {
+      border-bottom: none;
     }
     .team-offline td:first-child { font-weight: 600; }
 
@@ -247,10 +254,6 @@
   <h1>Phần mềm tính thưởng theo kênh bán hàng</h1>
   <div class="subtitle">
     Mỗi kênh: 1) Hòa vốn  2) Doanh thu & chia thưởng. Dưới cùng là bảng tổng doanh thu & tổng thưởng.
-  </div>
-
-  <div class="top-actions">
-    <button class="btn" onclick="calculateAllChannels()">Tính tất cả kênh & cập nhật bảng tổng</button>
   </div>
 
   <div class="cards">
@@ -277,24 +280,24 @@
           <div class="field">
             <label>Chi phí cố định / tháng</label>
             <div class="field-row">
-              <input type="number" class="js-fixed" value="32000000">
+              <input type="text" inputmode="decimal" class="js-fixed js-money" value="32.000.000">
               <span class="unit">VND</span>
             </div>
             <label>Giá vốn hàng bán</label>
             <div class="field-row">
-              <input type="number" class="js-cogs" value="45" step="0.1">
+              <input type="text" inputmode="decimal" class="js-cogs" value="45">
               <span class="unit">% doanh thu</span>
             </div>
           </div>
           <div class="field">
             <label>CP bán hàng (phí sàn, ship, voucher...)</label>
             <div class="field-row">
-              <input type="number" class="js-cpbh" value="27" step="0.1">
+              <input type="text" inputmode="decimal" class="js-cpbh" value="27">
               <span class="unit">% doanh thu</span>
             </div>
             <label>Chi phí khác</label>
             <div class="field-row">
-              <input type="number" class="js-cpk" value="5" step="0.1">
+              <input type="text" inputmode="decimal" class="js-cpk" value="5">
               <span class="unit">% doanh thu</span>
             </div>
           </div>
@@ -330,7 +333,7 @@
           <div class="field">
             <label>Doanh thu thực tế tháng</label>
             <div class="field-row">
-              <input type="number" class="js-rev" value="300000000">
+              <input type="text" inputmode="decimal" class="js-rev js-money" value="300.000.000">
               <span class="unit">VND</span>
             </div>
             <label>Lợi nhuận sau chi phí</label>
@@ -352,53 +355,53 @@
 
           <!-- Cột phải: % & tiền thưởng ngay cạnh -->
           <div class="field">
-            <label>% thưởng trên lợi nhuận</label>
+            <label>% thưởng trên lợi nhuận (hiển thị tiền thưởng ngay bên cạnh)</label>
 
             <div class="field-row">
               <span class="unit">Sale</span>
-              <input type="number" class="js-rate-sale" value="27" step="0.1">
+              <input type="text" inputmode="decimal" class="js-rate-sale" value="27">
               <span class="unit">%</span>
               <span class="value js-bonus-sale-amt">–</span>
             </div>
 
             <div class="field-row">
               <span class="unit">RD</span>
-              <input type="number" class="js-rate-rd" value="4" step="0.1">
+              <input type="text" inputmode="decimal" class="js-rate-rd" value="4">
               <span class="unit">%</span>
               <span class="value js-bonus-rd-amt">–</span>
             </div>
 
             <div class="field-row">
               <span class="unit">CSKH</span>
-              <input type="number" class="js-rate-cskh" value="1" step="0.1">
+              <input type="text" inputmode="decimal" class="js-rate-cskh" value="1">
               <span class="unit">%</span>
               <span class="value js-bonus-cskh-amt">–</span>
             </div>
 
             <div class="field-row">
               <span class="unit">KT + HCNS</span>
-              <input type="number" class="js-rate-kt" value="1.2" step="0.1">
+              <input type="text" inputmode="decimal" class="js-rate-kt" value="1,2">
               <span class="unit">%</span>
               <span class="value js-bonus-kt-amt">–</span>
             </div>
 
             <div class="field-row">
               <span class="unit">Media</span>
-              <input type="number" class="js-rate-media" value="1" step="0.1">
+              <input type="text" inputmode="decimal" class="js-rate-media" value="1">
               <span class="unit">%</span>
               <span class="value js-bonus-media-amt">–</span>
             </div>
 
             <div class="field-row">
               <span class="unit">Website</span>
-              <input type="number" class="js-rate-web" value="1" step="0.1">
+              <input type="text" inputmode="decimal" class="js-rate-web" value="1">
               <span class="unit">%</span>
               <span class="value js-bonus-web-amt">–</span>
             </div>
 
             <div class="field-row">
               <span class="unit">Offline</span>
-              <input type="number" class="js-rate-off" value="1" step="0.1">
+              <input type="text" inputmode="decimal" class="js-rate-off" value="1">
               <span class="unit">%</span>
               <span class="value js-bonus-off-amt">–</span>
             </div>
@@ -434,24 +437,24 @@
           <div class="field">
             <label>Chi phí cố định / tháng</label>
             <div class="field-row">
-              <input type="number" class="js-fixed" value="32000000">
+              <input type="text" inputmode="decimal" class="js-fixed js-money" value="32.000.000">
               <span class="unit">VND</span>
             </div>
             <label>Giá vốn hàng bán</label>
             <div class="field-row">
-              <input type="number" class="js-cogs" value="55" step="0.1">
+              <input type="text" inputmode="decimal" class="js-cogs" value="55">
               <span class="unit">% doanh thu</span>
             </div>
           </div>
           <div class="field">
             <label>CP bán hàng</label>
             <div class="field-row">
-              <input type="number" class="js-cpbh" value="18" step="0.1">
+              <input type="text" inputmode="decimal" class="js-cpbh" value="18">
               <span class="unit">% doanh thu</span>
             </div>
             <label>Chi phí khác</label>
             <div class="field-row">
-              <input type="number" class="js-cpk" value="5" step="0.1">
+              <input type="text" inputmode="decimal" class="js-cpk" value="5">
               <span class="unit">% doanh thu</span>
             </div>
           </div>
@@ -486,7 +489,7 @@
           <div class="field">
             <label>Doanh thu thực tế tháng</label>
             <div class="field-row">
-              <input type="number" class="js-rev" value="300000000">
+              <input type="text" inputmode="decimal" class="js-rev js-money" value="300.000.000">
               <span class="unit">VND</span>
             </div>
             <label>Lợi nhuận sau chi phí</label>
@@ -511,43 +514,43 @@
 
             <div class="field-row">
               <span class="unit">Sale</span>
-              <input type="number" class="js-rate-sale" value="27" step="0.1">
+              <input type="text" inputmode="decimal" class="js-rate-sale" value="27">
               <span class="unit">%</span>
               <span class="value js-bonus-sale-amt">–</span>
             </div>
             <div class="field-row">
               <span class="unit">RD</span>
-              <input type="number" class="js-rate-rd" value="4" step="0.1">
+              <input type="text" inputmode="decimal" class="js-rate-rd" value="4">
               <span class="unit">%</span>
               <span class="value js-bonus-rd-amt">–</span>
             </div>
             <div class="field-row">
               <span class="unit">CSKH</span>
-              <input type="number" class="js-rate-cskh" value="1" step="0.1">
+              <input type="text" inputmode="decimal" class="js-rate-cskh" value="1">
               <span class="unit">%</span>
               <span class="value js-bonus-cskh-amt">–</span>
             </div>
             <div class="field-row">
               <span class="unit">KT + HCNS</span>
-              <input type="number" class="js-rate-kt" value="1.2" step="0.1">
+              <input type="text" inputmode="decimal" class="js-rate-kt" value="1,2">
               <span class="unit">%</span>
               <span class="value js-bonus-kt-amt">–</span>
             </div>
             <div class="field-row">
               <span class="unit">Media</span>
-              <input type="number" class="js-rate-media" value="1" step="0.1">
+              <input type="text" inputmode="decimal" class="js-rate-media" value="1">
               <span class="unit">%</span>
               <span class="value js-bonus-media-amt">–</span>
             </div>
             <div class="field-row">
               <span class="unit">Website</span>
-              <input type="number" class="js-rate-web" value="1" step="0.1">
+              <input type="text" inputmode="decimal" class="js-rate-web" value="1">
               <span class="unit">%</span>
               <span class="value js-bonus-web-amt">–</span>
             </div>
             <div class="field-row">
               <span class="unit">Offline</span>
-              <input type="number" class="js-rate-off" value="1" step="0.1">
+              <input type="text" inputmode="decimal" class="js-rate-off" value="1">
               <span class="unit">%</span>
               <span class="value js-bonus-off-amt">–</span>
             </div>
@@ -583,24 +586,24 @@
           <div class="field">
             <label>Chi phí cố định / tháng</label>
             <div class="field-row">
-              <input type="number" class="js-fixed" value="32000000">
+              <input type="text" inputmode="decimal" class="js-fixed js-money" value="32.000.000">
               <span class="unit">VND</span>
             </div>
             <label>Giá vốn hàng bán</label>
             <div class="field-row">
-              <input type="number" class="js-cogs" value="55" step="0.1">
+              <input type="text" inputmode="decimal" class="js-cogs" value="55">
               <span class="unit">% doanh thu</span>
             </div>
           </div>
           <div class="field">
             <label>CP bán hàng</label>
             <div class="field-row">
-              <input type="number" class="js-cpbh" value="14" step="0.1">
+              <input type="text" inputmode="decimal" class="js-cpbh" value="14">
               <span class="unit">% doanh thu</span>
             </div>
             <label>Chi phí khác</label>
             <div class="field-row">
-              <input type="number" class="js-cpk" value="5" step="0.1">
+              <input type="text" inputmode="decimal" class="js-cpk" value="5">
               <span class="unit">% doanh thu</span>
             </div>
           </div>
@@ -635,7 +638,7 @@
           <div class="field">
             <label>Doanh thu thực tế tháng</label>
             <div class="field-row">
-              <input type="number" class="js-rev" value="300000000">
+              <input type="text" inputmode="decimal" class="js-rev js-money" value="300.000.000">
               <span class="unit">VND</span>
             </div>
             <label>Lợi nhuận sau chi phí</label>
@@ -660,43 +663,43 @@
 
             <div class="field-row">
               <span class="unit">Sale</span>
-              <input type="number" class="js-rate-sale" value="27" step="0.1">
+              <input type="text" inputmode="decimal" class="js-rate-sale" value="27">
               <span class="unit">%</span>
               <span class="value js-bonus-sale-amt">–</span>
             </div>
             <div class="field-row">
               <span class="unit">RD</span>
-              <input type="number" class="js-rate-rd" value="4" step="0.1">
+              <input type="text" inputmode="decimal" class="js-rate-rd" value="4">
               <span class="unit">%</span>
               <span class="value js-bonus-rd-amt">–</span>
             </div>
             <div class="field-row">
               <span class="unit">CSKH</span>
-              <input type="number" class="js-rate-cskh" value="1" step="0.1">
+              <input type="text" inputmode="decimal" class="js-rate-cskh" value="1">
               <span class="unit">%</span>
               <span class="value js-bonus-cskh-amt">–</span>
             </div>
             <div class="field-row">
               <span class="unit">KT + HCNS</span>
-              <input type="number" class="js-rate-kt" value="1.2" step="0.1">
+              <input type="text" inputmode="decimal" class="js-rate-kt" value="1,2">
               <span class="unit">%</span>
               <span class="value js-bonus-kt-amt">–</span>
             </div>
             <div class="field-row">
               <span class="unit">Media</span>
-              <input type="number" class="js-rate-media" value="1" step="0.1">
+              <input type="text" inputmode="decimal" class="js-rate-media" value="1">
               <span class="unit">%</span>
               <span class="value js-bonus-media-amt">–</span>
             </div>
             <div class="field-row">
               <span class="unit">Website</span>
-              <input type="number" class="js-rate-web" value="1" step="0.1">
+              <input type="text" inputmode="decimal" class="js-rate-web" value="1">
               <span class="unit">%</span>
               <span class="value js-bonus-web-amt">–</span>
             </div>
             <div class="field-row">
               <span class="unit">Offline</span>
-              <input type="number" class="js-rate-off" value="1" step="0.1">
+              <input type="text" inputmode="decimal" class="js-rate-off" value="1">
               <span class="unit">%</span>
               <span class="value js-bonus-off-amt">–</span>
             </div>
@@ -732,24 +735,24 @@
           <div class="field">
             <label>Chi phí cố định / tháng</label>
             <div class="field-row">
-              <input type="number" class="js-fixed" value="20000000">
+              <input type="text" inputmode="decimal" class="js-fixed js-money" value="20.000.000">
               <span class="unit">VND</span>
             </div>
             <label>Giá vốn hàng bán</label>
             <div class="field-row">
-              <input type="number" class="js-cogs" value="50" step="0.1">
+              <input type="text" inputmode="decimal" class="js-cogs" value="50">
               <span class="unit">% doanh thu</span>
             </div>
           </div>
           <div class="field">
             <label>CP bán hàng</label>
             <div class="field-row">
-              <input type="number" class="js-cpbh" value="15" step="0.1">
+              <input type="text" inputmode="decimal" class="js-cpbh" value="15">
               <span class="unit">% doanh thu</span>
             </div>
             <label>Chi phí khác</label>
             <div class="field-row">
-              <input type="number" class="js-cpk" value="5" step="0.1">
+              <input type="text" inputmode="decimal" class="js-cpk" value="5">
               <span class="unit">% doanh thu</span>
             </div>
           </div>
@@ -784,7 +787,7 @@
           <div class="field">
             <label>Doanh thu thực tế tháng</label>
             <div class="field-row">
-              <input type="number" class="js-rev" value="200000000">
+              <input type="text" inputmode="decimal" class="js-rev js-money" value="200.000.000">
               <span class="unit">VND</span>
             </div>
             <label>Lợi nhuận sau chi phí</label>
@@ -806,13 +809,13 @@
 
           <div class="field">
             <label>% thưởng trên lợi nhuận</label>
-            <div class="field-row"><span class="unit">Sale</span>   <input type="number" class="js-rate-sale"  value="27" step="0.1"><span class="unit">%</span><span class="value js-bonus-sale-amt">–</span></div>
-            <div class="field-row"><span class="unit">RD</span>     <input type="number" class="js-rate-rd"    value="4"  step="0.1"><span class="unit">%</span><span class="value js-bonus-rd-amt">–</span></div>
-            <div class="field-row"><span class="unit">CSKH</span>   <input type="number" class="js-rate-cskh"  value="1"  step="0.1"><span class="unit">%</span><span class="value js-bonus-cskh-amt">–</span></div>
-            <div class="field-row"><span class="unit">KT + HCNS</span><input type="number" class="js-rate-kt" value="1.2"step="0.1"><span class="unit">%</span><span class="value js-bonus-kt-amt">–</span></div>
-            <div class="field-row"><span class="unit">Media</span>  <input type="number" class="js-rate-media" value="1"  step="0.1"><span class="unit">%</span><span class="value js-bonus-media-amt">–</span></div>
-            <div class="field-row"><span class="unit">Website</span><input type="number" class="js-rate-web"   value="1"  step="0.1"><span class="unit">%</span><span class="value js-bonus-web-amt">–</span></div>
-            <div class="field-row"><span class="unit">Offline</span><input type="number" class="js-rate-off"   value="1"  step="0.1"><span class="unit">%</span><span class="value js-bonus-off-amt">–</span></div>
+            <div class="field-row"><span class="unit">Sale</span>   <input type="text" inputmode="decimal" class="js-rate-sale"  value="27"><span class="unit">%</span><span class="value js-bonus-sale-amt">–</span></div>
+            <div class="field-row"><span class="unit">RD</span>     <input type="text" inputmode="decimal" class="js-rate-rd"    value="4"><span class="unit">%</span><span class="value js-bonus-rd-amt">–</span></div>
+            <div class="field-row"><span class="unit">CSKH</span>   <input type="text" inputmode="decimal" class="js-rate-cskh"  value="1"><span class="unit">%</span><span class="value js-bonus-cskh-amt">–</span></div>
+            <div class="field-row"><span class="unit">KT + HCNS</span><input type="text" inputmode="decimal" class="js-rate-kt" value="1,2"><span class="unit">%</span><span class="value js-bonus-kt-amt">–</span></div>
+            <div class="field-row"><span class="unit">Media</span>  <input type="text" inputmode="decimal" class="js-rate-media" value="1"><span class="unit">%</span><span class="value js-bonus-media-amt">–</span></div>
+            <div class="field-row"><span class="unit">Website</span><input type="text" inputmode="decimal" class="js-rate-web"   value="1"><span class="unit">%</span><span class="value js-bonus-web-amt">–</span></div>
+            <div class="field-row"><span class="unit">Offline</span><input type="text" inputmode="decimal" class="js-rate-off"   value="1"><span class="unit">%</span><span class="value js-bonus-off-amt">–</span></div>
           </div>
         </div>
 
@@ -845,24 +848,24 @@
           <div class="field">
             <label>Chi phí cố định / tháng</label>
             <div class="field-row">
-              <input type="number" class="js-fixed" value="25000000">
+              <input type="text" inputmode="decimal" class="js-fixed js-money" value="25.000.000">
               <span class="unit">VND</span>
             </div>
             <label>Giá vốn hàng bán</label>
             <div class="field-row">
-              <input type="number" class="js-cogs" value="50" step="0.1">
+              <input type="text" inputmode="decimal" class="js-cogs" value="50">
               <span class="unit">% doanh thu</span>
             </div>
           </div>
           <div class="field">
             <label>CP bán hàng</label>
             <div class="field-row">
-              <input type="number" class="js-cpbh" value="20" step="0.1">
+              <input type="text" inputmode="decimal" class="js-cpbh" value="20">
               <span class="unit">% doanh thu</span>
             </div>
             <label>Chi phí khác</label>
             <div class="field-row">
-              <input type="number" class="js-cpk" value="5" step="0.1">
+              <input type="text" inputmode="decimal" class="js-cpk" value="5">
               <span class="unit">% doanh thu</span>
             </div>
           </div>
@@ -897,7 +900,7 @@
           <div class="field">
             <label>Doanh thu thực tế tháng</label>
             <div class="field-row">
-              <input type="number" class="js-rev" value="150000000">
+              <input type="text" inputmode="decimal" class="js-rev js-money" value="150.000.000">
               <span class="unit">VND</span>
             </div>
             <label>Lợi nhuận sau chi phí</label>
@@ -919,13 +922,13 @@
 
           <div class="field">
             <label>% thưởng trên lợi nhuận</label>
-            <div class="field-row"><span class="unit">Sale</span>   <input type="number" class="js-rate-sale"  value="27" step="0.1"><span class="unit">%</span><span class="value js-bonus-sale-amt">–</span></div>
-            <div class="field-row"><span class="unit">RD</span>     <input type="number" class="js-rate-rd"    value="4"  step="0.1"><span class="unit">%</span><span class="value js-bonus-rd-amt">–</span></div>
-            <div class="field-row"><span class="unit">CSKH</span>   <input type="number" class="js-rate-cskh"  value="1"  step="0.1"><span class="unit">%</span><span class="value js-bonus-cskh-amt">–</span></div>
-            <div class="field-row"><span class="unit">KT + HCNS</span><input type="number" class="js-rate-kt" value="1.2"step="0.1"><span class="unit">%</span><span class="value js-bonus-kt-amt">–</span></div>
-            <div class="field-row"><span class="unit">Media</span>  <input type="number" class="js-rate-media" value="1"  step="0.1"><span class="unit">%</span><span class="value js-bonus-media-amt">–</span></div>
-            <div class="field-row"><span class="unit">Website</span><input type="number" class="js-rate-web"   value="1"  step="0.1"><span class="unit">%</span><span class="value js-bonus-web-amt">–</span></div>
-            <div class="field-row"><span class="unit">Offline</span><input type="number" class="js-rate-off"   value="1"  step="0.1"><span class="unit">%</span><span class="value js-bonus-off-amt">–</span></div>
+            <div class="field-row"><span class="unit">Sale</span>   <input type="text" inputmode="decimal" class="js-rate-sale"  value="27"><span class="unit">%</span><span class="value js-bonus-sale-amt">–</span></div>
+            <div class="field-row"><span class="unit">RD</span>     <input type="text" inputmode="decimal" class="js-rate-rd"    value="4"><span class="unit">%</span><span class="value js-bonus-rd-amt">–</span></div>
+            <div class="field-row"><span class="unit">CSKH</span>   <input type="text" inputmode="decimal" class="js-rate-cskh"  value="1"><span class="unit">%</span><span class="value js-bonus-cskh-amt">–</span></div>
+            <div class="field-row"><span class="unit">KT + HCNS</span><input type="text" inputmode="decimal" class="js-rate-kt" value="1,2"><span class="unit">%</span><span class="value js-bonus-kt-amt">–</span></div>
+            <div class="field-row"><span class="unit">Media</span>  <input type="text" inputmode="decimal" class="js-rate-media" value="1"><span class="unit">%</span><span class="value js-bonus-media-amt">–</span></div>
+            <div class="field-row"><span class="unit">Website</span><input type="text" inputmode="decimal" class="js-rate-web"   value="1"><span class="unit">%</span><span class="value js-bonus-web-amt">–</span></div>
+            <div class="field-row"><span class="unit">Offline</span><input type="text" inputmode="decimal" class="js-rate-off"   value="1"><span class="unit">%</span><span class="value js-bonus-off-amt">–</span></div>
           </div>
         </div>
 
@@ -944,6 +947,7 @@
           <div class="summary-title">Bảng tổng doanh thu & tổng thưởng</div>
           <div class="section-sub">Tổng hợp nhanh hiệu quả theo từng kênh</div>
         </div>
+        <button class="btn" onclick="calculateAllChannels()">Tính tất cả kênh & cập nhật bảng tổng</button>
       </div>
       <table>
         <thead>
@@ -963,7 +967,7 @@
       <div class="section-header">
         <div>
           <div class="summary-title">Tổng thưởng theo bộ phận (mọi kênh)</div>
-          <div class="section-sub">Cộng gộp thưởng từ tất cả nền tảng</div>
+          <div class="section-sub">Cộng gộp thưởng từ tất cả nền tảng, sắp xếp từ cao xuống thấp</div>
         </div>
       </div>
       <table>
@@ -979,6 +983,15 @@
   </div>
 
   <script>
+    // Đọc số từ input có thể chứa . ngăn cách nghìn và , làm dấu thập phân
+    function parseNumber(el) {
+      if (!el) return 0;
+      const raw = (el.value || '').toString().trim();
+      if (!raw) return 0;
+      const cleaned = raw.replace(/\s/g, '').replace(/\./g, '').replace(',', '.');
+      const num = parseFloat(cleaned);
+      return isNaN(num) ? 0 : num;
+    }
     function fmtMoney(v) {
       if (!isFinite(v)) return '–';
       return Math.round(v).toLocaleString('vi-VN');
@@ -993,10 +1006,10 @@
       if (!card) return;
 
       // Hòa vốn
-      const fixed = Number(card.querySelector('.js-fixed')?.value || 0);
-      const cpbh  = (Number(card.querySelector('.js-cpbh')?.value || 0)) / 100;
-      const cogs  = (Number(card.querySelector('.js-cogs')?.value || 0)) / 100;
-      const cpk   = (Number(card.querySelector('.js-cpk') ?.value || 0)) / 100;
+      const fixed = parseNumber(card.querySelector('.js-fixed'));
+      const cpbh  = parseNumber(card.querySelector('.js-cpbh')) / 100;
+      const cogs  = parseNumber(card.querySelector('.js-cogs')) / 100;
+      const cpk   = parseNumber(card.querySelector('.js-cpk'))  / 100;
 
       const varRate = cpbh + cogs + cpk;
       const varRateEl   = card.querySelector('.js-varRate');
@@ -1008,7 +1021,7 @@
       if (breakevenEl) breakevenEl.textContent = fmtMoney(breakeven);
 
       // Doanh thu & lợi nhuận
-      const rev = Number(card.querySelector('.js-rev')?.value || 0);
+      const rev = parseNumber(card.querySelector('.js-rev'));
       const profitEl = card.querySelector('.js-profit');
       const marginEl = card.querySelector('.js-margin');
 
@@ -1025,13 +1038,13 @@
       const baseProfit = Math.max(profit, 0); // lỗ thì không thưởng
 
       // % thưởng
-      const rateSale  = (Number(card.querySelector('.js-rate-sale') ?.value || 0)) / 100;
-      const rateRD    = (Number(card.querySelector('.js-rate-rd')   ?.value || 0)) / 100;
-      const rateCSKH  = (Number(card.querySelector('.js-rate-cskh') ?.value || 0)) / 100;
-      const rateKT    = (Number(card.querySelector('.js-rate-kt')   ?.value || 0)) / 100;
-      const rateMedia = (Number(card.querySelector('.js-rate-media')?.value || 0)) / 100;
-      const rateWeb   = (Number(card.querySelector('.js-rate-web')  ?.value || 0)) / 100;
-      const rateOff   = (Number(card.querySelector('.js-rate-off')  ?.value || 0)) / 100;
+      const rateSale  = parseNumber(card.querySelector('.js-rate-sale'))  / 100;
+      const rateRD    = parseNumber(card.querySelector('.js-rate-rd'))    / 100;
+      const rateCSKH  = parseNumber(card.querySelector('.js-rate-cskh'))  / 100;
+      const rateKT    = parseNumber(card.querySelector('.js-rate-kt'))    / 100;
+      const rateMedia = parseNumber(card.querySelector('.js-rate-media')) / 100;
+      const rateWeb   = parseNumber(card.querySelector('.js-rate-web'))   / 100;
+      const rateOff   = parseNumber(card.querySelector('.js-rate-off'))   / 100;
 
       const bonusSale  = baseProfit * rateSale;
       const bonusRD    = baseProfit * rateRD;
@@ -1043,7 +1056,6 @@
 
       const bonusTotal = bonusSale + bonusRD + bonusCSKH + bonusKT + bonusMedia + bonusWeb + bonusOff;
 
-      // set tiền thưởng nằm ngay cạnh từng dòng %
       function setBonus(selectorAmount, bonus) {
         const a = card.querySelector(selectorAmount);
         if (a) a.textContent = fmtMoney(bonus);
@@ -1127,6 +1139,7 @@
       });
 
       const trTotal = document.createElement('tr');
+      trTotal.className = 'total-row';
       const totalMargin = totalRev > 0 ? totalProfit / totalRev : 0;
       trTotal.innerHTML = `
         <td>Tổng</td>
@@ -1137,23 +1150,43 @@
       `;
       tbody.appendChild(trTotal);
 
-      function addTeamRow(name, value, extraClass = '') {
-        const tr = document.createElement('tr');
-        if (extraClass) tr.className = extraClass;
-        tr.innerHTML = `<td>${name}</td><td>${fmtMoney(value)}</td>`;
-        tTeam.appendChild(tr);
-      }
+      // Tổng theo bộ phận: sort giảm dần
+      const teamTotals = [
+        { name: 'Sale',      value: sumSale },
+        { name: 'RD',        value: sumRD },
+        { name: 'CSKH',      value: sumCSKH },
+        { name: 'KT + HCNS', value: sumKT },
+        { name: 'Media',     value: sumMedia },
+        { name: 'Website',   value: sumWeb },
+        { name: 'Offline',   value: sumOff }
+      ].sort((a, b) => b.value - a.value);
 
-      addTeamRow('Sale',        sumSale);
-      addTeamRow('RD',          sumRD);
-      addTeamRow('CSKH',        sumCSKH);
-      addTeamRow('KT + HCNS',   sumKT);
-      addTeamRow('Media',       sumMedia);
-      addTeamRow('Website',     sumWeb);
-      addTeamRow('Offline',     sumOff, 'team-offline');
+      teamTotals.forEach(t => {
+        const tr = document.createElement('tr');
+        if (t.name === 'Offline') tr.className = 'team-offline';
+        tr.innerHTML = `<td>${t.name}</td><td>${fmtMoney(t.value)}</td>`;
+        tTeam.appendChild(tr);
+      });
     }
 
-    window.addEventListener('DOMContentLoaded', calculateAllChannels);
+    function formatMoneyInput(el) {
+      const num = parseNumber(el);
+      if (!num) {
+        if (!el.value) return;
+        el.value = '';
+        return;
+      }
+      el.value = Math.round(num).toLocaleString('vi-VN');
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      // Format sẵn các input tiền
+      document.querySelectorAll('.js-money').forEach(el => {
+        formatMoneyInput(el);
+        el.addEventListener('blur', () => formatMoneyInput(el));
+      });
+      calculateAllChannels();
+    });
   </script>
 </body>
 </html>
